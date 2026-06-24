@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#44357d">
+  <title>Murajaah Flash — Application complète</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="app">
+    <section class="screen active" id="homeScreen">
+      <header class="topbar">
+        <div class="brand">MURAJAAH<small>FLASH</small></div>
+        <button class="icon-btn" aria-label="Ouvrir les réglages" onclick="showScreen('settings')">
+          <svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.13.38.35.72.65 1 .3.28.68.42 1.1.4h.1v4h-.1c-.42-.02-.8.12-1.1.4-.3.28-.52.62-.65 1z"/></svg>
+        </button>
+      </header>
+      <div class="content">
+        <div class="greeting">
+          <div><p class="eyebrow" id="todayLabel">Aujourd’hui</p><h1>Salam 👋</h1></div>
+          <div class="streak" id="streakLabel">🔥 0 jour</div>
+        </div>
+
+        <article class="focus-card">
+          <div class="focus-head">
+            <div>
+              <p class="eyebrow">Ta session du jour</p>
+              <div class="due-number" id="dueCount">0</div>
+              <div class="due-label">passages à revoir</div>
+            </div>
+            <div class="time-pill" id="timeEstimate">≈ 0 min</div>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="dailyProgress"></div></div>
+          <button class="primary-btn" id="startReviewBtn" onclick="startReview()">Commencer la révision</button>
+        </article>
+
+        <div class="section-title"><h2>Accès rapide</h2></div>
+        <div class="quick-grid">
+          <button class="action-card" onclick="showScreen('add')">
+            <span class="quick-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="8.5"></circle>
+                <path d="M12 8.5v7"></path>
+                <path d="M8.5 12h7"></path>
+              </svg>
+            </span>
+            <strong>Ajouter</strong>
+            <span>Note un passage à revoir en quelques secondes.</span>
+          </button>
+          <button class="action-card" onclick="showScreen('library')">
+            <span class="quick-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 4.5h9.5a1.5 1.5 0 0 1 1.5 1.5v14H7a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2Z"></path>
+                <path d="M7 17h11"></path>
+                <path d="M8 4.5v12.5"></path>
+              </svg>
+            </span>
+            <strong>Mes passages</strong>
+            <span>Recherche, filtre et révise par sourate.</span>
+          </button>
+        </div>
+
+        <div class="section-title"><h2>Aujourd’hui</h2><button class="text-btn" onclick="showScreen('library')">Tout voir</button></div>
+        <div class="stats-grid">
+          <div class="stat-card red"><b id="reviewedToday">0</b><span>Révisés</span></div>
+          <div class="stat-card orange"><b id="fragileCount">0</b><span>Passages fragiles</span></div>
+          <div class="stat-card green"><b id="totalCount">0</b><span>Total</span></div>
+        </div>
+        <div class="insight" id="insightBox">
+          <div class="emoji">💡</div>
+          <p id="insightText">Ajoute ton premier passage pour lancer ta routine de murajaah ciblée.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="libraryScreen">
+      <header class="topbar">
+        <div class="brand">MURAJAAH<small>FLASH</small></div>
+        <button class="icon-btn" aria-label="Ajouter un passage" onclick="showScreen('add')">＋</button>
+      </header>
+      <div class="content">
+        <div class="page-title"><h1>Mes passages</h1><p id="librarySubtitle">Les passages que tu veux revoir avec régularité.</p></div>
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input id="searchInput" type="search" placeholder="Rechercher une sourate, un passage…" oninput="renderLibrary()">
+        </div>
+        <div class="filters">
+          <button class="filter-chip active" data-filter="all" onclick="setFilter('all', this)">Tous</button>
+          <button class="filter-chip" data-filter="due" onclick="setFilter('due', this)">À revoir</button>
+          <button class="filter-chip" data-filter="fragile" onclick="setFilter('fragile', this)">Passages fragiles</button>
+          <button class="filter-chip" data-filter="mastered" onclick="setFilter('mastered', this)">Maîtrisés</button>
+        </div>
+        <div class="card-list" id="cardList"></div>
+      </div>
+    </section>
+
+    <section class="screen" id="addScreen">
+      <header class="topbar">
+        <div class="brand">MURAJAAH<small>FLASH</small></div>
+        <button class="icon-btn" aria-label="Fermer" onclick="resetForm(); showScreen('home')">×</button>
+      </header>
+      <div class="content">
+        <div class="page-title"><p class="eyebrow">Nouveau passage</p><h1 id="formTitle">Ajoute un passage</h1><p>Renseigne les trois versets. L’audio est optionnel, mais il rend la révision plus naturelle.</p></div>
+        <form id="cardForm" onsubmit="saveCard(event)">
+          <input type="hidden" id="editId">
+          <div class="sequence-heading"><span>Informations</span></div>
+          <div class="form-card identity-card">
+            <div class="form-row">
+              <div class="field">
+                <label for="surah">Sourate <span>(facultatif)</span></label>
+                <input id="surah" maxlength="60" placeholder="Ex. Al-Baqara">
+              </div>
+              <div class="field">
+                <label for="ayah">Verset</label>
+                <input id="ayah" maxlength="12" inputmode="numeric" placeholder="Ex. 255">
+              </div>
+            </div>
+          </div>
+
+          <div class="sequence-heading"><span>Les trois versets</span></div>
+          <div class="verse-field">
+            <div class="field-heading">
+              <span class="step-number">1</span>
+              <div><strong>Verset avant *</strong><small>Le verset qui lance ta révision.</small></div>
+            </div>
+            <textarea class="arabic" dir="rtl" id="beforeVerse" required aria-label="Verset avant" placeholder="اكتب الآية التي تسبق موضع التوقف"></textarea>
+            <div class="inline-recorder">
+              <button type="button" class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙 Enregistrer</button>
+              <input type="file" id="audioCaptureFallback" accept="audio/*" capture="user" hidden onchange="importCapturedAudio(event)">
+              <button type="button" class="audio-action listen-btn" id="previewAudioBtn" aria-label="Réécouter l’audio avant d’enregistrer le passage" onclick="previewRecordedAudio()" disabled>▶ Écouter</button>
+              <button type="button" class="audio-action" id="deleteAudioBtn" aria-label="Supprimer l’audio" onclick="deleteRecordedAudio()" disabled>×</button>
+              <div class="record-status"><span class="record-dot" id="recordDot"></span><span id="recordStatus">Audio facultatif</span></div>
+            </div>
+          </div>
+
+          <div class="verse-field">
+            <div class="field-heading">
+              <span class="step-number">2</span>
+              <div><strong>Verset cible *</strong><small>Le verset ou passage qui te fait hésiter.</small></div>
+            </div>
+            <textarea class="arabic" dir="rtl" id="blockageVerse" required aria-label="Verset cible" placeholder="اكتب الآية التي تتعثر فيها"></textarea>
+          </div>
+
+          <div class="verse-field">
+            <div class="field-heading">
+              <span class="step-number">3</span>
+              <div><strong>Verset après *</strong><small>Le verset qui vient juste après.</small></div>
+            </div>
+            <textarea class="arabic" dir="rtl" id="afterVerse" required aria-label="Verset après" placeholder="اكتب الآية التي تلي موضع التوقف"></textarea>
+          </div>
+
+          <div class="sequence-heading"><span>En plus</span></div>
+          <div class="form-card detail-card">
+            <div class="field">
+              <label for="difficulty">Ce qui te gêne</label>
+              <select id="difficulty">
+                <option value="transition">Passage au verset suivant</option>
+                <option value="beginning">Début du verset</option>
+                <option value="similar">Je le confonds avec un autre</option>
+                <option value="forgotten">Je l’oublie souvent</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="note">Ma note <span>(facultatif)</span></label>
+              <input id="note" maxlength="140" placeholder="Ex. Je confonds avec le verset précédent">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="secondary-btn" onclick="resetForm(); showScreen('home')">Annuler</button>
+            <button type="submit" class="primary-btn" id="saveBtn">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="screen" id="settingsScreen">
+      <header class="topbar">
+        <div class="brand">MURAJAAH<small>FLASH</small></div>
+        <button class="icon-btn" aria-label="Retour" onclick="showScreen('home')">×</button>
+      </header>
+      <div class="content">
+        <div class="page-title"><h1>Progression</h1><p>Une vue simple de ta régularité et de la solidité de tes passages.</p></div>
+        <div class="settings-list">
+          <div class="setting-row">
+            <div><strong>Indice de confiance</strong><span>Calculé selon tes dernières réponses.</span></div>
+            <div class="confidence-ring" id="confidenceRing"><b id="confidenceValue">0%</b></div>
+          </div>
+          <div class="setting-row">
+            <div><strong>Répétition intelligente</strong><span>À revoir : aujourd’hui · Presque : demain · Acquis : espacé.</span></div>
+            <span style="font-size:24px">🧠</span>
+          </div>
+          <div class="setting-row">
+            <div><strong>Données locales</strong><span>Tes passages et audios restent sur cet appareil.</span></div>
+            <span style="font-size:24px">🔒</span>
+          </div>
+        </div>
+        <div class="section-title"><h2>Données</h2></div>
+        <button class="secondary-btn" onclick="exportData()">Exporter mes cartes</button>
+        <button class="danger-btn" style="margin-top:9px" onclick="askReset()">Effacer toutes les données</button>
+      </div>
+    </section>
+
+    <nav class="bottom-nav" id="bottomNav">
+      <button class="nav-btn active" data-screen="home" onclick="showScreen('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+        Accueil
+      </button>
+      <button class="nav-btn" data-screen="library" onclick="showScreen('library')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Passages
+      </button>
+      <button class="nav-btn" data-screen="add" onclick="resetForm(); showScreen('add')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+        Ajouter
+      </button>
+      <button class="nav-btn" data-screen="review" onclick="startReview()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m13 2-9 12h7l-1 8 9-12h-7l1-8z"/></svg>
+        Réviser
+      </button>
+    </nav>
+
+    <section class="review-screen" id="reviewScreen">
+      <div id="reviewSession">
+        <header class="review-header">
+          <button class="icon-btn" aria-label="Quitter la révision" onclick="exitReview()">×</button>
+          <div class="review-progress">
+            <div class="review-progress-top"><span>MURAJAAH DU JOUR</span><span id="reviewCounter">1 / 1</span></div>
+            <div class="progress-track"><div class="progress-fill" id="reviewProgress"></div></div>
+          </div>
+        </header>
+        <div class="review-main">
+          <div class="review-meta" id="reviewMeta">Passage personnel</div>
+          <button class="review-audio" id="reviewAudioBtn" onclick="playReviewAudio()">↻ Réécouter ma récitation</button>
+          <audio id="reviewAudio" preload="auto" playsinline></audio>
+          <article class="flashcard">
+            <div class="card-label" id="reviewStageLabel">Verset précédent</div>
+            <div class="verse-surface">
+              <div class="arabic" id="reviewVerse"></div>
+            </div>
+          </article>
+        </div>
+        <div class="review-controls">
+          <div class="review-instruction" id="reviewInstruction">Récite maintenant le verset qui vient juste après.</div>
+          <button class="primary-btn reveal-btn" id="revealBtn" onclick="advanceReviewStage()">Révéler le verset attendu</button>
+          <div class="rating-wrap" id="ratingWrap">
+            <p class="rating-title">As-tu enchaîné les deux versets sans hésiter ?</p>
+            <div class="ratings">
+              <button class="rating-btn yes" onclick="rateCard('yes')">Acquis<small>espacer</small></button>
+              <button class="rating-btn almost" onclick="rateCard('almost')">Presque<small>demain</small></button>
+              <button class="rating-btn no" onclick="rateCard('no')">À revoir<small>aujourd’hui</small></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="summary" id="reviewSummary">
+        <div class="summary-icon">✨</div>
+        <h2>Session terminée</h2>
+        <p>Chaque rappel renforce un peu plus tes transitions.</p>
+        <div class="summary-stats">
+          <div class="summary-stat"><b id="sumNo">0</b><span>À revoir</span></div>
+          <div class="summary-stat"><b id="sumAlmost">0</b><span>Presque</span></div>
+          <div class="summary-stat"><b id="sumYes">0</b><span>Solides</span></div>
+        </div>
+        <button class="primary-btn reveal-btn" onclick="exitReview()">Retour à l’accueil</button>
+      </div>
+    </section>
+
+    <div class="modal" id="confirmModal">
+      <div class="modal-card">
+        <h3 id="modalTitle">Confirmer</h3>
+        <p id="modalText">Cette action est irréversible.</p>
+        <div class="modal-actions">
+          <button class="secondary-btn" onclick="closeModal()">Annuler</button>
+          <button class="danger-btn" id="confirmAction">Confirmer</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="onboarding" id="onboarding">
+      <div class="onboarding-card">
+        <p class="eyebrow">Méthode Murajaah Flash</p>
+        <h2>Révise seulement les passages fragiles.</h2>
+        <div class="onboarding-steps">
+          <div><b>1</b><span>Ajoute le verset avant, le verset cible, puis le verset après.</span></div>
+          <div><b>2</b><span>Ajoute ton audio si tu veux recréer le départ de ta récitation.</span></div>
+          <div><b>3</b><span>Réponds honnêtement : Acquis, Presque, ou À revoir.</span></div>
+        </div>
+        <button class="primary-btn" onclick="completeOnboarding()">Commencer</button>
+        <button class="text-btn onboarding-skip" onclick="completeOnboarding()">J’ai compris</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </main>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
