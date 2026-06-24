@@ -6,7 +6,6 @@
 
     const STORAGE_KEY = "murajaah_flash_v2_cards";
     const ACTIVITY_KEY = "murajaah_flash_v2_activity";
-    const ONBOARDING_KEY = "murajaah_flash_v2_onboarding_done";
     const DAY = 86400000;
     let cards = load(STORAGE_KEY, []).map(card => ({
       ...card,
@@ -578,17 +577,15 @@
       toastTimer = setTimeout(() => element.classList.remove("show"), 2400);
     }
 
-    function maybeShowOnboarding() {
-      if (localStorage.getItem(ONBOARDING_KEY)) return;
-      const onboarding = document.getElementById("onboarding");
-      if (onboarding) onboarding.classList.add("active");
-    }
-
-    function completeOnboarding() {
-      localStorage.setItem(ONBOARDING_KEY, "1");
-      document.getElementById("onboarding")?.classList.remove("active");
+    function hideSplash() {
+      const splash = document.getElementById("splashScreen");
+      if (!splash) return;
+      setTimeout(() => {
+        splash.classList.add("hidden");
+        setTimeout(() => splash.remove(), 380);
+      }, 2000);
     }
 
     renderDashboard();
     renderLibrary();
-    maybeShowOnboarding();
+    hideSplash();
