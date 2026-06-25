@@ -101,30 +101,38 @@
         <button class="icon-btn" aria-label="Fermer" onclick="resetForm(); showScreen('home')">×</button>
       </header>
       <div class="content">
-        <div class="page-title"><p class="eyebrow">Nouveau passage</p><h1 id="formTitle">Ajoute un passage</h1><p>Renseigne les trois versets. L’audio est optionnel, mais il rend la révision plus naturelle.</p></div>
+        <div class="page-title"><p class="eyebrow">Nouveau passage</p><h1 id="formTitle">Ajoute un passage</h1><p>Choisis le verset cible, vérifie la séquence, puis ajoute l’audio si tu veux.</p></div>
         <form id="cardForm" onsubmit="saveCard(event)">
           <input type="hidden" id="editId">
-          <div class="sequence-heading"><span>Informations</span></div>
-          <div class="form-card identity-card">
-            <div class="form-row">
-              <div class="field">
-                <label for="surah">Sourate <span>(facultatif)</span></label>
-                <input id="surah" maxlength="60" placeholder="Ex. Al-Baqara">
-              </div>
-              <div class="field">
-                <label for="ayah">Verset</label>
-                <input id="ayah" maxlength="12" inputmode="numeric" placeholder="Ex. 255">
+          <input type="hidden" id="surah">
+          <input type="hidden" id="ayah">
+          <textarea id="beforeVerse" hidden></textarea>
+          <textarea id="blockageVerse" hidden></textarea>
+          <textarea id="afterVerse" hidden></textarea>
+
+          <div class="auto-fill-card">
+            <div class="auto-fill-copy">
+              <strong>Choisis ton passage</strong>
+              <span>Sélectionne la sourate et le verset cible. L’app prépare automatiquement le verset avant et le verset après.</span>
+            </div>
+            <button type="button" class="quran-picker-open" onclick="openQuranPicker()">
+              <span>Choisir dans le Quran</span>
+              <b id="quranPickerSummary">Sourate + verset cible</b>
+            </button>
+            <div class="auto-preview" id="autoPreview" hidden>
+              <div class="auto-preview-list" id="autoPreviewList"></div>
+              <div class="auto-preview-actions">
+                <button type="button" class="secondary-btn" onclick="clearAutoPreview()">Annuler</button>
+                <button type="button" class="primary-btn" onclick="applyAutoFill()">Utiliser ce passage</button>
               </div>
             </div>
           </div>
 
-          <div class="sequence-heading"><span>Les trois versets</span></div>
-          <div class="verse-field">
+          <div class="audio-card">
             <div class="field-heading">
-              <span class="step-number">1</span>
-              <div><strong>Verset avant *</strong><small>Le verset qui lance ta révision.</small></div>
+              <span class="step-number">🎙</span>
+              <div><strong>Audio du verset avant</strong><small>Optionnel : il se lance au début de la révision.</small></div>
             </div>
-            <textarea class="arabic" dir="rtl" id="beforeVerse" required aria-label="Verset avant" placeholder="اكتب الآية التي تسبق موضع التوقف"></textarea>
             <div class="inline-recorder">
               <button type="button" class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙 Enregistrer</button>
               <input type="file" id="audioCaptureFallback" accept="audio/*" capture="user" hidden onchange="importCapturedAudio(event)">
@@ -132,22 +140,6 @@
               <button type="button" class="audio-action" id="deleteAudioBtn" aria-label="Supprimer l’audio" onclick="deleteRecordedAudio()" disabled>×</button>
               <div class="record-status"><span class="record-dot" id="recordDot"></span><span id="recordStatus">Audio facultatif</span></div>
             </div>
-          </div>
-
-          <div class="verse-field">
-            <div class="field-heading">
-              <span class="step-number">2</span>
-              <div><strong>Verset cible *</strong><small>Le verset ou passage qui te fait hésiter.</small></div>
-            </div>
-            <textarea class="arabic" dir="rtl" id="blockageVerse" required aria-label="Verset cible" placeholder="اكتب الآية التي تتعثر فيها"></textarea>
-          </div>
-
-          <div class="verse-field">
-            <div class="field-heading">
-              <span class="step-number">3</span>
-              <div><strong>Verset après *</strong><small>Le verset qui vient juste après.</small></div>
-            </div>
-            <textarea class="arabic" dir="rtl" id="afterVerse" required aria-label="Verset après" placeholder="اكتب الآية التي تلي موضع التوقف"></textarea>
           </div>
 
           <div class="sequence-heading"><span>En plus</span></div>
@@ -221,22 +213,46 @@
     </nav>
 
     <section class="review-screen" id="reviewScreen">
+      <div class="review-intro" id="reviewIntro">
+        <header class="review-intro-header">
+          <h1>Mes révisions</h1>
+          <button class="review-close" aria-label="Quitter la révision" onclick="exitReview()">×</button>
+        </header>
+        <div class="review-intro-body">
+          <div class="review-alert-card">
+            <div class="review-alert-icon">↻</div>
+            <p><strong id="introDueCount">0</strong> passage<span id="introPlural">s</span> à revoir aujourd’hui.</p>
+            <small id="introEstimate">Une session courte suffit pour rester à jour.</small>
+          </div>
+          <button class="primary-btn intro-start-btn" onclick="beginReviewSession()">
+            Commencer la révision
+            <span id="introStartCount">0</span>
+          </button>
+        </div>
+      </div>
       <div id="reviewSession">
         <header class="review-header">
-          <button class="icon-btn" aria-label="Quitter la révision" onclick="exitReview()">×</button>
+          <div class="review-title">Murajaah</div>
+          <button class="review-close" aria-label="Quitter la révision" onclick="exitReview()">×</button>
+          <div class="review-prompt">
+            <span id="stepBefore">Verset avant</span>
+            <span id="stepTarget">Verset cible</span>
+            <span id="stepAfter">Verset de liaison</span>
+          </div>
           <div class="review-progress">
-            <div class="review-progress-top"><span>MURAJAAH DU JOUR</span><span id="reviewCounter">1 / 1</span></div>
             <div class="progress-track"><div class="progress-fill" id="reviewProgress"></div></div>
+            <div class="review-counter" id="reviewCounter">1 / 1</div>
           </div>
         </header>
         <div class="review-main">
-          <div class="review-meta" id="reviewMeta">Passage personnel</div>
-          <button class="review-audio" id="reviewAudioBtn" onclick="playReviewAudio()">↻ Réécouter ma récitation</button>
           <audio id="reviewAudio" preload="auto" playsinline></audio>
           <article class="flashcard">
-            <div class="card-label" id="reviewStageLabel">Verset précédent</div>
-            <div class="verse-surface">
-              <div class="arabic" id="reviewVerse"></div>
+            <button class="review-audio" id="reviewAudioBtn" onclick="playReviewAudio()" aria-label="Écouter ma récitation">▶</button>
+            <div class="verse-surface" id="reviewVerseList">
+              <div class="review-verse-item">
+                <div class="arabic" id="reviewVerse"></div>
+                <div class="review-meta" id="reviewMeta">Passage personnel</div>
+              </div>
             </div>
           </article>
         </div>
@@ -265,6 +281,23 @@
         <button class="primary-btn reveal-btn" onclick="exitReview()">Retour à l’accueil</button>
       </div>
     </section>
+
+    <div class="quran-picker-modal" id="quranPickerModal">
+      <div class="quran-picker-sheet">
+        <div class="quran-picker-top">
+          <div>
+            <span>Verset cible</span>
+            <strong id="quranPickerTitle">Choisir un verset</strong>
+          </div>
+          <button type="button" onclick="closeQuranPicker()" aria-label="Fermer">×</button>
+        </div>
+        <div class="quran-picker-columns">
+          <div class="quran-picker-column" id="quranSurahColumn" aria-label="Liste des sourates"></div>
+          <div class="quran-picker-column compact" id="quranAyahColumn" aria-label="Liste des versets"></div>
+        </div>
+        <button type="button" class="primary-btn quran-picker-confirm" onclick="confirmQuranPicker()">Utiliser ce verset</button>
+      </div>
+    </div>
 
     <div class="modal" id="confirmModal">
       <div class="modal-card">

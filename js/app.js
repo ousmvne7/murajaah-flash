@@ -26,6 +26,9 @@
     let recordingTimer = null;
     let recordingStartedAt = 0;
     let previewPlayer = null;
+    let quranData = null;
+    let pendingAutoFill = null;
+    let quranPickerState = { surahId: "2", ayah: 2 };
 
     function load(key, fallback) {
       try {
@@ -317,17 +320,240 @@
       toast("Audio supprimé.");
     }
 
+    function normalizeQuranKey(value = "") {
+      return String(value)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[\u0101\u00e2\u00e4]/g, "a")
+        .replace(/[\u012b\u00ee\u00ef]/g, "i")
+        .replace(/[\u016b\u00fb\u00fc]/g, "u")
+        .replace(/[^a-z0-9\u0600-\u06ff]+/g, " ")
+        .trim()
+        .replace(/\s+/g, " ");
+    }
+
+    async function loadQuranData() {
+      if (quranData) return quranData;
+      const response = await fetch("data/quran-uthmani.json");
+      if (!response.ok) throw new Error("Quran data unavailable");
+      quranData = await response.json();
+      return quranData;
+    }
+
+    function resolveSurah(data, value) {
+      const key = normalizeQuranKey(value);
+      const id = data.aliases[key] || (/^\d+$/.test(key) ? key : "");
+      return data.chapters[id] || null;
+    }
+
+    function updateQuranPickerTitle() {
+      if (!quranData) return;
+      const chapter = quranData.chapters[quranPickerState.surahId];
+      const title = document.getElementById("quranPickerTitle");
+      const summary = document.getElementById("quranPickerSummary");
+      const value = chapter ? `${chapter.name} — ${chapter.id}:${quranPickerState.ayah}` : "Choisir un verset";
+      if (title) title.textContent = value;
+      if (summary) summary.textContent = value;
+    }
+
+    function renderQuranPicker() {
+      if (!quranData) return;
+      const surahColumn = document.getElementById("quranSurahColumn");
+      const ayahColumn = document.getElementById("quranAyahColumn");
+      const chapter = quranData.chapters[quranPickerState.surahId];
+      surahColumn.innerHTML = "";
+      ayahColumn.innerHTML = "";
+
+      Object.values(quranData.chapters).forEach(item => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "quran-picker-option";
+        button.classList.toggle("active", String(item.id) === String(quranPickerState.surahId));
+        button.textContent = `${item.id} - ${item.name}`;
+        button.onclick = () => selectPickerSurah(String(item.id));
+        surahColumn.appendChild(button);
+      });
+
+      if (chapter) {
+        const safeAyah = Math.min(Math.max(2, quranPickerState.ayah), Math.max(2, chapter.versesCount - 1));
+        quranPickerState.ayah = safeAyah;
+        for (let i = 2; i < chapter.versesCount; i++) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "quran-picker-option";
+          button.classList.toggle("active", i === quranPickerState.ayah);
+          button.textContent = i;
+          button.onclick = () => selectPickerAyah(i);
+          ayahColumn.appendChild(button);
+        }
+      }
+      updateQuranPickerTitle();
+      requestAnimationFrame(() => {
+        surahColumn.querySelector(".active")?.scrollIntoView({ block: "center" });
+        ayahColumn.querySelector(".active")?.scrollIntoView({ block: "center" });
+      });
+    }
+
+    async function openQuranPicker() {
+      try {
+        await loadQuranData();
+        const currentSurah = resolveSurah(quranData, document.getElementById("surah").value.trim());
+        const currentAyah = Number.parseInt(document.getElementById("ayah").value.trim(), 10);
+        if (currentSurah) quranPickerState.surahId = String(currentSurah.id);
+        if (Number.isFinite(currentAyah)) quranPickerState.ayah = currentAyah;
+        renderQuranPicker();
+        document.getElementById("quranPickerModal").classList.add("active");
+      } catch (_) {
+        toast("Base Quran indisponible. Lance l’app depuis le serveur ou GitHub Pages.");
+      }
+    }
+
+    function closeQuranPicker() {
+      document.getElementById("quranPickerModal")?.classList.remove("active");
+    }
+
+    function selectPickerSurah(id) {
+      quranPickerState.surahId = id;
+      renderQuranPicker();
+    }
+
+    function selectPickerAyah(ayah) {
+      quranPickerState.ayah = ayah;
+      renderQuranPicker();
+    }
+
+    function confirmQuranPicker() {
+      if (!quranData) return;
+      const chapter = quranData.chapters[quranPickerState.surahId];
+      if (!chapter) return;
+      document.getElementById("surah").value = chapter.name;
+      document.getElementById("ayah").value = quranPickerState.ayah;
+      updateQuranPickerTitle();
+      closeQuranPicker();
+      previewAutoFill();
+    }
+
+    function renderAutoPreview(items) {
+      const preview = document.getElementById("autoPreview");
+      const list = document.getElementById("autoPreviewList");
+      list.innerHTML = "";
+      items.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "auto-preview-item";
+
+        const label = document.createElement("div");
+        label.className = "auto-preview-label";
+        label.innerHTML = `<span>${escapeHtml(item.label)}</span><span>${escapeHtml(item.ref)}</span>`;
+
+        const arabic = document.createElement("div");
+        arabic.className = "arabic";
+        arabic.dir = "rtl";
+        arabic.textContent = item.text;
+
+        row.append(label, arabic);
+        list.appendChild(row);
+      });
+      preview.hidden = false;
+    }
+
+    async function previewAutoFill() {
+      const surahValue = document.getElementById("surah").value.trim();
+      const ayahValue = document.getElementById("ayah").value.trim();
+      clearAutoPreview(false);
+
+      if (!surahValue || !ayahValue) {
+        toast("Ajoute la sourate et le verset cible.");
+        return;
+      }
+      if (!/^\d+$/.test(ayahValue)) {
+        toast("Le verset cible doit être un nombre.");
+        return;
+      }
+
+      try {
+        const data = await loadQuranData();
+        const chapter = resolveSurah(data, surahValue);
+        const targetAyah = Number.parseInt(ayahValue, 10);
+
+        if (!chapter) {
+          toast("Sourate non reconnue. Essaie le numéro, ex. 2.");
+          return;
+        }
+        if (targetAyah <= 1) {
+          toast("Impossible : il faut un verset avant le verset cible.");
+          return;
+        }
+        if (targetAyah >= chapter.versesCount) {
+          toast("Impossible : il faut un verset après le verset cible.");
+          return;
+        }
+
+        const before = chapter.verses[String(targetAyah - 1)];
+        const target = chapter.verses[String(targetAyah)];
+        const after = chapter.verses[String(targetAyah + 1)];
+        if (!before || !target || !after) {
+          toast("Les trois versets n’ont pas pu être trouvés.");
+          return;
+        }
+
+        pendingAutoFill = {
+          surah: chapter.name,
+          ayah: String(targetAyah),
+          beforeVerse: before,
+          blockageVerse: target,
+          afterVerse: after
+        };
+
+        renderAutoPreview([
+          { label: "Verset avant", ref: `${chapter.name} — ${targetAyah - 1}`, text: before },
+          { label: "Verset cible", ref: `${chapter.name} — ${targetAyah}`, text: target },
+          { label: "Verset après", ref: `${chapter.name} — ${targetAyah + 1}`, text: after }
+        ]);
+      } catch (_) {
+        toast("Base Quran indisponible. Lance l’app depuis le serveur ou GitHub Pages.");
+      }
+    }
+
+    function applyAutoFill() {
+      if (!pendingAutoFill) {
+        toast("Prévisualise d’abord les trois versets.");
+        return;
+      }
+      document.getElementById("surah").value = pendingAutoFill.surah;
+      document.getElementById("ayah").value = pendingAutoFill.ayah;
+      document.getElementById("beforeVerse").value = pendingAutoFill.beforeVerse;
+      document.getElementById("blockageVerse").value = pendingAutoFill.blockageVerse;
+      document.getElementById("afterVerse").value = pendingAutoFill.afterVerse;
+      toast("Champs remplis. Vérifie puis enregistre.");
+    }
+
+    function clearAutoPreview(clearPending = true) {
+      const preview = document.getElementById("autoPreview");
+      const list = document.getElementById("autoPreviewList");
+      if (preview) preview.hidden = true;
+      if (list) list.innerHTML = "";
+      if (clearPending) pendingAutoFill = null;
+    }
+
     function saveCard(event) {
       event.preventDefault();
       const editId = document.getElementById("editId").value;
       const existing = cards.find(card => card.id === editId);
+      const beforeVerse = document.getElementById("beforeVerse").value.trim();
+      const blockageVerse = document.getElementById("blockageVerse").value.trim();
+      const afterVerse = document.getElementById("afterVerse").value.trim();
+      if (!beforeVerse || !blockageVerse || !afterVerse) {
+        toast("Choisis puis valide un passage Quran avant d’enregistrer.");
+        return;
+      }
       const data = {
         id: editId || (Date.now().toString(36) + Math.random().toString(36).slice(2, 7)),
         surah: document.getElementById("surah").value.trim(),
         ayah: document.getElementById("ayah").value.trim(),
-        beforeVerse: document.getElementById("beforeVerse").value.trim(),
-        blockageVerse: document.getElementById("blockageVerse").value.trim(),
-        afterVerse: document.getElementById("afterVerse").value.trim(),
+        beforeVerse,
+        blockageVerse,
+        afterVerse,
         difficulty: document.getElementById("difficulty").value,
         note: document.getElementById("note").value.trim(),
         audioData: recordedAudio || "",
@@ -358,6 +584,19 @@
       document.getElementById("note").value = card.note || "";
       recordedAudio = card.audioData || "";
       updateRecorderUI(recordedAudio ? "ready" : "empty");
+      pendingAutoFill = {
+        surah: card.surah || "",
+        ayah: card.ayah || "",
+        beforeVerse: card.beforeVerse || card.prompt || "",
+        blockageVerse: card.blockageVerse || card.answer || "",
+        afterVerse: card.afterVerse || ""
+      };
+      updateQuranPickerTitle();
+      renderAutoPreview([
+        { label: "Verset avant", ref: verseReference(card, -1), text: pendingAutoFill.beforeVerse },
+        { label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse },
+        { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse }
+      ]);
       document.getElementById("formTitle").textContent = "Modifie ton passage";
       document.getElementById("saveBtn").textContent = "Enregistrer les modifications";
       showScreen("add");
@@ -371,6 +610,7 @@
       document.getElementById("editId").value = "";
       recordedAudio = "";
       updateRecorderUI("empty");
+      clearAutoPreview();
       document.getElementById("formTitle").textContent = "Ajoute un passage";
       document.getElementById("saveBtn").textContent = "Enregistrer";
     }
@@ -382,12 +622,26 @@
         if (!cards.length) showScreen("add");
         return;
       }
-      reviewIndex = 0;
-      sessionResults = { no: 0, almost: 0, yes: 0 };
-      document.getElementById("reviewSession").style.display = "flex";
+      const dueCount = reviewQueue.length;
+      const estimatedMinutes = Math.max(1, Math.ceil(dueCount * 0.45));
+      document.getElementById("introDueCount").textContent = dueCount;
+      document.getElementById("introStartCount").textContent = dueCount;
+      document.getElementById("introPlural").textContent = dueCount > 1 ? "s" : "";
+      document.getElementById("introEstimate").textContent = `≈ ${estimatedMinutes} min pour revoir tes passages fragiles.`;
+      document.getElementById("reviewIntro").classList.add("active");
+      document.getElementById("reviewSession").style.display = "none";
       document.getElementById("reviewSummary").classList.remove("active");
       document.getElementById("reviewScreen").classList.add("active");
       document.getElementById("bottomNav").style.display = "none";
+    }
+
+    function beginReviewSession() {
+      if (!reviewQueue.length) return startReview();
+      reviewIndex = 0;
+      sessionResults = { no: 0, almost: 0, yes: 0 };
+      document.getElementById("reviewIntro").classList.remove("active");
+      document.getElementById("reviewSession").style.display = "flex";
+      document.getElementById("reviewSummary").classList.remove("active");
       renderReviewCard();
     }
 
@@ -395,32 +649,32 @@
       const card = reviewQueue[reviewIndex];
       if (!card) return finishReview();
       document.getElementById("reviewCounter").textContent = `${reviewIndex + 1} / ${reviewQueue.length}`;
-      document.getElementById("reviewProgress").style.width = `${reviewIndex / reviewQueue.length * 100}%`;
-      document.getElementById("reviewMeta").textContent = [card.surah || "Passage personnel", card.ayah ? "verset " + card.ayah : ""].filter(Boolean).join(" · ");
+      document.getElementById("reviewProgress").style.width = `${(reviewIndex + 1) / reviewQueue.length * 100}%`;
       reviewStage = 0;
-      document.getElementById("reviewStageLabel").textContent = "Point de départ";
-      document.getElementById("reviewVerse").textContent = card.beforeVerse;
+      setReviewStep(0);
+      renderReviewVerses(card, 0);
       const reviewAudio = document.getElementById("reviewAudio");
       const reviewAudioBtn = document.getElementById("reviewAudioBtn");
       reviewAudio.pause();
       reviewAudio.currentTime = 0;
       reviewAudioBtn.classList.remove("playing");
-      reviewAudioBtn.textContent = "▶ Écouter ma récitation";
+      reviewAudioBtn.textContent = "▶";
       reviewAudioBtn.classList.toggle("visible", Boolean(card.audioData));
+      document.querySelector(".flashcard")?.classList.toggle("has-audio", Boolean(card.audioData));
       if (card.audioData) {
         reviewAudio.src = card.audioData;
         reviewAudio.load();
         reviewAudio.onplay = () => {
           reviewAudioBtn.classList.add("playing");
-          reviewAudioBtn.textContent = "🔊 Lecture en cours";
+          reviewAudioBtn.textContent = "🔊";
         };
         reviewAudio.onended = () => {
           reviewAudioBtn.classList.remove("playing");
-          reviewAudioBtn.textContent = "↻ Réécouter ma récitation";
+          reviewAudioBtn.textContent = "↻";
         };
         reviewAudio.onerror = () => {
           reviewAudioBtn.classList.remove("playing");
-          reviewAudioBtn.textContent = "Audio incompatible · réenregistrer";
+          reviewAudioBtn.textContent = "!";
         };
         playReviewAudio(true);
       } else {
@@ -429,9 +683,9 @@
       }
       document.getElementById("ratingWrap").classList.remove("visible");
       document.getElementById("reviewInstruction").style.display = "block";
-      document.getElementById("reviewInstruction").textContent = "Récite maintenant le verset qui vient juste après.";
+      document.getElementById("reviewInstruction").textContent = "Récite de mémoire le passage qui vient après.";
       document.getElementById("revealBtn").style.display = "block";
-      document.getElementById("revealBtn").textContent = "Révéler le verset attendu";
+      document.getElementById("revealBtn").textContent = "Révéler le passage";
     }
 
     function advanceReviewStage() {
@@ -441,18 +695,86 @@
       reviewAudio.pause();
       if (reviewStage === 0) {
         reviewStage = 1;
-        document.getElementById("reviewStageLabel").textContent = "Verset cible";
-        document.getElementById("reviewVerse").textContent = card.blockageVerse;
-        document.getElementById("reviewInstruction").textContent = "Prends un instant, puis poursuis avec le verset suivant.";
-        document.getElementById("revealBtn").textContent = "Révéler la continuation";
+        setReviewStep(1);
+        renderReviewVerses(card, 1);
+        document.getElementById("reviewInstruction").textContent = "Continue ensuite la récitation sans couper l’élan.";
+        document.getElementById("revealBtn").textContent = "Voir le verset après";
         return;
       }
       reviewStage = 2;
-      document.getElementById("reviewStageLabel").textContent = "Continuation";
-      document.getElementById("reviewVerse").textContent = card.afterVerse || "Verset suivant non renseigné";
+      setReviewStep(2);
+      renderReviewVerses(card, 2);
       document.getElementById("reviewInstruction").style.display = "none";
       document.getElementById("revealBtn").style.display = "none";
       document.getElementById("ratingWrap").classList.add("visible");
+    }
+
+    function verseReference(card, offset = 0) {
+      const surah = card.surah || "Passage personnel";
+      const rawAyah = String(card.ayah || "").trim();
+      if (!rawAyah) return surah;
+      if (/^\d+$/.test(rawAyah)) {
+        return `${surah} — ${Number.parseInt(rawAyah, 10) + offset}`;
+      }
+      return `${surah} — ${rawAyah}`;
+    }
+
+    function renderReviewVerses(card, stage) {
+      const list = document.getElementById("reviewVerseList");
+      list.innerHTML = "";
+      list.classList.toggle("single", stage === 0);
+
+      const pageHead = document.createElement("div");
+      pageHead.className = "review-page-head";
+      pageHead.innerHTML = `
+        <span>${escapeHtml(card.surah || "Passage personnel")}</span>
+        <span>${escapeHtml(card.ayah ? `Verset cible ${card.ayah}` : "Murajaah ciblée")}</span>
+      `;
+      list.appendChild(pageHead);
+
+      const verses = [
+        { label: "Verset avant", text: card.beforeVerse, ref: verseReference(card, -1) },
+        { label: "Verset cible", text: card.blockageVerse, ref: verseReference(card, 0) },
+        { label: "Verset de liaison", text: card.afterVerse || "Verset suivant non renseigné", ref: verseReference(card, 1) }
+      ];
+      const activeLength = String(verses[stage]?.text || "").length;
+      const visibleLength = verses.slice(0, stage + 1).reduce((sum, verse) => sum + String(verse.text || "").length, 0);
+      list.classList.toggle("has-long-active", activeLength > 115);
+      list.classList.toggle("has-very-long-active", activeLength > 190);
+      list.classList.toggle("compact-context", stage > 0 && (activeLength > 90 || visibleLength > 170));
+
+      verses.forEach((verse, index) => {
+        const length = String(verse.text || "").length;
+        const item = document.createElement("div");
+        item.className = "review-verse-item mushaf-line";
+        if (index === stage) item.classList.add("active");
+        if (index < stage) item.classList.add("context");
+        if (index > stage) item.classList.add("masked");
+        if (length > 115) item.classList.add("long");
+        if (length > 190) item.classList.add("very-long");
+
+        const arabic = document.createElement("div");
+        arabic.className = "arabic";
+        arabic.dir = "rtl";
+        arabic.textContent = index <= stage ? verse.text : "";
+
+        const placeholder = document.createElement("div");
+        placeholder.className = "mask-lines";
+        placeholder.innerHTML = "<span></span><span></span><span></span>";
+
+        const meta = document.createElement("div");
+        meta.className = "review-meta";
+        meta.textContent = index <= stage ? verse.ref : verse.label;
+
+        item.append(arabic, placeholder, meta);
+        list.appendChild(item);
+      });
+    }
+
+    function setReviewStep(step) {
+      ["stepBefore", "stepTarget", "stepAfter"].forEach((id, index) => {
+        document.getElementById(id)?.classList.toggle("active", index === step);
+      });
     }
 
     function playReviewAudio(automatic = false) {
@@ -462,7 +784,7 @@
       audio.play().catch(() => {
         const button = document.getElementById("reviewAudioBtn");
         button.classList.remove("playing");
-        button.textContent = "▶ Toucher pour écouter";
+        button.textContent = "▶";
         if (!automatic) toast("Impossible de lire cet audio. Essaie de le réenregistrer.");
       });
     }
@@ -500,6 +822,7 @@
 
     function finishReview() {
       document.getElementById("reviewSession").style.display = "none";
+      document.getElementById("reviewIntro").classList.remove("active");
       document.getElementById("reviewSummary").classList.add("active");
       document.getElementById("sumNo").textContent = sessionResults.no;
       document.getElementById("sumAlmost").textContent = sessionResults.almost;
@@ -511,6 +834,7 @@
       audio.pause();
       audio.currentTime = 0;
       document.getElementById("reviewScreen").classList.remove("active");
+      document.getElementById("reviewIntro").classList.remove("active");
       document.getElementById("reviewSummary").classList.remove("active");
       document.getElementById("reviewSession").style.display = "flex";
       document.getElementById("bottomNav").style.display = "grid";
