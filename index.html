@@ -272,13 +272,17 @@
       <div class="summary" id="reviewSummary">
         <div class="summary-icon">✨</div>
         <h2>Session terminée</h2>
-        <p>Chaque rappel renforce un peu plus tes transitions.</p>
+        <p id="summaryLead">Chaque rappel renforce un peu plus tes transitions.</p>
         <div class="summary-stats">
           <div class="summary-stat"><b id="sumNo">0</b><span>À revoir</span></div>
           <div class="summary-stat"><b id="sumAlmost">0</b><span>Presque</span></div>
           <div class="summary-stat"><b id="sumYes">0</b><span>Solides</span></div>
         </div>
-        <button class="primary-btn reveal-btn" onclick="exitReview()">Retour à l’accueil</button>
+        <div class="summary-next" id="summaryNext"></div>
+        <div class="summary-actions">
+          <button class="secondary-btn retry-btn" id="retryNowBtn" onclick="reviewFailedNow()">Revoir maintenant <span id="retryCount">0</span></button>
+          <button class="primary-btn reveal-btn" onclick="exitReview()">Retour à l’accueil</button>
+        </div>
       </div>
     </section>
 

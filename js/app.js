@@ -19,6 +19,8 @@
     let reviewIndex = 0;
     let reviewStage = 0;
     let sessionResults = { no: 0, almost: 0, yes: 0 };
+    let sessionRetryIds = [];
+    let sessionSchedule = [];
     let recordedAudio = "";
     let mediaRecorder = null;
     let recordingStream = null;
@@ -146,6 +148,16 @@
       if (next <= today + DAY - 1) return "Aujourd’hui";
       if (next < tomorrow + DAY) return "Demain";
       return "Prochaine : " + new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(new Date(next));
+    }
+
+    function scheduleLabelFromTime(next) {
+      const today = startOfToday();
+      const tomorrow = today + DAY;
+      if (next <= today + DAY - 1) return "à revoir aujourd’hui";
+      if (next < tomorrow + DAY) return "revient demain";
+      const diffDays = Math.max(2, Math.round((next - today) / DAY));
+      if (diffDays <= 7) return `revient dans ${diffDays} jours`;
+      return "revient le " + new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(new Date(next));
     }
 
     function renderLibrary() {
@@ -335,10 +347,25 @@
 
     async function loadQuranData() {
       if (quranData) return quranData;
-      const response = await fetch("data/quran-uthmani.json");
+      let response = await fetch("data/quran-tajweed.json");
+      if (!response.ok) response = await fetch("data/quran-uthmani.json");
       if (!response.ok) throw new Error("Quran data unavailable");
       quranData = await response.json();
       return quranData;
+    }
+
+    function cleanTajweedHtml(value = "") {
+      return String(value)
+        .replace(/<tajweed class=([a-z_]+)>/g, '<tajweed class="$1">')
+        .replace(/<span class=end>/g, '<span class="end">')
+        .replace(/<(?!\/?(tajweed|span)\b)[^>]*>/g, "")
+        .replace(/<span(?! class="end")[^>]*>/g, "<span>")
+        .replace(/\son\w+="[^"]*"/g, "");
+    }
+
+    function setArabicContent(node, text = "", html = "") {
+      if (html) node.innerHTML = cleanTajweedHtml(html);
+      else node.textContent = text;
     }
 
     function resolveSurah(data, value) {
@@ -449,7 +476,7 @@
         const arabic = document.createElement("div");
         arabic.className = "arabic";
         arabic.dir = "rtl";
-        arabic.textContent = item.text;
+        setArabicContent(arabic, item.text, item.html);
 
         row.append(label, arabic);
         list.appendChild(row);
@@ -492,6 +519,9 @@
         const before = chapter.verses[String(targetAyah - 1)];
         const target = chapter.verses[String(targetAyah)];
         const after = chapter.verses[String(targetAyah + 1)];
+        const beforeHtml = chapter.tajweed?.[String(targetAyah - 1)] || "";
+        const targetHtml = chapter.tajweed?.[String(targetAyah)] || "";
+        const afterHtml = chapter.tajweed?.[String(targetAyah + 1)] || "";
         if (!before || !target || !after) {
           toast("Les trois versets n’ont pas pu être trouvés.");
           return;
@@ -502,13 +532,16 @@
           ayah: String(targetAyah),
           beforeVerse: before,
           blockageVerse: target,
-          afterVerse: after
+          afterVerse: after,
+          beforeVerseHtml: beforeHtml,
+          blockageVerseHtml: targetHtml,
+          afterVerseHtml: afterHtml
         };
 
         renderAutoPreview([
-          { label: "Verset avant", ref: `${chapter.name} — ${targetAyah - 1}`, text: before },
-          { label: "Verset cible", ref: `${chapter.name} — ${targetAyah}`, text: target },
-          { label: "Verset après", ref: `${chapter.name} — ${targetAyah + 1}`, text: after }
+          { label: "Verset avant", ref: `${chapter.name} — ${targetAyah - 1}`, text: before, html: beforeHtml },
+          { label: "Verset cible", ref: `${chapter.name} — ${targetAyah}`, text: target, html: targetHtml },
+          { label: "Verset après", ref: `${chapter.name} — ${targetAyah + 1}`, text: after, html: afterHtml }
         ]);
       } catch (_) {
         toast("Base Quran indisponible. Lance l’app depuis le serveur ou GitHub Pages.");
@@ -554,6 +587,9 @@
         beforeVerse,
         blockageVerse,
         afterVerse,
+        beforeVerseHtml: pendingAutoFill?.beforeVerseHtml || existing?.beforeVerseHtml || "",
+        blockageVerseHtml: pendingAutoFill?.blockageVerseHtml || existing?.blockageVerseHtml || "",
+        afterVerseHtml: pendingAutoFill?.afterVerseHtml || existing?.afterVerseHtml || "",
         difficulty: document.getElementById("difficulty").value,
         note: document.getElementById("note").value.trim(),
         audioData: recordedAudio || "",
@@ -589,13 +625,16 @@
         ayah: card.ayah || "",
         beforeVerse: card.beforeVerse || card.prompt || "",
         blockageVerse: card.blockageVerse || card.answer || "",
-        afterVerse: card.afterVerse || ""
+        afterVerse: card.afterVerse || "",
+        beforeVerseHtml: card.beforeVerseHtml || "",
+        blockageVerseHtml: card.blockageVerseHtml || "",
+        afterVerseHtml: card.afterVerseHtml || ""
       };
       updateQuranPickerTitle();
       renderAutoPreview([
-        { label: "Verset avant", ref: verseReference(card, -1), text: pendingAutoFill.beforeVerse },
-        { label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse },
-        { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse }
+        { label: "Verset avant", ref: verseReference(card, -1), text: pendingAutoFill.beforeVerse, html: pendingAutoFill.beforeVerseHtml },
+        { label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse, html: pendingAutoFill.blockageVerseHtml },
+        { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse, html: pendingAutoFill.afterVerseHtml }
       ]);
       document.getElementById("formTitle").textContent = "Modifie ton passage";
       document.getElementById("saveBtn").textContent = "Enregistrer les modifications";
@@ -639,6 +678,8 @@
       if (!reviewQueue.length) return startReview();
       reviewIndex = 0;
       sessionResults = { no: 0, almost: 0, yes: 0 };
+      sessionRetryIds = [];
+      sessionSchedule = [];
       document.getElementById("reviewIntro").classList.remove("active");
       document.getElementById("reviewSession").style.display = "flex";
       document.getElementById("reviewSummary").classList.remove("active");
@@ -733,15 +774,16 @@
       list.appendChild(pageHead);
 
       const verses = [
-        { label: "Verset avant", text: card.beforeVerse, ref: verseReference(card, -1) },
-        { label: "Verset cible", text: card.blockageVerse, ref: verseReference(card, 0) },
-        { label: "Verset de liaison", text: card.afterVerse || "Verset suivant non renseigné", ref: verseReference(card, 1) }
+        { label: "Verset avant", text: card.beforeVerse, html: card.beforeVerseHtml, ref: verseReference(card, -1) },
+        { label: "Verset cible", text: card.blockageVerse, html: card.blockageVerseHtml, ref: verseReference(card, 0) },
+        { label: "Verset de liaison", text: card.afterVerse || "Verset suivant non renseigné", html: card.afterVerseHtml, ref: verseReference(card, 1) }
       ];
       const activeLength = String(verses[stage]?.text || "").length;
       const visibleLength = verses.slice(0, stage + 1).reduce((sum, verse) => sum + String(verse.text || "").length, 0);
       list.classList.toggle("has-long-active", activeLength > 115);
       list.classList.toggle("has-very-long-active", activeLength > 190);
       list.classList.toggle("compact-context", stage > 0 && (activeLength > 90 || visibleLength > 170));
+      list.classList.toggle("focus-only", stage < 2);
 
       verses.forEach((verse, index) => {
         const length = String(verse.text || "").length;
@@ -756,7 +798,7 @@
         const arabic = document.createElement("div");
         arabic.className = "arabic";
         arabic.dir = "rtl";
-        arabic.textContent = index <= stage ? verse.text : "";
+        if (index <= stage) setArabicContent(arabic, verse.text, verse.html);
 
         const placeholder = document.createElement("div");
         placeholder.className = "mask-lines";
@@ -769,6 +811,15 @@
         item.append(arabic, placeholder, meta);
         list.appendChild(item);
       });
+
+      if (stage < 2) {
+        const hint = document.createElement("div");
+        hint.className = "review-focus-hint";
+        hint.innerHTML = stage === 0
+          ? "<span>À retrouver</span><b>Verset cible + liaison</b>"
+          : "<span>Continue</span><b>Verset de liaison</b>";
+        list.appendChild(hint);
+      }
     }
 
     function setReviewStep(step) {
@@ -810,6 +861,14 @@
       card.nextReview = startOfToday() + days * DAY;
       card.lastReview = Date.now();
       card.reviews = (card.reviews || 0) + 1;
+      if (rating !== "yes" && !sessionRetryIds.includes(card.id)) sessionRetryIds.push(card.id);
+      sessionSchedule.push({
+        id: card.id,
+        rating,
+        title: `${card.surah || "Passage"}${card.ayah ? " — " + card.ayah : ""}`,
+        nextReview: card.nextReview,
+        label: scheduleLabelFromTime(card.nextReview)
+      });
       sessionResults[rating]++;
       const key = todayKey();
       activity[key] = activity[key] || { reviewed: 0 };
@@ -827,6 +886,42 @@
       document.getElementById("sumNo").textContent = sessionResults.no;
       document.getElementById("sumAlmost").textContent = sessionResults.almost;
       document.getElementById("sumYes").textContent = sessionResults.yes;
+      const retryTotal = sessionRetryIds.length;
+      const total = sessionResults.no + sessionResults.almost + sessionResults.yes;
+      const lead = retryTotal
+        ? `${retryTotal} passage${retryTotal > 1 ? "s" : ""} mérite${retryTotal > 1 ? "nt" : ""} un rappel immédiat.`
+        : `Belle session : ${total} passage${total > 1 ? "s" : ""} travaillé${total > 1 ? "s" : ""}.`;
+      document.getElementById("summaryLead").textContent = lead;
+      document.getElementById("retryCount").textContent = retryTotal;
+      document.getElementById("retryNowBtn").style.display = retryTotal ? "flex" : "none";
+
+      const next = document.getElementById("summaryNext");
+      next.innerHTML = "";
+      const items = sessionSchedule.slice(-4);
+      items.forEach(item => {
+        const row = document.createElement("div");
+        row.className = `summary-next-row ${item.rating}`;
+        row.innerHTML = `<span>${escapeHtml(item.title)}</span><b>${escapeHtml(item.label)}</b>`;
+        next.appendChild(row);
+      });
+    }
+
+    function reviewFailedNow() {
+      const retryCards = sessionRetryIds
+        .map(id => cards.find(card => card.id === id && !card.archived))
+        .filter(Boolean);
+      if (!retryCards.length) {
+        toast("Aucun passage à revoir maintenant.");
+        return;
+      }
+      reviewQueue = retryCards;
+      reviewIndex = 0;
+      sessionResults = { no: 0, almost: 0, yes: 0 };
+      sessionRetryIds = [];
+      sessionSchedule = [];
+      document.getElementById("reviewSummary").classList.remove("active");
+      document.getElementById("reviewSession").style.display = "flex";
+      renderReviewCard();
     }
 
     function exitReview() {
