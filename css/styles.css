@@ -1109,39 +1109,6 @@
       color: #242424;
       letter-spacing: 0;
     }
-    .arabic tajweed { font: inherit; }
-    .arabic tajweed.ham_wasl,
-    .arabic tajweed.laam_shamsiyah,
-    .arabic tajweed.slnt { color: rgba(36,36,36,.34); }
-    .arabic tajweed.madda_normal,
-    .arabic tajweed.madda_permissible,
-    .arabic tajweed.madda_necessary,
-    .arabic tajweed.madda_obligatory { color: #2b84a6; }
-    .arabic tajweed.ghunnah,
-    .arabic tajweed.idgham_ghunnah,
-    .arabic tajweed.idgham_shafawi,
-    .arabic tajweed.iqlab { color: #3aa86e; }
-    .arabic tajweed.ikhafa,
-    .arabic tajweed.ikhafa_shafawi { color: #d18428; }
-    .arabic tajweed.qalaqah { color: #7d58b5; }
-    .arabic tajweed.idgham_wo_ghunnah,
-    .arabic tajweed.idgham_mutajanisayn,
-    .arabic tajweed.idgham_mutaqaribayn { color: #bd4f71; }
-    .arabic .end {
-      display: inline-grid;
-      place-items: center;
-      min-width: 1.55em;
-      height: 1.55em;
-      margin: 0 .18em;
-      border-radius: 50%;
-      border: 1px solid rgba(68,53,125,.26);
-      color: var(--navy);
-      font-size: .52em;
-      font-weight: 900;
-      line-height: 1;
-      vertical-align: middle;
-      background: rgba(255,255,255,.82);
-    }
     .mushaf-line.long .arabic {
       font-size: clamp(26px, 7.6vw, 36px);
       line-height: 1.72;

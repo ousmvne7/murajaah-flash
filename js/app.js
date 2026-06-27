@@ -347,25 +347,10 @@
 
     async function loadQuranData() {
       if (quranData) return quranData;
-      let response = await fetch("data/quran-tajweed.json");
-      if (!response.ok) response = await fetch("data/quran-uthmani.json");
+      const response = await fetch("data/quran-uthmani.json");
       if (!response.ok) throw new Error("Quran data unavailable");
       quranData = await response.json();
       return quranData;
-    }
-
-    function cleanTajweedHtml(value = "") {
-      return String(value)
-        .replace(/<tajweed class=([a-z_]+)>/g, '<tajweed class="$1">')
-        .replace(/<span class=end>/g, '<span class="end">')
-        .replace(/<(?!\/?(tajweed|span)\b)[^>]*>/g, "")
-        .replace(/<span(?! class="end")[^>]*>/g, "<span>")
-        .replace(/\son\w+="[^"]*"/g, "");
-    }
-
-    function setArabicContent(node, text = "", html = "") {
-      if (html) node.innerHTML = cleanTajweedHtml(html);
-      else node.textContent = text;
     }
 
     function resolveSurah(data, value) {
@@ -476,7 +461,7 @@
         const arabic = document.createElement("div");
         arabic.className = "arabic";
         arabic.dir = "rtl";
-        setArabicContent(arabic, item.text, item.html);
+        arabic.textContent = item.text;
 
         row.append(label, arabic);
         list.appendChild(row);
@@ -519,9 +504,6 @@
         const before = chapter.verses[String(targetAyah - 1)];
         const target = chapter.verses[String(targetAyah)];
         const after = chapter.verses[String(targetAyah + 1)];
-        const beforeHtml = chapter.tajweed?.[String(targetAyah - 1)] || "";
-        const targetHtml = chapter.tajweed?.[String(targetAyah)] || "";
-        const afterHtml = chapter.tajweed?.[String(targetAyah + 1)] || "";
         if (!before || !target || !after) {
           toast("Les trois versets n’ont pas pu être trouvés.");
           return;
@@ -532,16 +514,13 @@
           ayah: String(targetAyah),
           beforeVerse: before,
           blockageVerse: target,
-          afterVerse: after,
-          beforeVerseHtml: beforeHtml,
-          blockageVerseHtml: targetHtml,
-          afterVerseHtml: afterHtml
+          afterVerse: after
         };
 
         renderAutoPreview([
-          { label: "Verset avant", ref: `${chapter.name} — ${targetAyah - 1}`, text: before, html: beforeHtml },
-          { label: "Verset cible", ref: `${chapter.name} — ${targetAyah}`, text: target, html: targetHtml },
-          { label: "Verset après", ref: `${chapter.name} — ${targetAyah + 1}`, text: after, html: afterHtml }
+          { label: "Verset avant", ref: `${chapter.name} — ${targetAyah - 1}`, text: before },
+          { label: "Verset cible", ref: `${chapter.name} — ${targetAyah}`, text: target },
+          { label: "Verset après", ref: `${chapter.name} — ${targetAyah + 1}`, text: after }
         ]);
       } catch (_) {
         toast("Base Quran indisponible. Lance l’app depuis le serveur ou GitHub Pages.");
@@ -587,9 +566,6 @@
         beforeVerse,
         blockageVerse,
         afterVerse,
-        beforeVerseHtml: pendingAutoFill?.beforeVerseHtml || existing?.beforeVerseHtml || "",
-        blockageVerseHtml: pendingAutoFill?.blockageVerseHtml || existing?.blockageVerseHtml || "",
-        afterVerseHtml: pendingAutoFill?.afterVerseHtml || existing?.afterVerseHtml || "",
         difficulty: document.getElementById("difficulty").value,
         note: document.getElementById("note").value.trim(),
         audioData: recordedAudio || "",
@@ -625,16 +601,13 @@
         ayah: card.ayah || "",
         beforeVerse: card.beforeVerse || card.prompt || "",
         blockageVerse: card.blockageVerse || card.answer || "",
-        afterVerse: card.afterVerse || "",
-        beforeVerseHtml: card.beforeVerseHtml || "",
-        blockageVerseHtml: card.blockageVerseHtml || "",
-        afterVerseHtml: card.afterVerseHtml || ""
+        afterVerse: card.afterVerse || ""
       };
       updateQuranPickerTitle();
       renderAutoPreview([
-        { label: "Verset avant", ref: verseReference(card, -1), text: pendingAutoFill.beforeVerse, html: pendingAutoFill.beforeVerseHtml },
-        { label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse, html: pendingAutoFill.blockageVerseHtml },
-        { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse, html: pendingAutoFill.afterVerseHtml }
+        { label: "Verset avant", ref: verseReference(card, -1), text: pendingAutoFill.beforeVerse },
+        { label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse },
+        { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse }
       ]);
       document.getElementById("formTitle").textContent = "Modifie ton passage";
       document.getElementById("saveBtn").textContent = "Enregistrer les modifications";
@@ -774,9 +747,9 @@
       list.appendChild(pageHead);
 
       const verses = [
-        { label: "Verset avant", text: card.beforeVerse, html: card.beforeVerseHtml, ref: verseReference(card, -1) },
-        { label: "Verset cible", text: card.blockageVerse, html: card.blockageVerseHtml, ref: verseReference(card, 0) },
-        { label: "Verset de liaison", text: card.afterVerse || "Verset suivant non renseigné", html: card.afterVerseHtml, ref: verseReference(card, 1) }
+        { label: "Verset avant", text: card.beforeVerse, ref: verseReference(card, -1) },
+        { label: "Verset cible", text: card.blockageVerse, ref: verseReference(card, 0) },
+        { label: "Verset de liaison", text: card.afterVerse || "Verset suivant non renseigné", ref: verseReference(card, 1) }
       ];
       const activeLength = String(verses[stage]?.text || "").length;
       const visibleLength = verses.slice(0, stage + 1).reduce((sum, verse) => sum + String(verse.text || "").length, 0);
@@ -798,7 +771,7 @@
         const arabic = document.createElement("div");
         arabic.className = "arabic";
         arabic.dir = "rtl";
-        if (index <= stage) setArabicContent(arabic, verse.text, verse.html);
+        if (index <= stage) arabic.textContent = verse.text;
 
         const placeholder = document.createElement("div");
         placeholder.className = "mask-lines";
