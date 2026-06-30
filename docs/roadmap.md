@@ -13,6 +13,7 @@
 - Fin de session plus claire
 - Meilleur résumé des résultats
 - Indication de la prochaine révision
+- Affiner la difficulté automatique avec plus de données utilisateur
 - Bouton “revoir maintenant” mieux intégré
 - Meilleure gestion des longs versets
 

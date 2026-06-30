@@ -18,18 +18,21 @@
       </header>
       <div class="content">
         <div class="greeting">
-          <div><p class="eyebrow" id="todayLabel">Aujourd’hui</p><h1>Salam 👋</h1></div>
-          <div class="streak" id="streakLabel">🔥 0 jour</div>
+          <div><h1>Assalamu alaykoum 👋</h1><p id="todayLabel">Aujourd’hui</p></div>
+          <div class="streak" id="streakLabel">0 jour</div>
         </div>
 
         <article class="focus-card">
           <div class="focus-head">
             <div>
               <p class="eyebrow">Ta session du jour</p>
-              <div class="due-number" id="dueCount">0</div>
-              <div class="due-label">passages à revoir</div>
+              <div class="session-main-line"><strong id="dueCount">0</strong><span>passages à revoir</span></div>
             </div>
             <div class="time-pill" id="timeEstimate">≈ 0 min</div>
+          </div>
+          <div class="session-progress-meta">
+            <span id="sessionRangeLabel">— 0 révision</span>
+            <b id="sessionReviewedLabel">0 / 0 révisés</b>
           </div>
           <div class="progress-track"><div class="progress-fill" id="dailyProgress"></div></div>
           <button class="primary-btn" id="startReviewBtn" onclick="startReview()">Commencer la révision</button>
@@ -64,12 +67,8 @@
         <div class="section-title"><h2>Aujourd’hui</h2><button class="text-btn" onclick="showScreen('library')">Tout voir</button></div>
         <div class="stats-grid">
           <div class="stat-card red"><b id="reviewedToday">0</b><span>Révisés</span></div>
-          <div class="stat-card orange"><b id="fragileCount">0</b><span>Passages fragiles</span></div>
+          <div class="stat-card orange"><b id="fragileCount">0</b><span>Fragiles</span></div>
           <div class="stat-card green"><b id="totalCount">0</b><span>Total</span></div>
-        </div>
-        <div class="insight" id="insightBox">
-          <div class="emoji">💡</div>
-          <p id="insightText">Ajoute ton premier passage pour lancer ta routine de murajaah ciblée.</p>
         </div>
       </div>
     </section>
@@ -167,13 +166,53 @@
       </div>
     </section>
 
+    <section class="screen" id="progressScreen">
+      <header class="topbar">
+        <div class="brand">MURAJAAH<small>FLASH</small></div>
+        <button class="icon-btn" aria-label="Ouvrir les réglages" onclick="showScreen('settings')">
+          <svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.13.38.35.72.65 1 .3.28.68.42 1.1.4h.1v4h-.1c-.42-.02-.8.12-1.1.4-.3.28-.52.62-.65 1z"/></svg>
+        </button>
+      </header>
+      <div class="content">
+        <div class="page-title"><h1>Progression</h1><p>Ta régularité, ton niveau de maîtrise et les passages à renforcer.</p></div>
+
+        <article class="progress-hero">
+          <div class="progress-hero-top">
+            <span>Série actuelle</span>
+            <b id="progressStreakPill">0 jour</b>
+          </div>
+          <strong id="progressStreakValue">0 jours</strong>
+          <small id="progressBestStreak">Meilleur record : 0 jour</small>
+        </article>
+
+        <div class="progress-summary-grid">
+          <div class="progress-mini"><b id="progressTotalPassages">0</b><span>Passages</span></div>
+          <div class="progress-mini"><b id="progressMasteryRate">0%</b><span>Maîtrise</span></div>
+          <div class="progress-mini"><b id="progressTotalReviews">0</b><span>Révisions</span></div>
+        </div>
+
+        <article class="progress-panel">
+          <div class="progress-panel-head"><h2>Révisions cette semaine</h2><span id="progressWeekTotal">0 revues</span></div>
+          <div class="week-bars" id="weekBars"></div>
+        </article>
+
+        <article class="progress-panel">
+          <div class="progress-panel-head"><h2>Répartition par niveau</h2><span id="progressLevelTotal">0 passages</span></div>
+          <div class="level-layout">
+            <div class="level-donut" id="levelDonut"></div>
+            <div class="level-legend" id="levelLegend"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <section class="screen" id="settingsScreen">
       <header class="topbar">
         <div class="brand">MURAJAAH<small>FLASH</small></div>
-        <button class="icon-btn" aria-label="Retour" onclick="showScreen('home')">×</button>
+        <button class="icon-btn" aria-label="Retour" onclick="showScreen('progress')">×</button>
       </header>
       <div class="content">
-        <div class="page-title"><h1>Progression</h1><p>Une vue simple de ta régularité et de la solidité de tes passages.</p></div>
+        <div class="page-title"><h1>Réglages</h1><p>Gère tes données locales et tes préférences de révision.</p></div>
         <div class="settings-list">
           <div class="setting-row">
             <div><strong>Indice de confiance</strong><span>Calculé selon tes dernières réponses.</span></div>
@@ -210,6 +249,10 @@
       <button class="nav-btn" data-screen="review" onclick="startReview()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m13 2-9 12h7l-1 8 9-12h-7l1-8z"/></svg>
         Réviser
+      </button>
+      <button class="nav-btn" data-screen="progress" onclick="showScreen('progress')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5"/><path d="M4 19h16"/><rect x="7" y="11" width="3" height="5" rx="1"/><rect x="12" y="8" width="3" height="8" rx="1"/><rect x="17" y="4" width="3" height="12" rx="1"/></svg>
+        Progression
       </button>
     </nav>
 

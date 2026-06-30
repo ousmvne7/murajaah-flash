@@ -78,6 +78,16 @@
       return activity[todayKey()]?.reviewed || 0;
     }
 
+    function dashboardSessionStats() {
+      const remaining = dueCards().length;
+      const reviewed = reviewedTodayCount();
+      const total = reviewed + remaining;
+      const progress = total ? Math.round((reviewed / total) * 100) : 0;
+      const estimate = remaining ? Math.max(1, Math.ceil(remaining * .35)) : 0;
+
+      return { remaining, reviewed, total, progress, estimate };
+    }
+
     function confidence() {
       if (!cards.length) return 0;
       const total = cards.reduce((sum, card) => sum + (card.strength || 0), 0);
@@ -104,43 +114,167 @@
       document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.screen === name));
       if (name === "home") renderDashboard();
       if (name === "library") renderLibrary();
+      if (name === "progress") renderProgress();
       if (name === "settings") renderSettings();
       window.scrollTo(0, 0);
     }
 
     function renderDashboard() {
-      const due = dueCards().length;
-      const reviewed = reviewedTodayCount();
-      const totalForDay = due + reviewed;
-      const progress = totalForDay ? Math.round(reviewed / totalForDay * 100) : 100;
-      const fragile = cards.filter(card => !card.archived && (card.strength || 0) <= 1).length;
+      const session = dashboardSessionStats();
+      const fragile = cards.filter(card => !card.archived && ["very-fragile", "fragile"].includes(autoDifficulty(card).level)).length;
       const days = streak();
       const date = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
       document.getElementById("todayLabel").textContent = date;
-      document.getElementById("dueCount").textContent = due;
-      document.getElementById("timeEstimate").textContent = "≈ " + (due ? Math.max(1, Math.ceil(due * .35)) : 0) + " min";
-      document.getElementById("dailyProgress").style.width = progress + "%";
-      document.getElementById("reviewedToday").textContent = reviewed;
+      document.getElementById("dueCount").textContent = session.remaining;
+      document.getElementById("timeEstimate").textContent = "≈ " + session.estimate + " min";
+      document.getElementById("dailyProgress").style.width = session.progress + "%";
+      document.getElementById("sessionRangeLabel").textContent = session.total
+        ? "— " + session.total + " révision" + (session.total > 1 ? "s" : "")
+        : "Aucune révision prévue";
+      document.getElementById("sessionReviewedLabel").textContent = session.reviewed + " / " + session.total + " révisés";
+      document.getElementById("reviewedToday").textContent = session.reviewed;
       document.getElementById("fragileCount").textContent = fragile;
       document.getElementById("totalCount").textContent = cards.length;
-      document.getElementById("streakLabel").textContent = "🔥 " + days + " jour" + (days > 1 ? "s" : "");
+      document.getElementById("streakLabel").textContent = days + " jour" + (days > 1 ? "s" : "");
       const startBtn = document.getElementById("startReviewBtn");
-      startBtn.disabled = cards.length > 0 && due === 0;
-      startBtn.textContent = due ? "Commencer la révision" : cards.length ? "Tout est à jour ✓" : "Ajoute ton premier passage";
-      const insight = !cards.length
-        ? "Ajoute ton premier passage pour lancer ta routine de murajaah ciblée."
-        : due
-          ? "En 5 minutes ou moins, tu peux revoir tes passages du jour."
-          : "Tu es à jour. Reviens demain ou ajoute un passage rencontré aujourd’hui.";
-      document.getElementById("insightText").textContent = insight;
+      startBtn.disabled = cards.length > 0 && session.remaining === 0;
+      startBtn.textContent = session.remaining ? "Commencer la révision" : cards.length ? "Tout est à jour ✓" : "Ajoute ton premier passage";
+    }
+
+    function reviewedOn(date) {
+      return activity[todayKey(date)]?.reviewed || 0;
+    }
+
+    function bestStreak() {
+      const days = Object.keys(activity)
+        .filter(key => activity[key]?.reviewed > 0)
+        .sort();
+      if (!days.length) return 0;
+
+      let best = 1;
+      let current = 1;
+      for (let index = 1; index < days.length; index++) {
+        const previous = new Date(days[index - 1] + "T00:00:00").getTime();
+        const next = new Date(days[index] + "T00:00:00").getTime();
+        if (next - previous === DAY) {
+          current++;
+        } else {
+          current = 1;
+        }
+        best = Math.max(best, current);
+      }
+      return best;
+    }
+
+    function currentWeekDays() {
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+      return Array.from({ length: 7 }, (_, index) => {
+        const date = new Date(start);
+        date.setDate(start.getDate() + index);
+        return date;
+      });
+    }
+
+    function levelDistribution() {
+      const active = cards.filter(card => !card.archived);
+      const dueLimit = startOfToday() + DAY - 1;
+      const counts = { mastered: 0, progress: 0, fragile: 0, due: 0 };
+
+      active.forEach(card => {
+        if ((card.nextReview || 0) <= dueLimit) {
+          counts.due++;
+          return;
+        }
+        const level = autoDifficulty(card).level;
+        if (level === "mastered") counts.mastered++;
+        else if (level === "fragile" || level === "very-fragile") counts.fragile++;
+        else counts.progress++;
+      });
+
+      return { total: active.length, counts };
+    }
+
+    function renderProgress() {
+      const current = streak();
+      const best = bestStreak();
+      const activeCards = cards.filter(card => !card.archived);
+      const totalReviews = activeCards.reduce((sum, card) => sum + (card.reviews || 0), 0);
+      const week = currentWeekDays().map(date => ({
+        date,
+        label: new Intl.DateTimeFormat("fr-FR", { weekday: "short" }).format(date).replace(".", ""),
+        value: reviewedOn(date)
+      }));
+      const weekTotal = week.reduce((sum, day) => sum + day.value, 0);
+      const weekMax = Math.max(1, ...week.map(day => day.value));
+      const levels = levelDistribution();
+      const { mastered, progress, fragile, due } = levels.counts;
+      const total = Math.max(1, levels.total);
+      const masteredEnd = mastered / total * 100;
+      const progressEnd = masteredEnd + progress / total * 100;
+      const fragileEnd = progressEnd + fragile / total * 100;
+
+      document.getElementById("progressStreakPill").textContent = current + " jour" + (current > 1 ? "s" : "");
+      document.getElementById("progressStreakValue").textContent = current + " jour" + (current > 1 ? "s" : "");
+      document.getElementById("progressBestStreak").textContent = "Meilleur record : " + best + " jour" + (best > 1 ? "s" : "");
+      document.getElementById("progressTotalPassages").textContent = activeCards.length;
+      document.getElementById("progressMasteryRate").textContent = confidence() + "%";
+      document.getElementById("progressTotalReviews").textContent = totalReviews;
+      document.getElementById("progressWeekTotal").textContent = weekTotal + " revue" + (weekTotal > 1 ? "s" : "");
+      document.getElementById("progressLevelTotal").textContent = levels.total + " passage" + (levels.total > 1 ? "s" : "");
+
+      document.getElementById("weekBars").innerHTML = week.map(day => {
+        const isToday = todayKey(day.date) === todayKey();
+        const height = day.value ? Math.max(10, Math.round(day.value / weekMax * 100)) : 0;
+        return `
+          <div class="week-bar ${isToday ? "today" : ""}" title="${day.value} révision${day.value > 1 ? "s" : ""}">
+            <div class="week-bar-track"><div class="week-bar-fill" style="height:${height}%"></div></div>
+            <span>${day.label.slice(0, 3)}</span>
+          </div>
+        `;
+      }).join("");
+
+      const donut = document.getElementById("levelDonut");
+      donut.style.background = levels.total
+        ? `conic-gradient(var(--green) 0 ${masteredEnd}%, var(--navy-2) ${masteredEnd}% ${progressEnd}%, var(--orange) ${progressEnd}% ${fragileEnd}%, var(--red) ${fragileEnd}% 100%)`
+        : "conic-gradient(#edf1f5 0 100%)";
+
+      const rows = [
+        ["var(--green)", "Solides", mastered],
+        ["var(--navy-2)", "En progrès", progress],
+        ["var(--orange)", "Fragiles", fragile],
+        ["var(--red)", "À revoir", due]
+      ];
+      document.getElementById("levelLegend").innerHTML = rows.map(([color, label, value]) => {
+        const percent = levels.total ? Math.round(value / levels.total * 100) : 0;
+        return `
+          <div class="level-item">
+            <span><i class="level-dot" style="background:${color}"></i>${label}</span>
+            <b>${value} (${percent}%)</b>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function autoDifficulty(card) {
+      const recent = Array.isArray(card.ratingHistory) ? card.ratingHistory.slice(-6) : [];
+      const noCount = recent.filter(rating => rating === "no").length;
+      const almostCount = recent.filter(rating => rating === "almost").length;
+      const weakScore = noCount * 2 + almostCount;
+      const strength = card.strength || 0;
+
+      if (noCount >= 2 || weakScore >= 4 || strength <= 0) return { level: "very-fragile", label: "Très fragile" };
+      if (noCount >= 1 || weakScore >= 2 || strength <= 1) return { level: "fragile", label: "Fragile" };
+      if (strength >= 4 && weakScore === 0) return { level: "mastered", label: "Solide" };
+      return { level: "progress", label: "En progrès" };
     }
 
     function statusFor(card) {
       const due = (card.nextReview || 0) <= startOfToday() + DAY - 1;
       if (due) return ["due", "À revoir"];
-      if ((card.strength || 0) <= 1) return ["fragile", "Fragile"];
-      if ((card.strength || 0) >= 4) return ["mastered", "Maîtrisé"];
-      return ["progress", "En progrès"];
+      const difficulty = autoDifficulty(card);
+      return [difficulty.level, difficulty.label];
     }
 
     function nextReviewLabel(card) {
@@ -167,8 +301,8 @@
       let filtered = cards.filter(card => !card.archived);
       if (query) filtered = filtered.filter(card => [card.surah, card.ayah, card.beforeVerse, card.blockageVerse, card.afterVerse, card.note].join(" ").toLowerCase().includes(query));
       if (activeFilter === "due") filtered = filtered.filter(card => (card.nextReview || 0) <= startOfToday() + DAY - 1);
-      if (activeFilter === "fragile") filtered = filtered.filter(card => (card.strength || 0) <= 1);
-      if (activeFilter === "mastered") filtered = filtered.filter(card => (card.strength || 0) >= 4);
+      if (activeFilter === "fragile") filtered = filtered.filter(card => ["very-fragile", "fragile"].includes(autoDifficulty(card).level));
+      if (activeFilter === "mastered") filtered = filtered.filter(card => autoDifficulty(card).level === "mastered");
       filtered.sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
       document.getElementById("librarySubtitle").textContent = `${cards.length} passage${cards.length !== 1 ? "s" : ""} enregistré${cards.length !== 1 ? "s" : ""}.`;
       const list = document.getElementById("cardList");
@@ -964,6 +1098,7 @@
       card.nextReview = startOfToday() + days * DAY;
       card.lastReview = Date.now();
       card.reviews = (card.reviews || 0) + 1;
+      card.ratingHistory = [...(Array.isArray(card.ratingHistory) ? card.ratingHistory : []), rating].slice(-10);
       if (rating !== "yes" && !sessionRetryIds.includes(card.id)) sessionRetryIds.push(card.id);
       sessionSchedule.push({
         id: card.id,

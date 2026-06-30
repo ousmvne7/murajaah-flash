@@ -70,6 +70,19 @@ Le passage reste fragile.
 
 Il peut être revu immédiatement ou très bientôt.
 
+## Difficulté automatique
+
+L’application garde un court historique des dernières réponses du passage.
+
+Cet historique permet d’attribuer automatiquement un niveau :
+
+- **Très fragile** : plusieurs échecs récents ou solidité très basse ;
+- **Fragile** : au moins une hésitation forte ou plusieurs réponses “Presque” ;
+- **En progrès** : passage travaillé mais pas encore stable ;
+- **Solide** : plusieurs réussites et peu d’hésitations récentes.
+
+Cette logique permet à l’utilisateur de repérer rapidement les passages qui demandent le plus d’attention.
+
 ## Répétition espacée
 
 La logique actuelle est volontairement simple.
