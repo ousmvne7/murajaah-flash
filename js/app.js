@@ -6,6 +6,8 @@
 
     const STORAGE_KEY = "murajaah_flash_v2_cards";
     const ACTIVITY_KEY = "murajaah_flash_v2_activity";
+    const ELAN_RECITER_BASE = "https://everyayah.com/data/Minshawy_Murattal_128kbps";
+    const ELAN_PLAYBACK_RATE = 1.25;
     const DAY = 86400000;
     let cards = load(STORAGE_KEY, []).map(card => ({
       ...card,
@@ -359,6 +361,30 @@
       return data.chapters[id] || null;
     }
 
+    function elanAudioFileName(surahId, ayah) {
+      const surahCode = String(surahId).padStart(3, "0");
+      const ayahCode = String(ayah).padStart(3, "0");
+      return `${surahCode}${ayahCode}.mp3`;
+    }
+
+    async function getElanAudioInfo(card) {
+      const rawAyah = String(card.ayah || "").trim();
+      if (!/^\d+$/.test(rawAyah)) return null;
+      const targetAyah = Number.parseInt(rawAyah, 10);
+      if (targetAyah <= 1) return null;
+
+      const data = await loadQuranData();
+      const chapter = resolveSurah(data, card.surah || "");
+      if (!chapter) return null;
+
+      const beforeAyah = targetAyah - 1;
+      const fileName = elanAudioFileName(chapter.id, beforeAyah);
+      return {
+        url: `${ELAN_RECITER_BASE}/${fileName}`,
+        label: `${chapter.name} — ${beforeAyah}`
+      };
+    }
+
     function updateQuranPickerTitle() {
       if (!quranData) return;
       const chapter = quranData.chapters[quranPickerState.surahId];
@@ -627,7 +653,12 @@
       document.getElementById("saveBtn").textContent = "Enregistrer";
     }
 
-    function startReview() {
+    async function startReview() {
+      try {
+        await loadQuranData();
+      } catch (_) {
+        quranData = null;
+      }
       reviewQueue = dueCards().sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
       if (!reviewQueue.length) {
         toast(cards.length ? "Tu es à jour pour aujourd’hui." : "Ajoute d’abord un passage.");
@@ -667,6 +698,7 @@
       reviewStage = 0;
       setReviewStep(0);
       renderReviewVerses(card, 0);
+      setupElanAudio(card);
       const reviewAudio = document.getElementById("reviewAudio");
       const reviewAudioBtn = document.getElementById("reviewAudioBtn");
       reviewAudio.pause();
@@ -707,6 +739,7 @@
       if (!card) return;
       const reviewAudio = document.getElementById("reviewAudio");
       reviewAudio.pause();
+      resetElanAudio();
       if (reviewStage === 0) {
         reviewStage = 1;
         setReviewStep(1);
@@ -781,18 +814,30 @@
         meta.className = "review-meta";
         meta.textContent = index <= stage ? verse.ref : verse.label;
 
-        item.append(arabic, placeholder, meta);
+        if (index <= stage) {
+          item.append(meta, arabic);
+        } else {
+          item.append(placeholder, meta);
+        }
         list.appendChild(item);
+
+        if (stage === 0 && index === 0) {
+          const elan = document.createElement("div");
+          elan.className = "elan-audio-panel";
+          elan.id = "elanAudioPanel";
+          elan.innerHTML = `
+            <div>
+              <span id="elanAudioMeta">Préparation de l’élan audio…</span>
+            </div>
+            <div class="elan-actions">
+              <button type="button" id="elanAudioBtn" onclick="playElanAudio()" disabled>…</button>
+              <span>1.25x</span>
+            </div>
+          `;
+          list.appendChild(elan);
+        }
       });
 
-      if (stage < 2) {
-        const hint = document.createElement("div");
-        hint.className = "review-focus-hint";
-        hint.innerHTML = stage === 0
-          ? "<span>À retrouver</span><b>Verset cible + liaison</b>"
-          : "<span>Continue</span><b>Verset de liaison</b>";
-        list.appendChild(hint);
-      }
     }
 
     function setReviewStep(step) {
@@ -810,6 +855,79 @@
         button.classList.remove("playing");
         button.textContent = "▶";
         if (!automatic) toast("Impossible de lire cet audio. Essaie de le réenregistrer.");
+      });
+    }
+
+    function resetElanAudio() {
+      const audio = document.getElementById("elanAudio");
+      const panel = document.getElementById("elanAudioPanel");
+      const button = document.getElementById("elanAudioBtn");
+      audio.pause();
+      audio.currentTime = 0;
+      audio.removeAttribute("src");
+      audio.load();
+      if (panel) panel.hidden = true;
+      if (button) {
+        button.disabled = true;
+        button.textContent = "▶";
+      }
+    }
+
+    async function setupElanAudio(card) {
+      resetElanAudio();
+      const panel = document.getElementById("elanAudioPanel");
+      const meta = document.getElementById("elanAudioMeta");
+      const button = document.getElementById("elanAudioBtn");
+      const audio = document.getElementById("elanAudio");
+      if (!panel || !meta || !button) return;
+      panel.hidden = false;
+      button.disabled = true;
+      button.textContent = "…";
+      meta.textContent = "Préparation de l’élan audio…";
+
+      try {
+        const info = await getElanAudioInfo(card);
+        if (reviewStage !== 0 || reviewQueue[reviewIndex]?.id !== card.id) return resetElanAudio();
+        if (!info) {
+          button.textContent = "!";
+          meta.textContent = "Élan audio disponible seulement pour un passage Quran reconnu.";
+          return;
+        }
+
+        audio.src = info.url;
+        audio.playbackRate = ELAN_PLAYBACK_RATE;
+        audio.load();
+        meta.textContent = `${info.label} · Minshawi`;
+        button.disabled = false;
+        button.textContent = "▶";
+        audio.onplay = () => { button.textContent = "Ⅱ"; };
+        audio.onpause = () => { button.textContent = "▶"; };
+        audio.onended = () => { button.textContent = "↻"; };
+        audio.onerror = () => {
+          button.textContent = "!";
+          button.disabled = false;
+          meta.textContent = "Élan audio indisponible pour ce verset.";
+        };
+        playElanAudio(true);
+      } catch (_) {
+        button.textContent = "!";
+        meta.textContent = "Ouvre l’app via localhost ou GitHub Pages pour charger l’élan audio.";
+      }
+    }
+
+    function playElanAudio(automatic = false) {
+      const audio = document.getElementById("elanAudio");
+      if (!audio.src) return toast("Élan audio indisponible pour ce passage.");
+      audio.playbackRate = ELAN_PLAYBACK_RATE;
+      if (!audio.paused) {
+        audio.pause();
+        return;
+      }
+      audio.currentTime = 0;
+      audio.play().catch(() => {
+        const button = document.getElementById("elanAudioBtn");
+        if (button) button.textContent = "▶";
+        if (!automatic) toast("Impossible de lancer l’élan audio. Vérifie ta connexion.");
       });
     }
 
@@ -853,6 +971,7 @@
     }
 
     function finishReview() {
+      resetElanAudio();
       document.getElementById("reviewSession").style.display = "none";
       document.getElementById("reviewIntro").classList.remove("active");
       document.getElementById("reviewSummary").classList.add("active");
@@ -901,6 +1020,7 @@
       const audio = document.getElementById("reviewAudio");
       audio.pause();
       audio.currentTime = 0;
+      resetElanAudio();
       document.getElementById("reviewScreen").classList.remove("active");
       document.getElementById("reviewIntro").classList.remove("active");
       document.getElementById("reviewSummary").classList.remove("active");

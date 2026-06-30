@@ -145,12 +145,12 @@
           <div class="sequence-heading"><span>En plus</span></div>
           <div class="form-card detail-card">
             <div class="field">
-              <label for="difficulty">Ce qui te gêne</label>
+              <label for="difficulty">Type d’hésitation</label>
               <select id="difficulty">
-                <option value="transition">Passage au verset suivant</option>
+                <option value="transition">Enchaînement</option>
                 <option value="beginning">Début du verset</option>
-                <option value="similar">Je le confonds avec un autre</option>
-                <option value="forgotten">Je l’oublie souvent</option>
+                <option value="similar">Confusion</option>
+                <option value="forgotten">Oubli fréquent</option>
               </select>
             </div>
             <div class="field">
@@ -246,6 +246,7 @@
         </header>
         <div class="review-main">
           <audio id="reviewAudio" preload="auto" playsinline></audio>
+          <audio id="elanAudio" preload="none" playsinline></audio>
           <article class="flashcard">
             <button class="review-audio" id="reviewAudioBtn" onclick="playReviewAudio()" aria-label="Écouter ma récitation">▶</button>
             <div class="verse-surface" id="reviewVerseList">
