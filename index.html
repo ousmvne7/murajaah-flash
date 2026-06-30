@@ -116,7 +116,7 @@
               <span>Sélectionne la sourate et le verset cible. L’app prépare automatiquement le verset avant et le verset après.</span>
             </div>
             <button type="button" class="quran-picker-open" onclick="openQuranPicker()">
-              <span>Choisir dans le Quran</span>
+              <span>Choisir un verset</span>
               <b id="quranPickerSummary">Sourate + verset cible</b>
             </button>
             <div class="auto-preview" id="autoPreview" hidden>
@@ -131,7 +131,7 @@
           <div class="audio-card">
             <div class="field-heading">
               <span class="step-number">🎙</span>
-              <div><strong>Audio du verset avant</strong><small>Optionnel : il se lance au début de la révision.</small></div>
+              <div><strong>Élan audio</strong><small>Optionnel · lancé au début de la révision.</small></div>
             </div>
             <div class="inline-recorder">
               <button type="button" class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙 Enregistrer</button>
@@ -142,19 +142,20 @@
             </div>
           </div>
 
-          <div class="sequence-heading"><span>En plus</span></div>
+          <div class="sequence-heading"><span>Repère personnel</span></div>
           <div class="form-card detail-card">
             <div class="field">
-              <label for="difficulty">Type d’hésitation</label>
-              <select id="difficulty">
-                <option value="transition">Enchaînement</option>
-                <option value="beginning">Début du verset</option>
-                <option value="similar">Confusion</option>
-                <option value="forgotten">Oubli fréquent</option>
-              </select>
+              <label>Type d’hésitation</label>
+              <input type="hidden" id="difficulty" value="transition">
+              <div class="difficulty-chips" role="radiogroup" aria-label="Type d’hésitation">
+                <button type="button" class="difficulty-chip active" data-difficulty="transition" role="radio" aria-checked="true" onclick="selectDifficulty('transition')">Enchaînement</button>
+                <button type="button" class="difficulty-chip" data-difficulty="beginning" role="radio" aria-checked="false" onclick="selectDifficulty('beginning')">Début</button>
+                <button type="button" class="difficulty-chip" data-difficulty="similar" role="radio" aria-checked="false" onclick="selectDifficulty('similar')">Confusion</button>
+                <button type="button" class="difficulty-chip" data-difficulty="forgotten" role="radio" aria-checked="false" onclick="selectDifficulty('forgotten')">Oubli fréquent</button>
+              </div>
             </div>
             <div class="field">
-              <label for="note">Ma note <span>(facultatif)</span></label>
+              <label for="note">Note courte <span>(facultatif)</span></label>
               <input id="note" maxlength="140" placeholder="Ex. Je confonds avec le verset précédent">
             </div>
           </div>
@@ -271,7 +272,12 @@
         </div>
       </div>
       <div class="summary" id="reviewSummary">
-        <div class="summary-icon">✨</div>
+        <div class="summary-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" role="img">
+            <circle cx="24" cy="24" r="20"></circle>
+            <path d="M15 24.5l6 6L34 17"></path>
+          </svg>
+        </div>
         <h2>Session terminée</h2>
         <p id="summaryLead">Chaque rappel renforce un peu plus tes transitions.</p>
         <div class="summary-stats">
@@ -282,7 +288,7 @@
         <div class="summary-next" id="summaryNext"></div>
         <div class="summary-actions">
           <button class="secondary-btn retry-btn" id="retryNowBtn" onclick="reviewFailedNow()">Revoir maintenant <span id="retryCount">0</span></button>
-          <button class="primary-btn reveal-btn" onclick="exitReview()">Retour à l’accueil</button>
+          <button class="primary-btn summary-home-btn" onclick="exitReview()">Retour à l’accueil</button>
         </div>
       </div>
     </section>

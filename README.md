@@ -301,7 +301,7 @@ C’est le bloc principal de l’ajout.
 Il contient :
 
 - une explication courte ;
-- un bouton **Choisir dans le Quran** ;
+- un bouton **Choisir un verset** ;
 - un résumé de la sélection ;
 - une prévisualisation des trois versets ;
 - les boutons Annuler et Utiliser ce passage.
@@ -354,7 +354,7 @@ Il doit ensuite cliquer sur **Utiliser ce passage**.
 
 Cette étape évite d’enregistrer un passage par erreur.
 
-### Audio du verset avant
+### Élan audio personnel
 
 L’utilisateur peut ajouter un audio personnel.
 
@@ -403,7 +403,7 @@ Deux vitesses sont proposées :
 L’audio n’est pas stocké dans l’application.  
 Il est lu en ligne depuis EveryAyah avec la récitation **Minshawy Murattal 128kbps**.
 
-### Bloc “En plus”
+### Bloc “Repère personnel”
 
 Ce bloc ajoute du contexte au passage.
 
@@ -416,7 +416,7 @@ L’utilisateur peut choisir la nature de la difficulté :
 - confusion ;
 - oubli fréquent.
 
-#### Ma note
+#### Note courte
 
 Une note facultative peut être ajoutée.
 

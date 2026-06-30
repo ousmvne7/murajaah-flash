@@ -574,6 +574,16 @@
       if (clearPending) pendingAutoFill = null;
     }
 
+    function selectDifficulty(value = "transition") {
+      const input = document.getElementById("difficulty");
+      if (input) input.value = value;
+      document.querySelectorAll(".difficulty-chip").forEach(chip => {
+        const active = chip.dataset.difficulty === value;
+        chip.classList.toggle("active", active);
+        chip.setAttribute("aria-checked", active ? "true" : "false");
+      });
+    }
+
     function saveCard(event) {
       event.preventDefault();
       const editId = document.getElementById("editId").value;
@@ -618,7 +628,7 @@
       document.getElementById("beforeVerse").value = card.beforeVerse || card.prompt || "";
       document.getElementById("blockageVerse").value = card.blockageVerse || card.answer || "";
       document.getElementById("afterVerse").value = card.afterVerse || "";
-      document.getElementById("difficulty").value = card.difficulty || "transition";
+      selectDifficulty(card.difficulty || "transition");
       document.getElementById("note").value = card.note || "";
       recordedAudio = card.audioData || "";
       updateRecorderUI(recordedAudio ? "ready" : "empty");
@@ -649,6 +659,7 @@
       recordedAudio = "";
       updateRecorderUI("empty");
       clearAutoPreview();
+      selectDifficulty("transition");
       document.getElementById("formTitle").textContent = "Ajoute un passage";
       document.getElementById("saveBtn").textContent = "Enregistrer";
     }
@@ -784,6 +795,7 @@
         { label: "Verset cible", text: card.blockageVerse, ref: verseReference(card, 0) },
         { label: "Verset de liaison", text: card.afterVerse || "Verset suivant non renseigné", ref: verseReference(card, 1) }
       ];
+
       const activeLength = String(verses[stage]?.text || "").length;
       const visibleLength = verses.slice(0, stage + 1).reduce((sum, verse) => sum + String(verse.text || "").length, 0);
       list.classList.toggle("has-long-active", activeLength > 115);
