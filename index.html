@@ -4,7 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#44357d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Murajaah">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Murajaah Flash — Application complète</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -12,13 +19,16 @@
     <section class="screen active" id="homeScreen">
       <header class="topbar">
         <div class="brand">MURAJAAH<small>FLASH</small></div>
-        <button class="icon-btn" aria-label="Ouvrir les réglages" onclick="showScreen('settings')">
+        <button class="icon-btn" aria-label="Ouvrir l’espace progression et réglages" onclick="openProfile('progress')">
           <svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.13.38.35.72.65 1 .3.28.68.42 1.1.4h.1v4h-.1c-.42-.02-.8.12-1.1.4-.3.28-.52.62-.65 1z"/></svg>
         </button>
       </header>
       <div class="content">
         <div class="greeting">
-          <div><h1>Assalamu alaykoum 👋</h1><p id="todayLabel">Aujourd’hui</p></div>
+          <div>
+            <h1>Assalamu alaykoum</h1>
+            <p id="todayLabel">Aujourd’hui</p>
+          </div>
           <div class="streak" id="streakLabel">0 jour</div>
         </div>
 
@@ -169,67 +179,66 @@
     <section class="screen" id="progressScreen">
       <header class="topbar">
         <div class="brand">MURAJAAH<small>FLASH</small></div>
-        <button class="icon-btn" aria-label="Ouvrir les réglages" onclick="showScreen('settings')">
-          <svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.13.38.35.72.65 1 .3.28.68.42 1.1.4h.1v4h-.1c-.42-.02-.8.12-1.1.4-.3.28-.52.62-.65 1z"/></svg>
-        </button>
+        <button class="icon-btn" aria-label="Retour à l’accueil" onclick="showScreen('home')">×</button>
       </header>
       <div class="content">
-        <div class="page-title"><h1>Progression</h1><p>Ta régularité, ton niveau de maîtrise et les passages à renforcer.</p></div>
-
-        <article class="progress-hero">
-          <div class="progress-hero-top">
-            <span>Série actuelle</span>
-            <b id="progressStreakPill">0 jour</b>
-          </div>
-          <strong id="progressStreakValue">0 jours</strong>
-          <small id="progressBestStreak">Meilleur record : 0 jour</small>
-        </article>
-
-        <div class="progress-summary-grid">
-          <div class="progress-mini"><b id="progressTotalPassages">0</b><span>Passages</span></div>
-          <div class="progress-mini"><b id="progressMasteryRate">0%</b><span>Maîtrise</span></div>
-          <div class="progress-mini"><b id="progressTotalReviews">0</b><span>Révisions</span></div>
+        <div class="profile-tabs" role="tablist" aria-label="Progression et réglages">
+          <button class="profile-tab-btn active" type="button" data-profile-tab="progress" onclick="setProfileTab('progress')">Progression</button>
+          <button class="profile-tab-btn" type="button" data-profile-tab="settings" onclick="setProfileTab('settings')">Réglages</button>
         </div>
 
-        <article class="progress-panel">
-          <div class="progress-panel-head"><h2>Révisions cette semaine</h2><span id="progressWeekTotal">0 revues</span></div>
-          <div class="week-bars" id="weekBars"></div>
-        </article>
+        <div class="profile-tab-panel active" id="profileProgressPanel">
+          <div class="page-title"><h1>Progression</h1><p>Ta régularité, ton niveau de maîtrise et les passages à renforcer.</p></div>
 
-        <article class="progress-panel">
-          <div class="progress-panel-head"><h2>Répartition par niveau</h2><span id="progressLevelTotal">0 passages</span></div>
-          <div class="level-layout">
-            <div class="level-donut" id="levelDonut"></div>
-            <div class="level-legend" id="levelLegend"></div>
-          </div>
-        </article>
-      </div>
-    </section>
+          <article class="progress-hero">
+            <div class="progress-hero-top">
+              <span>Série actuelle</span>
+              <b id="progressStreakPill">0 jour</b>
+            </div>
+            <strong id="progressStreakValue">0 jours</strong>
+            <small id="progressBestStreak">Meilleur record : 0 jour</small>
+          </article>
 
-    <section class="screen" id="settingsScreen">
-      <header class="topbar">
-        <div class="brand">MURAJAAH<small>FLASH</small></div>
-        <button class="icon-btn" aria-label="Retour" onclick="showScreen('progress')">×</button>
-      </header>
-      <div class="content">
-        <div class="page-title"><h1>Réglages</h1><p>Gère tes données locales et tes préférences de révision.</p></div>
-        <div class="settings-list">
-          <div class="setting-row">
-            <div><strong>Indice de confiance</strong><span>Calculé selon tes dernières réponses.</span></div>
-            <div class="confidence-ring" id="confidenceRing"><b id="confidenceValue">0%</b></div>
+          <div class="progress-summary-grid">
+            <div class="progress-mini"><b id="progressTotalPassages">0</b><span>Passages</span></div>
+            <div class="progress-mini"><b id="progressMasteryRate">0%</b><span>Maîtrise</span></div>
+            <div class="progress-mini"><b id="progressTotalReviews">0</b><span>Révisions</span></div>
           </div>
-          <div class="setting-row">
-            <div><strong>Répétition intelligente</strong><span>À revoir : aujourd’hui · Presque : demain · Acquis : espacé.</span></div>
-            <span style="font-size:24px">🧠</span>
-          </div>
-          <div class="setting-row">
-            <div><strong>Données locales</strong><span>Tes passages et audios restent sur cet appareil.</span></div>
-            <span style="font-size:24px">🔒</span>
-          </div>
+
+          <article class="progress-panel">
+            <div class="progress-panel-head"><h2>Révisions cette semaine</h2><span id="progressWeekTotal">0 revues</span></div>
+            <div class="week-bars" id="weekBars"></div>
+          </article>
+
+          <article class="progress-panel">
+            <div class="progress-panel-head"><h2>Répartition par niveau</h2><span id="progressLevelTotal">0 passages</span></div>
+            <div class="level-layout">
+              <div class="level-donut" id="levelDonut"></div>
+              <div class="level-legend" id="levelLegend"></div>
+            </div>
+          </article>
         </div>
-        <div class="section-title"><h2>Données</h2></div>
-        <button class="secondary-btn" onclick="exportData()">Exporter mes cartes</button>
-        <button class="danger-btn" style="margin-top:9px" onclick="askReset()">Effacer toutes les données</button>
+
+        <div class="profile-tab-panel" id="profileSettingsPanel">
+          <div class="page-title"><h1>Réglages</h1><p>Gère tes données locales et tes préférences de révision.</p></div>
+          <div class="settings-list">
+            <div class="setting-row">
+              <div><strong>Indice de confiance</strong><span>Calculé selon tes dernières réponses.</span></div>
+              <div class="confidence-ring" id="confidenceRing"><b id="confidenceValue">0%</b></div>
+            </div>
+            <div class="setting-row">
+              <div><strong>Répétition intelligente</strong><span>À revoir : aujourd’hui · Presque : demain · Acquis : espacé.</span></div>
+              <span style="font-size:24px">🧠</span>
+            </div>
+            <div class="setting-row">
+              <div><strong>Données locales</strong><span>Tes passages et audios restent sur cet appareil.</span></div>
+              <span style="font-size:24px">🔒</span>
+            </div>
+          </div>
+          <div class="section-title"><h2>Données</h2></div>
+          <button class="secondary-btn" onclick="exportData()">Exporter mes cartes</button>
+          <button class="danger-btn" style="margin-top:9px" onclick="askReset()">Effacer toutes les données</button>
+        </div>
       </div>
     </section>
 
@@ -249,10 +258,6 @@
       <button class="nav-btn" data-screen="review" onclick="startReview()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m13 2-9 12h7l-1 8 9-12h-7l1-8z"/></svg>
         Réviser
-      </button>
-      <button class="nav-btn" data-screen="progress" onclick="showScreen('progress')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5"/><path d="M4 19h16"/><rect x="7" y="11" width="3" height="5" rx="1"/><rect x="12" y="8" width="3" height="8" rx="1"/><rect x="17" y="4" width="3" height="12" rx="1"/></svg>
-        Progression
       </button>
     </nav>
 

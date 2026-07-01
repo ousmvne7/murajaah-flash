@@ -31,6 +31,7 @@
     let recordingStartedAt = 0;
     let previewPlayer = null;
     let quranData = null;
+    let quranPagesData = null;
     let pendingAutoFill = null;
     let quranPickerState = { surahId: "2", ayah: 2 };
 
@@ -114,9 +115,28 @@
       document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.screen === name));
       if (name === "home") renderDashboard();
       if (name === "library") renderLibrary();
-      if (name === "progress") renderProgress();
-      if (name === "settings") renderSettings();
+      if (name === "progress") {
+        renderProgress();
+        renderSettings();
+      }
       window.scrollTo(0, 0);
+    }
+
+    function openProfile(tab = "progress") {
+      showScreen("progress");
+      setProfileTab(tab);
+    }
+
+    function setProfileTab(tab = "progress") {
+      document.querySelectorAll(".profile-tab-btn").forEach(button => {
+        const active = button.dataset.profileTab === tab;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-selected", active ? "true" : "false");
+      });
+      document.getElementById("profileProgressPanel")?.classList.toggle("active", tab === "progress");
+      document.getElementById("profileSettingsPanel")?.classList.toggle("active", tab === "settings");
+      if (tab === "progress") renderProgress();
+      if (tab === "settings") renderSettings();
     }
 
     function renderDashboard() {
@@ -312,7 +332,7 @@
       }
       list.innerHTML = filtered.map(card => {
         const status = statusFor(card);
-        const label = [card.surah || "Sans sourate", card.ayah ? "v. " + card.ayah : ""].filter(Boolean).join(" · ");
+        const label = verseReference(card, 0);
         return `<article class="memory-card">
           <div class="memory-top">
             <div class="memory-meta">${escapeHtml(label)}</div>
@@ -489,10 +509,38 @@
       return quranData;
     }
 
+    async function loadQuranPagesData() {
+      if (quranPagesData) return quranPagesData;
+      const response = await fetch("data/quran-pages.json");
+      if (!response.ok) throw new Error("Quran pages unavailable");
+      quranPagesData = await response.json();
+      return quranPagesData;
+    }
+
     function resolveSurah(data, value) {
       const key = normalizeQuranKey(value);
       const id = data.aliases[key] || (/^\d+$/.test(key) ? key : "");
       return data.chapters[id] || null;
+    }
+
+    function resolveSurahId(value) {
+      const data = quranData;
+      if (!data) return "";
+      const key = normalizeQuranKey(value);
+      return data.aliases[key] || (/^\d+$/.test(key) ? key : "");
+    }
+
+    function quranPageFor(surahValue, ayahValue) {
+      const surahId = resolveSurahId(surahValue);
+      const ayah = String(ayahValue || "").trim();
+      if (!surahId || !/^\d+$/.test(ayah)) return "";
+      return quranPagesData?.chapters?.[String(surahId)]?.pages?.[ayah] || "";
+    }
+
+    function formatVerseReference(surah, ayah, page = "") {
+      if (!surah) return "Passage personnel";
+      if (!ayah) return surah;
+      return page ? `${surah} — Page ${page} - V${ayah}` : `${surah} — V${ayah}`;
     }
 
     function elanAudioFileName(surahId, ayah) {
@@ -508,6 +556,7 @@
       if (targetAyah <= 1) return null;
 
       const data = await loadQuranData();
+      await loadQuranPagesData();
       const chapter = resolveSurah(data, card.surah || "");
       if (!chapter) return null;
 
@@ -515,7 +564,7 @@
       const fileName = elanAudioFileName(chapter.id, beforeAyah);
       return {
         url: `${ELAN_RECITER_BASE}/${fileName}`,
-        label: `${chapter.name} — ${beforeAyah}`
+        label: formatVerseReference(chapter.name, beforeAyah, quranPageFor(chapter.name, beforeAyah))
       };
     }
 
@@ -524,7 +573,7 @@
       const chapter = quranData.chapters[quranPickerState.surahId];
       const title = document.getElementById("quranPickerTitle");
       const summary = document.getElementById("quranPickerSummary");
-      const value = chapter ? `${chapter.name} — ${chapter.id}:${quranPickerState.ayah}` : "Choisir un verset";
+      const value = chapter ? formatVerseReference(chapter.name, quranPickerState.ayah, quranPageFor(chapter.name, quranPickerState.ayah)) : "Choisir un verset";
       if (title) title.textContent = value;
       if (summary) summary.textContent = value;
     }
@@ -570,6 +619,7 @@
     async function openQuranPicker() {
       try {
         await loadQuranData();
+        await loadQuranPagesData();
         const currentSurah = resolveSurah(quranData, document.getElementById("surah").value.trim());
         const currentAyah = Number.parseInt(document.getElementById("ayah").value.trim(), 10);
         if (currentSurah) quranPickerState.surahId = String(currentSurah.id);
@@ -645,6 +695,7 @@
 
       try {
         const data = await loadQuranData();
+        await loadQuranPagesData();
         const chapter = resolveSurah(data, surahValue);
         const targetAyah = Number.parseInt(ayahValue, 10);
 
@@ -678,9 +729,9 @@
         };
 
         renderAutoPreview([
-          { label: "Verset avant", ref: `${chapter.name} — ${targetAyah - 1}`, text: before },
-          { label: "Verset cible", ref: `${chapter.name} — ${targetAyah}`, text: target },
-          { label: "Verset après", ref: `${chapter.name} — ${targetAyah + 1}`, text: after }
+          { label: "Verset avant", ref: formatVerseReference(chapter.name, targetAyah - 1, quranPageFor(chapter.name, targetAyah - 1)), text: before },
+          { label: "Verset cible", ref: formatVerseReference(chapter.name, targetAyah, quranPageFor(chapter.name, targetAyah)), text: target },
+          { label: "Verset après", ref: formatVerseReference(chapter.name, targetAyah + 1, quranPageFor(chapter.name, targetAyah + 1)), text: after }
         ]);
       } catch (_) {
         toast("Base Quran indisponible. Lance l’app depuis le serveur ou GitHub Pages.");
@@ -906,9 +957,10 @@
       const rawAyah = String(card.ayah || "").trim();
       if (!rawAyah) return surah;
       if (/^\d+$/.test(rawAyah)) {
-        return `${surah} — ${Number.parseInt(rawAyah, 10) + offset}`;
+        const ayah = Number.parseInt(rawAyah, 10) + offset;
+        return formatVerseReference(surah, ayah, quranPageFor(surah, ayah));
       }
-      return `${surah} — ${rawAyah}`;
+      return formatVerseReference(surah, rawAyah);
     }
 
     function renderReviewVerses(card, stage) {
@@ -920,7 +972,7 @@
       pageHead.className = "review-page-head";
       pageHead.innerHTML = `
         <span>${escapeHtml(card.surah || "Passage personnel")}</span>
-        <span>${escapeHtml(card.ayah ? `Verset cible ${card.ayah}` : "Murajaah ciblée")}</span>
+        <span>${escapeHtml(card.ayah ? verseReference(card, 0).replace((card.surah || "Passage personnel") + " — ", "") : "Murajaah ciblée")}</span>
       `;
       list.appendChild(pageHead);
 
@@ -1103,7 +1155,7 @@
       sessionSchedule.push({
         id: card.id,
         rating,
-        title: `${card.surah || "Passage"}${card.ayah ? " — " + card.ayah : ""}`,
+        title: verseReference(card, 0),
         nextReview: card.nextReview,
         label: scheduleLabelFromTime(card.nextReview)
       });
@@ -1198,6 +1250,7 @@
         activity = {};
         persist();
         closeModal();
+        renderProgress();
         renderSettings();
         toast("Toutes les données ont été effacées.");
       });
@@ -1247,4 +1300,9 @@
 
     renderDashboard();
     renderLibrary();
+    Promise.all([loadQuranData(), loadQuranPagesData()]).then(() => {
+      renderDashboard();
+      renderLibrary();
+      if (document.getElementById("progressScreen")?.classList.contains("active")) renderProgress();
+    }).catch(() => {});
     hideSplash();
