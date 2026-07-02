@@ -523,56 +523,9 @@
       font-feature-settings: "liga" 1, "kern" 1, "calt" 1;
       text-rendering: optimizeLegibility;
     }
-    .arabic.tajweed-arabic tajweed {
-      color: inherit;
-    }
-    .arabic.tajweed-arabic .ham_wasl,
-    .arabic.tajweed-arabic .slnt {
-      color: rgba(36,36,36,.42);
-    }
-    .arabic.tajweed-arabic .madda_normal {
-      color: #3498db;
-    }
-    .arabic.tajweed-arabic .madda_permissible,
-    .arabic.tajweed-arabic .madda_obligatory,
-    .arabic.tajweed-arabic .madda_necessary {
-      color: #4169d8;
-    }
-    .arabic.tajweed-arabic .ghunnah,
-    .arabic.tajweed-arabic .idgham_ghunnah,
-    .arabic.tajweed-arabic .idgham_shafawi,
-    .arabic.tajweed-arabic .ikhafa,
-    .arabic.tajweed-arabic .ikhafa_shafawi,
-    .arabic.tajweed-arabic .iqlab {
-      color: #34a853;
-    }
-    .arabic.tajweed-arabic .idgham_wo_ghunnah,
-    .arabic.tajweed-arabic .idgham_mutajanisayn,
-    .arabic.tajweed-arabic .idgham_mutaqaribayn {
-      color: #e18424;
-    }
-    .arabic.tajweed-arabic .qalaqah {
-      color: #b44686;
-    }
-    .arabic.tajweed-arabic .laam_shamsiyah {
-      color: #8b7bd6;
-    }
+    .arabic.tajweed-arabic tajweed,
     .arabic.tajweed-arabic .end {
-      display: inline-grid;
-      place-items: center;
-      width: 1.55em;
-      height: 1.55em;
-      margin: 0 .12em;
-      border-radius: 50%;
-      color: #44357d;
-      font-size: .72em;
-      font-weight: 900;
-      line-height: 1;
-      background:
-        radial-gradient(circle at center, #fff 42%, transparent 44%),
-        conic-gradient(from 18deg, #6bc98f, #44357d, #c4497b, #6bc98f);
-      box-shadow: inset 0 0 0 2px rgba(255,255,255,.92), 0 2px 7px rgba(68,53,125,.15);
-      vertical-align: .12em;
+      color: inherit;
     }
     .memory-card .arabic { margin: 10px 0 8px; }
     .memory-bottom { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 10px; }
