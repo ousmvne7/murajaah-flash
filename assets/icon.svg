@@ -17,7 +17,8 @@
   <circle cx="424" cy="92" r="120" fill="#ffffff" opacity=".08"/>
   <circle cx="416" cy="428" r="150" fill="#ffffff" opacity=".06"/>
   <g filter="url(#shadow)">
-    <path d="M149 331V188c0-34 20-56 51-56 27 0 45 14 56 39 11-25 30-39 57-39 31 0 51 22 51 56v143h-57V201c0-14-8-23-20-23-14 0-23 10-23 28v125h-57V206c0-18-9-28-23-28-12 0-20 9-20 23v130h-55Z" fill="url(#shine)"/>
-    <path d="M149 351h215" stroke="#48c98b" stroke-width="30" stroke-linecap="round"/>
+    <path d="M309 154c-48 0-84 34-84 78 0 43 34 74 78 74 45 0 78-32 78-76 0-43-31-76-72-76Zm-4 54c14 0 24 10 24 25 0 14-10 24-25 24s-26-10-26-25c0-14 11-24 27-24Z" fill="url(#shine)"/>
+    <path d="M260 272c0 58-28 91-86 104" stroke="url(#shine)" stroke-width="54" stroke-linecap="round"/>
+    <path d="M164 382h198" stroke="#48c98b" stroke-width="30" stroke-linecap="round"/>
   </g>
 </svg>
