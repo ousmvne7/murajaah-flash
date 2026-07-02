@@ -32,6 +32,7 @@
     let previewPlayer = null;
     let quranData = null;
     let quranPagesData = null;
+    let quranTajweedData = null;
     let pendingAutoFill = null;
     let quranPickerState = { surahId: "2", ayah: 2 };
 
@@ -517,6 +518,14 @@
       return quranPagesData;
     }
 
+    async function loadQuranTajweedData() {
+      if (quranTajweedData) return quranTajweedData;
+      const response = await fetch("data/quran-tajweed.json");
+      if (!response.ok) throw new Error("Quran tajweed unavailable");
+      quranTajweedData = await response.json();
+      return quranTajweedData;
+    }
+
     function resolveSurah(data, value) {
       const key = normalizeQuranKey(value);
       const id = data.aliases[key] || (/^\d+$/.test(key) ? key : "");
@@ -541,6 +550,23 @@
       if (!surah) return "Passage personnel";
       if (!ayah) return surah;
       return page ? `${surah} — Page ${page} - V${ayah}` : `${surah} — V${ayah}`;
+    }
+
+    function getTajweedVerseHtml(surahValue, ayahValue) {
+      if (!quranTajweedData || !surahValue || !ayahValue) return "";
+      const chapter = resolveSurah(quranTajweedData, surahValue);
+      if (!chapter) return "";
+      return chapter.tajweed?.[String(ayahValue)] || "";
+    }
+
+    function setArabicVerseContent(element, text, surahValue = "", ayahValue = "") {
+      const html = getTajweedVerseHtml(surahValue, ayahValue);
+      element.classList.toggle("tajweed-arabic", Boolean(html));
+      if (html) {
+        element.innerHTML = html;
+      } else {
+        element.textContent = text || "";
+      }
     }
 
     function elanAudioFileName(surahId, ayah) {
@@ -671,7 +697,7 @@
         const arabic = document.createElement("div");
         arabic.className = "arabic";
         arabic.dir = "rtl";
-        arabic.textContent = item.text;
+        setArabicVerseContent(arabic, item.text, item.surah, item.ayah);
 
         row.append(label, arabic);
         list.appendChild(row);
@@ -729,9 +755,9 @@
         };
 
         renderAutoPreview([
-          { label: "Verset avant", ref: formatVerseReference(chapter.name, targetAyah - 1, quranPageFor(chapter.name, targetAyah - 1)), text: before },
-          { label: "Verset cible", ref: formatVerseReference(chapter.name, targetAyah, quranPageFor(chapter.name, targetAyah)), text: target },
-          { label: "Verset après", ref: formatVerseReference(chapter.name, targetAyah + 1, quranPageFor(chapter.name, targetAyah + 1)), text: after }
+          { label: "Verset avant", ref: formatVerseReference(chapter.name, targetAyah - 1, quranPageFor(chapter.name, targetAyah - 1)), text: before, surah: chapter.name, ayah: targetAyah - 1 },
+          { label: "Verset cible", ref: formatVerseReference(chapter.name, targetAyah, quranPageFor(chapter.name, targetAyah)), text: target, surah: chapter.name, ayah: targetAyah },
+          { label: "Verset après", ref: formatVerseReference(chapter.name, targetAyah + 1, quranPageFor(chapter.name, targetAyah + 1)), text: after, surah: chapter.name, ayah: targetAyah + 1 }
         ]);
       } catch (_) {
         toast("Base Quran indisponible. Lance l’app depuis le serveur ou GitHub Pages.");
@@ -825,10 +851,11 @@
         afterVerse: card.afterVerse || ""
       };
       updateQuranPickerTitle();
+      const editAyah = /^\d+$/.test(String(card.ayah || "")) ? Number.parseInt(card.ayah, 10) : null;
       renderAutoPreview([
-        { label: "Verset avant", ref: verseReference(card, -1), text: pendingAutoFill.beforeVerse },
-        { label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse },
-        { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse }
+        { label: "Verset avant", ref: verseReference(card, -1), text: pendingAutoFill.beforeVerse, surah: card.surah, ayah: editAyah ? editAyah - 1 : "" },
+        { label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse, surah: card.surah, ayah: editAyah || "" },
+        { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse, surah: card.surah, ayah: editAyah ? editAyah + 1 : "" }
       ]);
       document.getElementById("formTitle").textContent = "Modifie ton passage";
       document.getElementById("saveBtn").textContent = "Enregistrer les modifications";
@@ -976,10 +1003,11 @@
       `;
       list.appendChild(pageHead);
 
+      const baseAyah = /^\d+$/.test(String(card.ayah || "")) ? Number.parseInt(card.ayah, 10) : null;
       const verses = [
-        { label: "Verset avant", text: card.beforeVerse, ref: verseReference(card, -1) },
-        { label: "Verset cible", text: card.blockageVerse, ref: verseReference(card, 0) },
-        { label: "Verset de liaison", text: card.afterVerse || "Verset suivant non renseigné", ref: verseReference(card, 1) }
+        { label: "Verset avant", text: card.beforeVerse, ref: verseReference(card, -1), ayah: baseAyah ? baseAyah - 1 : "" },
+        { label: "Verset cible", text: card.blockageVerse, ref: verseReference(card, 0), ayah: baseAyah || "" },
+        { label: "Verset de liaison", text: card.afterVerse || "Verset suivant non renseigné", ref: verseReference(card, 1), ayah: baseAyah ? baseAyah + 1 : "" }
       ];
 
       const activeLength = String(verses[stage]?.text || "").length;
@@ -1002,7 +1030,7 @@
         const arabic = document.createElement("div");
         arabic.className = "arabic";
         arabic.dir = "rtl";
-        if (index <= stage) arabic.textContent = verse.text;
+        if (index <= stage) setArabicVerseContent(arabic, verse.text, card.surah, verse.ayah);
 
         const placeholder = document.createElement("div");
         placeholder.className = "mask-lines";
@@ -1300,7 +1328,7 @@
 
     renderDashboard();
     renderLibrary();
-    Promise.all([loadQuranData(), loadQuranPagesData()]).then(() => {
+    Promise.all([loadQuranData(), loadQuranPagesData(), loadQuranTajweedData()]).then(() => {
       renderDashboard();
       renderLibrary();
       if (document.getElementById("progressScreen")?.classList.contains("active")) renderProgress();
