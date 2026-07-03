@@ -1,11 +1,13 @@
-# Quran font
+# Quran fonts
 
-## `uthmanic_hafs_v22.ttf`
+## Active font — `hafs.18.ttf` / `hafs.18.woff2`
 
-- Name: `kfgqpc_hafs_uthmanic_script`
+- Name: `KFGQPC HAFS Uthmanic Script`
 - Author: King Fahd Glorious Quran Printing Complex
-- Origin: Madinah, Saudi Arabia
-- Version: 2.2
+- Version: 0.18
+- Paired data: `data/quran-uthmani.json`, generated from `hafsData_v18.json`
+
+This font must be used with the matching KFGQPC Hafs v18 text data. Do not mix it with a different Quran text source.
 
 ## Usage notes
 
@@ -22,4 +24,3 @@ Not allowed:
 - sell the font by itself;
 - modify the font;
 - alter or decompile the font.
-

@@ -1,6 +1,8 @@
     @font-face {
       font-family: "KFGQPC Hafs";
-      src: url("../assets/fonts/uthmanic_hafs_v22.ttf") format("truetype");
+      src:
+        url("../assets/fonts/hafs.18.woff2") format("woff2"),
+        url("../assets/fonts/hafs.18.ttf") format("truetype");
       font-weight: 400;
       font-style: normal;
       font-display: swap;
@@ -513,19 +515,11 @@
     .memory-actions { display: flex; gap: 5px; }
     .tiny-btn { border: 0; background: var(--paper); color: var(--muted); border-radius: 10px; width: 31px; height: 31px; display: grid; place-items: center; }
     .arabic {
-      font-family: "KFGQPC Hafs", "Amiri Quran", "Amiri", "Scheherazade New", "Noto Naskh Arabic", "Geeza Pro", "Traditional Arabic", serif;
+      font-family: "KFGQPC Hafs", serif;
       direction: rtl;
       text-align: right;
       font-size: 22px;
       line-height: 1.85;
-    }
-    .arabic.tajweed-arabic {
-      font-feature-settings: "liga" 1, "kern" 1, "calt" 1;
-      text-rendering: optimizeLegibility;
-    }
-    .arabic.tajweed-arabic tajweed,
-    .arabic.tajweed-arabic .end {
-      color: inherit;
     }
     .memory-card .arabic { margin: 10px 0 8px; }
     .memory-bottom { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 10px; }
@@ -1357,28 +1351,26 @@
       transform: scale(.985);
     }
     .verse-surface.compact-context .mushaf-line.context {
-      min-height: 36px;
-      padding: 8px 10px;
+      min-height: 0;
+      height: 0;
+      padding: 0;
+      margin: 0;
       border-radius: 12px;
-      background: rgba(255,255,255,.76);
+      background: transparent;
       opacity: 1;
       transform: none;
       box-shadow: none;
+      border: 0;
+      overflow: hidden;
     }
     .verse-surface.compact-context .mushaf-line.context .arabic {
       display: none;
     }
     .verse-surface.compact-context .mushaf-line.context .review-meta {
-      margin: 0;
-      color: rgba(72,201,139,.94);
-      font-size: 11px;
-      background: transparent;
-      border: 0;
-      padding: 0;
+      display: none;
     }
     .verse-surface.compact-context .mushaf-line.context .review-meta::before {
-      content: "✓ ";
-      color: var(--green-dark);
+      content: none;
     }
     .mushaf-line.masked {
       background: rgba(255,255,255,.74);
@@ -1412,7 +1404,7 @@
       padding-top: 2px;
     }
     .flashcard .arabic, .answer-panel .arabic {
-      font-family: "KFGQPC Hafs", "Amiri Quran", "Amiri", "Scheherazade New", "Times New Roman", serif;
+      font-family: "KFGQPC Hafs", serif;
       font-size: clamp(26px, 7.6vw, 36px);
       line-height: 1.72;
       font-weight: 500;

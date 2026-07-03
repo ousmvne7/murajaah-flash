@@ -32,7 +32,6 @@
     let previewPlayer = null;
     let quranData = null;
     let quranPagesData = null;
-    let quranTajweedData = null;
     let pendingAutoFill = null;
     let quranPickerState = { surahId: "2", ayah: 2 };
 
@@ -342,7 +341,7 @@
               <button class="tiny-btn" aria-label="Supprimer" onclick="askDelete('${card.id}')">×</button>
             </div>
           </div>
-          <div class="arabic">${escapeHtml(card.blockageVerse)}</div>
+          <div class="arabic">${escapeHtml(cleanQuranDisplayText(card.blockageVerse))}</div>
           <div class="memory-bottom"><span class="status ${status[0]}">${status[1]}</span><span>${nextReviewLabel(card)}</span></div>
         </article>`;
       }).join("");
@@ -518,14 +517,6 @@
       return quranPagesData;
     }
 
-    async function loadQuranTajweedData() {
-      if (quranTajweedData) return quranTajweedData;
-      const response = await fetch("data/quran-tajweed.json");
-      if (!response.ok) throw new Error("Quran tajweed unavailable");
-      quranTajweedData = await response.json();
-      return quranTajweedData;
-    }
-
     function resolveSurah(data, value) {
       const key = normalizeQuranKey(value);
       const id = data.aliases[key] || (/^\d+$/.test(key) ? key : "");
@@ -543,6 +534,8 @@
       const surahId = resolveSurahId(surahValue);
       const ayah = String(ayahValue || "").trim();
       if (!surahId || !/^\d+$/.test(ayah)) return "";
+      const chapterPage = quranData?.chapters?.[String(surahId)]?.pages?.[ayah];
+      if (chapterPage) return chapterPage;
       return quranPagesData?.chapters?.[String(surahId)]?.pages?.[ayah] || "";
     }
 
@@ -552,21 +545,14 @@
       return page ? `${surah} — Page ${page} - V${ayah}` : `${surah} — V${ayah}`;
     }
 
-    function getTajweedVerseHtml(surahValue, ayahValue) {
-      if (!quranTajweedData || !surahValue || !ayahValue) return "";
-      const chapter = resolveSurah(quranTajweedData, surahValue);
-      if (!chapter) return "";
-      return chapter.tajweed?.[String(ayahValue)] || "";
+    function cleanQuranDisplayText(value = "") {
+      return String(value)
+        .replace(/[ \t\r\n\f]+/g, " ")
+        .trim();
     }
 
     function setArabicVerseContent(element, text, surahValue = "", ayahValue = "") {
-      const html = getTajweedVerseHtml(surahValue, ayahValue);
-      element.classList.toggle("tajweed-arabic", Boolean(html));
-      if (html) {
-        element.innerHTML = html;
-      } else {
-        element.textContent = text || "";
-      }
+      element.textContent = cleanQuranDisplayText(text || "");
     }
 
     function elanAudioFileName(surahId, ayah) {
@@ -990,6 +976,22 @@
       return formatVerseReference(surah, rawAyah);
     }
 
+    function appendElanAudioPanel(list) {
+      const elan = document.createElement("div");
+      elan.className = "elan-audio-panel";
+      elan.id = "elanAudioPanel";
+      elan.innerHTML = `
+        <div>
+          <span id="elanAudioMeta">Préparation de l’élan audio…</span>
+        </div>
+        <div class="elan-actions">
+          <button type="button" id="elanAudioBtn" onclick="playElanAudio()" disabled>…</button>
+          <span>1.25x</span>
+        </div>
+      `;
+      list.appendChild(elan);
+    }
+
     function renderReviewVerses(card, stage) {
       const list = document.getElementById("reviewVerseList");
       list.innerHTML = "";
@@ -1038,7 +1040,7 @@
 
         const meta = document.createElement("div");
         meta.className = "review-meta";
-        meta.textContent = index <= stage ? verse.ref : verse.label;
+        meta.textContent = index < stage ? "" : verse.label;
 
         if (index <= stage) {
           item.append(meta, arabic);
@@ -1048,19 +1050,7 @@
         list.appendChild(item);
 
         if (stage === 0 && index === 0) {
-          const elan = document.createElement("div");
-          elan.className = "elan-audio-panel";
-          elan.id = "elanAudioPanel";
-          elan.innerHTML = `
-            <div>
-              <span id="elanAudioMeta">Préparation de l’élan audio…</span>
-            </div>
-            <div class="elan-actions">
-              <button type="button" id="elanAudioBtn" onclick="playElanAudio()" disabled>…</button>
-              <span>1.25x</span>
-            </div>
-          `;
-          list.appendChild(elan);
+          appendElanAudioPanel(list);
         }
       });
 
@@ -1326,9 +1316,26 @@
       }, 2000);
     }
 
+    function verifyQuranFontLoaded() {
+      if (!document.fonts?.load || !document.fonts?.check) {
+        console.error("[Murajaah Flash] Font Loading API unavailable: cannot verify KFGQPC Hafs v18.");
+        return;
+      }
+
+      document.fonts.load('1em "KFGQPC Hafs"', "بِسۡمِ ٱللَّهِ").then(() => {
+        const loaded = document.fonts.check('1em "KFGQPC Hafs"', "بِسۡمِ ٱللَّهِ");
+        if (!loaded) {
+          console.error("[Murajaah Flash] Technical font error: KFGQPC Hafs v18 failed to load.");
+        }
+      }).catch(error => {
+        console.error("[Murajaah Flash] Technical font error: KFGQPC Hafs v18 failed to load.", error);
+      });
+    }
+
+    verifyQuranFontLoaded();
     renderDashboard();
     renderLibrary();
-    Promise.all([loadQuranData(), loadQuranPagesData(), loadQuranTajweedData()]).then(() => {
+    Promise.all([loadQuranData(), loadQuranPagesData()]).then(() => {
       renderDashboard();
       renderLibrary();
       if (document.getElementById("progressScreen")?.classList.contains("active")) renderProgress();
