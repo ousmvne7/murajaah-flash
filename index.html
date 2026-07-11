@@ -115,14 +115,32 @@
           <input type="hidden" id="editId">
           <input type="hidden" id="surah">
           <input type="hidden" id="ayah">
+          <input type="hidden" id="reviewMode" value="recitation">
           <textarea id="beforeVerse" hidden></textarea>
           <textarea id="blockageVerse" hidden></textarea>
           <textarea id="afterVerse" hidden></textarea>
 
+          <div class="form-card mode-card">
+            <div class="field-heading">
+              <span class="step-number">1</span>
+              <div><strong>Carte à créer</strong><small>Choisis le travail de mémoire.</small></div>
+            </div>
+            <div class="review-mode-chips" role="radiogroup" aria-label="Type de révision">
+              <button type="button" class="review-mode-chip active" data-review-mode="recitation" role="radio" aria-checked="true" onclick="selectReviewMode('recitation')">
+                Récitation
+                <small>enchaînement</small>
+              </button>
+              <button type="button" class="review-mode-chip" data-review-mode="translation" role="radio" aria-checked="false" onclick="selectReviewMode('translation')">
+                Comprendre
+                <small>sens du verset</small>
+              </button>
+            </div>
+          </div>
+
           <div class="auto-fill-card">
             <div class="auto-fill-copy">
-              <strong>Choisis ton passage</strong>
-              <span>Sélectionne la sourate et le verset cible. L’app prépare automatiquement le verset avant et le verset après.</span>
+              <strong id="passageCopyTitle">Choisis ton passage</strong>
+              <span id="passageCopyText">Sélectionne la sourate et le verset cible. L’app prépare automatiquement le verset avant et le verset après.</span>
             </div>
             <button type="button" class="quran-picker-open" onclick="openQuranPicker()">
               <span>Choisir un verset</span>
@@ -137,7 +155,16 @@
             </div>
           </div>
 
-          <div class="audio-card">
+          <div class="form-card translation-card" id="translationSection">
+            <div class="field-heading">
+              <span class="step-number">2</span>
+              <div><strong>Traduction française</strong><small>Pour réviser le sens en rappel actif.</small></div>
+            </div>
+            <textarea id="translation" class="translation-input" rows="4" placeholder="Écris ou colle la traduction française du verset cible…"></textarea>
+            <p class="translation-hint" id="translationHint">Optionnel pour la récitation · requis pour le mode traduction.</p>
+          </div>
+
+          <div class="audio-card" id="userAudioSection">
             <div class="field-heading">
               <span class="step-number">🎙</span>
               <div><strong>Élan audio</strong><small>Optionnel · lancé au début de la révision.</small></div>
@@ -277,6 +304,16 @@
             Commencer la révision
             <span id="introStartCount">0</span>
           </button>
+          <div class="review-session-picker" role="radiogroup" aria-label="Type de session">
+            <button type="button" class="review-session-chip active" data-session-mode="recitation" role="radio" aria-checked="true" onclick="selectSessionReviewMode('recitation')">
+              Récitation
+              <small id="sessionRecitationCount">0</small>
+            </button>
+            <button type="button" class="review-session-chip" data-session-mode="translation" role="radio" aria-checked="false" onclick="selectSessionReviewMode('translation')">
+              Comprendre
+              <small id="sessionTranslationCount">0</small>
+            </button>
+          </div>
         </div>
       </div>
       <div id="reviewSession">

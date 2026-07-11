@@ -13,7 +13,9 @@ murajaah-flash/
   js/
     app.js
   data/
-    quran-simple.json
+    quran-uthmani.json
+    quran-fr-hamidullah.json
+    quran-pages.json
   assets/
   docs/
 ```
@@ -50,6 +52,27 @@ Chaque passage contient notamment :
 - audio éventuel ;
 - prochaine date de révision ;
 - niveau de solidité.
+
+## TextRepository
+
+Les textes sources sont volontairement séparés par responsabilité.
+
+```text
+TextRepository
+├── KFGQPC Hafs
+│   └── data/quran-uthmani.json
+└── Hamidullah
+    └── data/quran-fr-hamidullah.json
+```
+
+Le texte arabe et les traductions ne doivent pas être mélangés dans un même repository logique.
+
+Objectif :
+
+- changer une traduction sans modifier le moteur Quran ;
+- ajouter d’autres traductions plus tard ;
+- garder le mode Réciter indépendant du mode Comprendre ;
+- éviter toute dépendance réseau pendant l’utilisation.
 
 ## Stockage
 

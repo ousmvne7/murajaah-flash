@@ -8,15 +8,33 @@
     const ACTIVITY_KEY = "murajaah_flash_v2_activity";
     const ELAN_RECITER_BASE = "https://everyayah.com/data/Minshawy_Murattal_128kbps";
     const ELAN_PLAYBACK_RATE = 1.25;
+    const TEXT_REPOSITORIES = {
+      kfgqpc: {
+        label: "KFGQPC Hafs",
+        path: "data/quran-uthmani.json"
+      }
+    };
+    const TRANSLATION_REPOSITORIES = {
+      hamidullah: {
+        label: "Muhammad Hamidullah",
+        language: "fr",
+        path: "data/quran-fr-hamidullah.json",
+        source: "QUL Resources"
+      }
+    };
     const DAY = 86400000;
     let cards = load(STORAGE_KEY, []).map(card => ({
       ...card,
+      type: card.type || "recitation",
+      translation: card.translation || "",
       beforeVerse: card.beforeVerse || card.prompt || "",
       blockageVerse: card.blockageVerse || card.answer || "",
       afterVerse: card.afterVerse || ""
     }));
     let activity = load(ACTIVITY_KEY, {});
     let activeFilter = "all";
+    let reviewPool = [];
+    let reviewSessionMode = "recitation";
     let reviewQueue = [];
     let reviewIndex = 0;
     let reviewStage = 0;
@@ -32,6 +50,8 @@
     let previewPlayer = null;
     let quranData = null;
     let quranPagesData = null;
+    let translationRepository = null;
+    let translationIndex = null;
     let pendingAutoFill = null;
     let quranPickerState = { surahId: "2", ayah: 2 };
 
@@ -316,10 +336,14 @@
       return "revient le " + new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(new Date(next));
     }
 
+    function cardTypeLabel(card) {
+      return card?.type === "translation" ? "Comprendre" : "Récitation";
+    }
+
     function renderLibrary() {
       const query = document.getElementById("searchInput").value.trim().toLowerCase();
       let filtered = cards.filter(card => !card.archived);
-      if (query) filtered = filtered.filter(card => [card.surah, card.ayah, card.beforeVerse, card.blockageVerse, card.afterVerse, card.note].join(" ").toLowerCase().includes(query));
+      if (query) filtered = filtered.filter(card => [card.surah, card.ayah, card.type, card.beforeVerse, card.blockageVerse, card.afterVerse, card.translation, card.note].join(" ").toLowerCase().includes(query));
       if (activeFilter === "due") filtered = filtered.filter(card => (card.nextReview || 0) <= startOfToday() + DAY - 1);
       if (activeFilter === "fragile") filtered = filtered.filter(card => ["very-fragile", "fragile"].includes(autoDifficulty(card).level));
       if (activeFilter === "mastered") filtered = filtered.filter(card => autoDifficulty(card).level === "mastered");
@@ -335,13 +359,14 @@
         const label = verseReference(card, 0);
         return `<article class="memory-card">
           <div class="memory-top">
-            <div class="memory-meta">${escapeHtml(label)}</div>
+            <div class="memory-meta">${escapeHtml(label)}<span class="memory-type">${escapeHtml(cardTypeLabel(card))}</span></div>
             <div class="memory-actions">
               <button class="tiny-btn" aria-label="Modifier" onclick="editCard('${card.id}')">✎</button>
               <button class="tiny-btn" aria-label="Supprimer" onclick="askDelete('${card.id}')">×</button>
             </div>
           </div>
           <div class="arabic">${escapeHtml(cleanQuranDisplayText(card.blockageVerse))}</div>
+          ${card.type === "translation" && card.translation ? `<p class="memory-translation">${escapeHtml(card.translation)}</p>` : ""}
           <div class="memory-bottom"><span class="status ${status[0]}">${status[1]}</span><span>${nextReviewLabel(card)}</span></div>
         </article>`;
       }).join("");
@@ -503,10 +528,31 @@
 
     async function loadQuranData() {
       if (quranData) return quranData;
-      const response = await fetch("data/quran-uthmani.json");
+      const response = await fetch(TEXT_REPOSITORIES.kfgqpc.path);
       if (!response.ok) throw new Error("Quran data unavailable");
       quranData = await response.json();
       return quranData;
+    }
+
+    async function loadTranslationRepository() {
+      if (translationRepository && translationIndex) {
+        return { data: translationRepository, index: translationIndex };
+      }
+
+      const response = await fetch(TRANSLATION_REPOSITORIES.hamidullah.path);
+      if (!response.ok) throw new Error("Translation data unavailable");
+
+      translationRepository = await response.json();
+      translationIndex = new Map(
+        translationRepository.map(item => [`${item.surah}:${item.ayah}`, item.text])
+      );
+
+      return { data: translationRepository, index: translationIndex };
+    }
+
+    async function translationForAyah(surahId, ayah) {
+      const { index } = await loadTranslationRepository();
+      return index.get(`${Number(surahId)}:${Number(ayah)}`) || "";
     }
 
     async function loadQuranPagesData() {
@@ -565,18 +611,18 @@
       const rawAyah = String(card.ayah || "").trim();
       if (!/^\d+$/.test(rawAyah)) return null;
       const targetAyah = Number.parseInt(rawAyah, 10);
-      if (targetAyah <= 1) return null;
 
       const data = await loadQuranData();
       await loadQuranPagesData();
       const chapter = resolveSurah(data, card.surah || "");
       if (!chapter) return null;
 
-      const beforeAyah = targetAyah - 1;
-      const fileName = elanAudioFileName(chapter.id, beforeAyah);
+      const audioAyah = card.type === "translation" ? targetAyah : targetAyah - 1;
+      if (audioAyah <= 0) return null;
+      const fileName = elanAudioFileName(chapter.id, audioAyah);
       return {
         url: `${ELAN_RECITER_BASE}/${fileName}`,
-        label: formatVerseReference(chapter.name, beforeAyah, quranPageFor(chapter.name, beforeAyah))
+        label: formatVerseReference(chapter.name, audioAyah, quranPageFor(chapter.name, audioAyah))
       };
     }
 
@@ -609,9 +655,12 @@
       });
 
       if (chapter) {
-        const safeAyah = Math.min(Math.max(2, quranPickerState.ayah), Math.max(2, chapter.versesCount - 1));
+        const pickerMode = document.getElementById("reviewMode")?.value || "recitation";
+        const minAyah = pickerMode === "translation" ? 1 : 2;
+        const maxAyah = pickerMode === "translation" ? chapter.versesCount : Math.max(2, chapter.versesCount - 1);
+        const safeAyah = Math.min(Math.max(minAyah, quranPickerState.ayah), maxAyah);
         quranPickerState.ayah = safeAyah;
-        for (let i = 2; i < chapter.versesCount; i++) {
+        for (let i = minAyah; i <= maxAyah; i++) {
           const button = document.createElement("button");
           button.type = "button";
           button.className = "quran-picker-option";
@@ -710,41 +759,54 @@
         await loadQuranPagesData();
         const chapter = resolveSurah(data, surahValue);
         const targetAyah = Number.parseInt(ayahValue, 10);
+        const selectedMode = document.getElementById("reviewMode").value || "recitation";
 
         if (!chapter) {
           toast("Sourate non reconnue. Essaie le numéro, ex. 2.");
           return;
         }
-        if (targetAyah <= 1) {
+        if (targetAyah < 1 || targetAyah > chapter.versesCount) {
+          toast("Verset introuvable dans cette sourate.");
+          return;
+        }
+        if (selectedMode === "recitation" && targetAyah <= 1) {
           toast("Impossible : il faut un verset avant le verset cible.");
           return;
         }
-        if (targetAyah >= chapter.versesCount) {
+        if (selectedMode === "recitation" && targetAyah >= chapter.versesCount) {
           toast("Impossible : il faut un verset après le verset cible.");
           return;
         }
 
-        const before = chapter.verses[String(targetAyah - 1)];
+        const before = chapter.verses[String(targetAyah - 1)] || "";
         const target = chapter.verses[String(targetAyah)];
-        const after = chapter.verses[String(targetAyah + 1)];
-        if (!before || !target || !after) {
-          toast("Les trois versets n’ont pas pu être trouvés.");
+        const after = chapter.verses[String(targetAyah + 1)] || "";
+        if (!target || (selectedMode === "recitation" && (!before || !after))) {
+          toast(selectedMode === "translation" ? "Le verset cible n’a pas pu être trouvé." : "Les trois versets n’ont pas pu être trouvés.");
           return;
         }
+
+        const translation = selectedMode === "translation"
+          ? await translationForAyah(chapter.id, targetAyah)
+          : "";
 
         pendingAutoFill = {
           surah: chapter.name,
           ayah: String(targetAyah),
           beforeVerse: before,
           blockageVerse: target,
-          afterVerse: after
+          afterVerse: after,
+          translation
         };
 
-        renderAutoPreview([
-          { label: "Verset avant", ref: formatVerseReference(chapter.name, targetAyah - 1, quranPageFor(chapter.name, targetAyah - 1)), text: before, surah: chapter.name, ayah: targetAyah - 1 },
-          { label: "Verset cible", ref: formatVerseReference(chapter.name, targetAyah, quranPageFor(chapter.name, targetAyah)), text: target, surah: chapter.name, ayah: targetAyah },
-          { label: "Verset après", ref: formatVerseReference(chapter.name, targetAyah + 1, quranPageFor(chapter.name, targetAyah + 1)), text: after, surah: chapter.name, ayah: targetAyah + 1 }
-        ]);
+        const previewItems = selectedMode === "translation"
+          ? [{ label: "Verset cible", ref: formatVerseReference(chapter.name, targetAyah, quranPageFor(chapter.name, targetAyah)), text: target, surah: chapter.name, ayah: targetAyah }]
+          : [
+              { label: "Verset avant", ref: formatVerseReference(chapter.name, targetAyah - 1, quranPageFor(chapter.name, targetAyah - 1)), text: before, surah: chapter.name, ayah: targetAyah - 1 },
+              { label: "Verset cible", ref: formatVerseReference(chapter.name, targetAyah, quranPageFor(chapter.name, targetAyah)), text: target, surah: chapter.name, ayah: targetAyah },
+              { label: "Verset après", ref: formatVerseReference(chapter.name, targetAyah + 1, quranPageFor(chapter.name, targetAyah + 1)), text: after, surah: chapter.name, ayah: targetAyah + 1 }
+            ];
+        renderAutoPreview(previewItems);
       } catch (_) {
         toast("Base Quran indisponible. Lance l’app depuis le serveur ou GitHub Pages.");
       }
@@ -752,7 +814,8 @@
 
     function applyAutoFill() {
       if (!pendingAutoFill) {
-        toast("Prévisualise d’abord les trois versets.");
+        const mode = document.getElementById("reviewMode")?.value || "recitation";
+        toast(mode === "translation" ? "Prévisualise d’abord le verset cible." : "Prévisualise d’abord les trois versets.");
         return;
       }
       document.getElementById("surah").value = pendingAutoFill.surah;
@@ -760,6 +823,10 @@
       document.getElementById("beforeVerse").value = pendingAutoFill.beforeVerse;
       document.getElementById("blockageVerse").value = pendingAutoFill.blockageVerse;
       document.getElementById("afterVerse").value = pendingAutoFill.afterVerse;
+      const translationInput = document.getElementById("translation");
+      if (translationInput && !translationInput.value.trim() && pendingAutoFill.translation) {
+        translationInput.value = pendingAutoFill.translation;
+      }
       toast("Champs remplis. Vérifie puis enregistre.");
     }
 
@@ -781,6 +848,35 @@
       });
     }
 
+    function selectReviewMode(value = "recitation") {
+      const mode = ["recitation", "translation"].includes(value) ? value : "recitation";
+      const input = document.getElementById("reviewMode");
+      if (input) input.value = mode;
+      document.querySelectorAll(".review-mode-chip").forEach(chip => {
+        const active = chip.dataset.reviewMode === mode;
+        chip.classList.toggle("active", active);
+        chip.setAttribute("aria-checked", active ? "true" : "false");
+      });
+      const section = document.getElementById("translationSection");
+      const hint = document.getElementById("translationHint");
+      const audioSection = document.getElementById("userAudioSection");
+      if (section) section.classList.toggle("is-optional", mode === "recitation");
+      if (audioSection) audioSection.hidden = mode === "translation";
+      if (hint) {
+        hint.textContent = mode === "recitation"
+          ? "Optionnel · utile si tu veux transformer ce passage plus tard en carte Comprendre."
+          : "Requis · cette traduction sera cachée pendant la révision.";
+      }
+      const title = document.getElementById("passageCopyTitle");
+      const text = document.getElementById("passageCopyText");
+      if (title) title.textContent = mode === "translation" ? "Choisis le verset" : "Choisis ton passage";
+      if (text) {
+        text.textContent = mode === "translation"
+          ? "Sélectionne uniquement le verset cible. La carte servira à retrouver son sens."
+          : "Sélectionne la sourate et le verset cible. L’app prépare automatiquement le verset avant et le verset après.";
+      }
+    }
+
     function saveCard(event) {
       event.preventDefault();
       const editId = document.getElementById("editId").value;
@@ -788,31 +884,52 @@
       const beforeVerse = document.getElementById("beforeVerse").value.trim();
       const blockageVerse = document.getElementById("blockageVerse").value.trim();
       const afterVerse = document.getElementById("afterVerse").value.trim();
-      if (!beforeVerse || !blockageVerse || !afterVerse) {
+      const selectedMode = document.getElementById("reviewMode").value || "recitation";
+      if (!blockageVerse || (selectedMode === "recitation" && (!beforeVerse || !afterVerse))) {
         toast("Choisis puis valide un passage Quran avant d’enregistrer.");
         return;
       }
-      const data = {
-        id: editId || (Date.now().toString(36) + Math.random().toString(36).slice(2, 7)),
+      const translation = document.getElementById("translation").value.trim();
+      if (selectedMode === "translation" && !translation) {
+        toast("Ajoute une traduction française pour créer la carte traduction.");
+        return;
+      }
+      const baseData = {
         surah: document.getElementById("surah").value.trim(),
         ayah: document.getElementById("ayah").value.trim(),
         beforeVerse,
         blockageVerse,
         afterVerse,
+        translation,
         difficulty: document.getElementById("difficulty").value,
         note: document.getElementById("note").value.trim(),
-        audioData: recordedAudio || "",
+        audioData: selectedMode === "translation" ? "" : (recordedAudio || ""),
         createdAt: existing?.createdAt || Date.now(),
         nextReview: existing?.nextReview || Date.now(),
         strength: existing?.strength || 0,
         interval: existing?.interval || 0,
         reviews: existing?.reviews || 0
       };
-      if (existing) cards = cards.map(card => card.id === editId ? data : card);
-      else cards.push(data);
+
+      if (existing) {
+        const data = {
+          ...baseData,
+          id: editId,
+          type: selectedMode,
+          audioData: selectedMode === "translation" ? "" : (recordedAudio || "")
+        };
+        cards = cards.map(card => card.id === editId ? data : card);
+      } else {
+        cards.push({
+          ...baseData,
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+          type: selectedMode,
+          audioData: selectedMode === "translation" ? "" : (recordedAudio || "")
+        });
+      }
       persist();
       resetForm();
-      toast(existing ? "Passage modifié." : "Passage ajouté à ta prochaine session.");
+      toast(existing ? "Passage modifié." : selectedMode === "translation" ? "Carte Comprendre ajoutée." : "Passage ajouté à ta prochaine session.");
       showScreen("library");
     }
 
@@ -825,7 +942,9 @@
       document.getElementById("beforeVerse").value = card.beforeVerse || card.prompt || "";
       document.getElementById("blockageVerse").value = card.blockageVerse || card.answer || "";
       document.getElementById("afterVerse").value = card.afterVerse || "";
+      selectReviewMode(card.type || "recitation");
       selectDifficulty(card.difficulty || "transition");
+      document.getElementById("translation").value = card.translation || "";
       document.getElementById("note").value = card.note || "";
       recordedAudio = card.audioData || "";
       updateRecorderUI(recordedAudio ? "ready" : "empty");
@@ -834,15 +953,19 @@
         ayah: card.ayah || "",
         beforeVerse: card.beforeVerse || card.prompt || "",
         blockageVerse: card.blockageVerse || card.answer || "",
-        afterVerse: card.afterVerse || ""
+        afterVerse: card.afterVerse || "",
+        translation: card.translation || ""
       };
       updateQuranPickerTitle();
       const editAyah = /^\d+$/.test(String(card.ayah || "")) ? Number.parseInt(card.ayah, 10) : null;
-      renderAutoPreview([
-        { label: "Verset avant", ref: verseReference(card, -1), text: pendingAutoFill.beforeVerse, surah: card.surah, ayah: editAyah ? editAyah - 1 : "" },
-        { label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse, surah: card.surah, ayah: editAyah || "" },
-        { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse, surah: card.surah, ayah: editAyah ? editAyah + 1 : "" }
-      ]);
+      const previewItems = (card.type || "recitation") === "translation"
+        ? [{ label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse, surah: card.surah, ayah: editAyah || "" }]
+        : [
+            { label: "Verset avant", ref: verseReference(card, -1), text: pendingAutoFill.beforeVerse, surah: card.surah, ayah: editAyah ? editAyah - 1 : "" },
+            { label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse, surah: card.surah, ayah: editAyah || "" },
+            { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse, surah: card.surah, ayah: editAyah ? editAyah + 1 : "" }
+          ];
+      renderAutoPreview(previewItems);
       document.getElementById("formTitle").textContent = "Modifie ton passage";
       document.getElementById("saveBtn").textContent = "Enregistrer les modifications";
       showScreen("add");
@@ -857,9 +980,45 @@
       recordedAudio = "";
       updateRecorderUI("empty");
       clearAutoPreview();
+      selectReviewMode("recitation");
       selectDifficulty("transition");
       document.getElementById("formTitle").textContent = "Ajoute un passage";
       document.getElementById("saveBtn").textContent = "Enregistrer";
+    }
+
+    function updateReviewIntroCounts() {
+      const recitationCount = reviewPool.filter(card => (card.type || "recitation") === "recitation").length;
+      const translationCount = reviewPool.filter(card => card.type === "translation").length;
+      const activeCount = reviewPool.filter(card => (card.type || "recitation") === reviewSessionMode).length;
+      const estimatedMinutes = Math.max(1, Math.ceil(activeCount * 0.45));
+
+      document.getElementById("introDueCount").textContent = activeCount;
+      document.getElementById("introStartCount").textContent = activeCount;
+      document.getElementById("introPlural").textContent = activeCount > 1 ? "s" : "";
+      document.getElementById("introEstimate").textContent = activeCount
+        ? `≈ ${estimatedMinutes} min pour cette session.`
+        : "Aucune carte à revoir dans ce mode aujourd’hui.";
+      document.getElementById("sessionRecitationCount").textContent = recitationCount;
+      document.getElementById("sessionTranslationCount").textContent = translationCount;
+
+      document.querySelectorAll(".review-session-chip").forEach(chip => {
+        const active = chip.dataset.sessionMode === reviewSessionMode;
+        const count = chip.dataset.sessionMode === "translation" ? translationCount : recitationCount;
+        chip.classList.toggle("active", active);
+        chip.disabled = count === 0;
+        chip.setAttribute("aria-checked", active ? "true" : "false");
+      });
+      reviewQueue = reviewPool
+        .filter(card => (card.type || "recitation") === reviewSessionMode)
+        .sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
+    }
+
+    function selectSessionReviewMode(mode = "recitation") {
+      if (!["recitation", "translation"].includes(mode)) return;
+      const count = reviewPool.filter(card => (card.type || "recitation") === mode).length;
+      if (!count) return;
+      reviewSessionMode = mode;
+      updateReviewIntroCounts();
     }
 
     async function startReview() {
@@ -868,18 +1027,14 @@
       } catch (_) {
         quranData = null;
       }
-      reviewQueue = dueCards().sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
-      if (!reviewQueue.length) {
+      reviewPool = dueCards().sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
+      if (!reviewPool.length) {
         toast(cards.length ? "Tu es à jour pour aujourd’hui." : "Ajoute d’abord un passage.");
         if (!cards.length) showScreen("add");
         return;
       }
-      const dueCount = reviewQueue.length;
-      const estimatedMinutes = Math.max(1, Math.ceil(dueCount * 0.45));
-      document.getElementById("introDueCount").textContent = dueCount;
-      document.getElementById("introStartCount").textContent = dueCount;
-      document.getElementById("introPlural").textContent = dueCount > 1 ? "s" : "";
-      document.getElementById("introEstimate").textContent = `≈ ${estimatedMinutes} min pour revoir tes passages fragiles.`;
+      reviewSessionMode = reviewPool.some(card => (card.type || "recitation") === "recitation") ? "recitation" : "translation";
+      updateReviewIntroCounts();
       document.getElementById("reviewIntro").classList.add("active");
       document.getElementById("reviewSession").style.display = "none";
       document.getElementById("reviewSummary").classList.remove("active");
@@ -902,10 +1057,11 @@
     function renderReviewCard() {
       const card = reviewQueue[reviewIndex];
       if (!card) return finishReview();
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       document.getElementById("reviewCounter").textContent = `${reviewIndex + 1} / ${reviewQueue.length}`;
       document.getElementById("reviewProgress").style.width = `${(reviewIndex + 1) / reviewQueue.length * 100}%`;
       reviewStage = 0;
-      setReviewStep(0);
+      setReviewStep(card.type === "translation" ? 1 : 0);
       renderReviewVerses(card, 0);
       setupElanAudio(card);
       const reviewAudio = document.getElementById("reviewAudio");
@@ -937,10 +1093,15 @@
         reviewAudio.load();
       }
       document.getElementById("ratingWrap").classList.remove("visible");
+      document.querySelector(".rating-title").textContent = card.type === "translation"
+        ? "As-tu retrouvé le sens du verset ?"
+        : "As-tu enchaîné les deux versets sans hésiter ?";
       document.getElementById("reviewInstruction").style.display = "block";
-      document.getElementById("reviewInstruction").textContent = "Récite de mémoire le passage qui vient après.";
+      document.getElementById("reviewInstruction").textContent = card.type === "translation"
+        ? "Retrouve le sens du verset en français."
+        : "Récite de mémoire le passage qui vient après.";
       document.getElementById("revealBtn").style.display = "block";
-      document.getElementById("revealBtn").textContent = "Révéler le passage";
+      document.getElementById("revealBtn").textContent = card.type === "translation" ? "Révéler la traduction" : "Révéler le passage";
     }
 
     function advanceReviewStage() {
@@ -949,6 +1110,16 @@
       const reviewAudio = document.getElementById("reviewAudio");
       reviewAudio.pause();
       resetElanAudio();
+      if (card.type === "translation") {
+        reviewStage = 1;
+        setReviewStep(1);
+        renderReviewVerses(card, 1);
+        document.getElementById("reviewInstruction").style.display = "none";
+        document.getElementById("revealBtn").style.display = "none";
+        document.getElementById("ratingWrap").classList.add("visible");
+        speakTranslationAudio(true);
+        return;
+      }
       if (reviewStage === 0) {
         reviewStage = 1;
         setReviewStep(1);
@@ -992,7 +1163,58 @@
       list.appendChild(elan);
     }
 
+    function renderTranslationReviewVerses(card, stage) {
+      const list = document.getElementById("reviewVerseList");
+      list.innerHTML = "";
+      list.className = "verse-surface translation-surface single";
+
+      const pageHead = document.createElement("div");
+      pageHead.className = "review-page-head";
+      pageHead.innerHTML = `
+        <span>${escapeHtml(card.surah || "Passage personnel")}</span>
+        <span>${escapeHtml(card.ayah ? verseReference(card, 0).replace((card.surah || "Passage personnel") + " — ", "") : "Comprendre")}</span>
+      `;
+      list.appendChild(pageHead);
+
+      const item = document.createElement("div");
+      item.className = "review-verse-item mushaf-line active translation-arabic-line";
+
+      const meta = document.createElement("div");
+      meta.className = "review-meta";
+      meta.textContent = verseReference(card, 0);
+
+      const arabic = document.createElement("div");
+      arabic.className = "arabic";
+      arabic.dir = "rtl";
+      setArabicVerseContent(arabic, card.blockageVerse, card.surah, card.ayah);
+
+      item.append(meta, arabic);
+      list.appendChild(item);
+
+      if (stage === 0) appendElanAudioPanel(list);
+
+      const answer = document.createElement("div");
+      answer.className = stage > 0 ? "translation-answer revealed" : "translation-answer masked";
+      if (stage > 0) {
+        answer.innerHTML = `
+          <span>Sens du verset</span>
+          <p>${escapeHtml(card.translation || "Traduction non renseignée.")}</p>
+          <button type="button" class="translation-audio-btn" onclick="speakTranslationAudio()">Écouter en français</button>
+        `;
+      } else {
+        answer.innerHTML = `
+          <span>Sens caché</span>
+          <div class="mask-lines"><span></span><span></span><span></span></div>
+        `;
+      }
+      list.appendChild(answer);
+    }
+
     function renderReviewVerses(card, stage) {
+      if (card.type === "translation") {
+        renderTranslationReviewVerses(card, stage);
+        return;
+      }
       const list = document.getElementById("reviewVerseList");
       list.innerHTML = "";
       list.classList.toggle("single", stage === 0);
@@ -1074,6 +1296,22 @@
       });
     }
 
+    function speakTranslationAudio(automatic = false) {
+      const card = reviewQueue[reviewIndex];
+      const text = String(card?.translation || "").trim();
+      if (!text) return;
+      if (!("speechSynthesis" in window) || !window.SpeechSynthesisUtterance) {
+        if (!automatic) toast("Lecture vocale indisponible sur ce navigateur.");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "fr-FR";
+      utterance.rate = 0.94;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+
     function resetElanAudio() {
       const audio = document.getElementById("elanAudio");
       const panel = document.getElementById("elanAudioPanel");
@@ -1099,14 +1337,14 @@
       panel.hidden = false;
       button.disabled = true;
       button.textContent = "…";
-      meta.textContent = "Préparation de l’élan audio…";
+      meta.textContent = card.type === "translation" ? "Préparation de l’audio du verset…" : "Préparation de l’élan audio…";
 
       try {
         const info = await getElanAudioInfo(card);
         if (reviewStage !== 0 || reviewQueue[reviewIndex]?.id !== card.id) return resetElanAudio();
         if (!info) {
           button.textContent = "!";
-          meta.textContent = "Élan audio disponible seulement pour un passage Quran reconnu.";
+          meta.textContent = "Audio disponible seulement pour un passage Quran reconnu.";
           return;
         }
 
@@ -1122,12 +1360,12 @@
         audio.onerror = () => {
           button.textContent = "!";
           button.disabled = false;
-          meta.textContent = "Élan audio indisponible pour ce verset.";
+          meta.textContent = "Audio indisponible pour ce verset.";
         };
         playElanAudio(true);
       } catch (_) {
         button.textContent = "!";
-        meta.textContent = "Ouvre l’app via localhost ou GitHub Pages pour charger l’élan audio.";
+        meta.textContent = "Ouvre l’app via localhost ou GitHub Pages pour charger l’audio.";
       }
     }
 
@@ -1237,6 +1475,7 @@
       const audio = document.getElementById("reviewAudio");
       audio.pause();
       audio.currentTime = 0;
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       resetElanAudio();
       document.getElementById("reviewScreen").classList.remove("active");
       document.getElementById("reviewIntro").classList.remove("active");

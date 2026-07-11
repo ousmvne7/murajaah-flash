@@ -27,6 +27,7 @@ L’application programme ensuite la prochaine révision avec une répétition e
 - Remplissage automatique du verset avant, cible et après
 - Audio d’élan sur le verset avant
 - Récitation Minshawi en ligne à 1.25x
+- Mode Comprendre avec traduction française préremplie
 - Répétition espacée
 - Données locales
 - Sans compte
@@ -71,7 +72,7 @@ L’écran d’accueil affiche la session du jour, le nombre de passages à revo
 ### Ajouter
 
 L’utilisateur choisit une sourate et un verset cible.  
-L’application prépare automatiquement :
+En mode **Réciter**, l’application prépare automatiquement :
 
 - le verset avant ;
 - le verset cible ;
@@ -79,13 +80,18 @@ L’application prépare automatiquement :
 
 Un audio personnel peut aussi être ajouté sur le verset avant.
 
+En mode **Comprendre**, l’utilisateur choisit uniquement le verset cible.  
+La traduction française Muhammad Hamidullah est préremplie automatiquement, puis reste modifiable avant l’enregistrement.
+
 ### Réviser
 
-La révision se fait en trois étapes :
+Le mode **Réciter** se fait en trois étapes :
 
 1. écouter ou lire le verset avant ;
 2. retrouver le verset cible ;
 3. continuer avec le verset de liaison.
+
+Le mode **Comprendre** affiche le verset arabe, cache d’abord la traduction, puis demande à l’utilisateur de retrouver le sens du verset avant de s’auto-évaluer.
 
 ### Passages
 
@@ -119,6 +125,34 @@ Le détail complet du projet est séparé dans le dossier [`docs`](docs/).
 - [`docs/architecture.md`](docs/architecture.md) — structure technique
 - [`docs/revision.md`](docs/revision.md) — méthode de révision
 - [`docs/roadmap.md`](docs/roadmap.md) — prochaines étapes
+
+## Sources des textes
+
+Murajaah Flash sépare les sources textuelles pour pouvoir remplacer une traduction sans toucher au texte arabe.
+
+```text
+TextRepository
+├── KFGQPC Hafs — texte arabe Uthmani
+└── Hamidullah — traduction française
+```
+
+### Texte arabe
+
+- Source : King Fahd Glorious Qur'an Printing Complex, via les ressources KFGQPC Hafs utilisées dans l’app.
+- Fichier local : `data/quran-uthmani.json`
+- Police : `hafs.18.ttf`
+
+### Traduction française
+
+- Traduction : Muhammad Hamidullah
+- Source : [QUL Resources — Muhammad Hamidullah](https://qul.tarteel.ai/resources/translation/227)
+- Ressource API QUL : `quran.fr.hamidullah`
+- Fichier local : `data/quran-fr-hamidullah.json`
+- Format interne : `{ surah, ayah, text }`
+
+Les données sont embarquées localement : l’application n’a pas besoin d’appeler QUL pendant l’utilisation.
+
+Les conditions d’utilisation de QUL renvoient vers les [Terms of Service de Tarteel](https://www.tarteel.ai/terms). Toute distribution publique ou commerciale doit respecter ces conditions et les crédits de la source.
 
 ## Roadmap courte
 
