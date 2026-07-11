@@ -27,7 +27,6 @@ L’application programme ensuite la prochaine révision avec une répétition e
 - Remplissage automatique du verset avant, cible et après
 - Audio d’élan sur le verset avant
 - Récitation Minshawi en ligne à 1.25x
-- Mode Comprendre avec traduction française préremplie
 - Répétition espacée
 - Données locales
 - Sans compte
@@ -80,9 +79,6 @@ En mode **Réciter**, l’application prépare automatiquement :
 
 Un audio personnel peut aussi être ajouté sur le verset avant.
 
-En mode **Comprendre**, l’utilisateur choisit uniquement le verset cible.  
-La traduction française Muhammad Hamidullah est préremplie automatiquement, puis reste modifiable avant l’enregistrement.
-
 ### Réviser
 
 Le mode **Réciter** se fait en trois étapes :
@@ -90,8 +86,6 @@ Le mode **Réciter** se fait en trois étapes :
 1. écouter ou lire le verset avant ;
 2. retrouver le verset cible ;
 3. continuer avec le verset de liaison.
-
-Le mode **Comprendre** affiche le verset arabe, cache d’abord la traduction, puis demande à l’utilisateur de retrouver le sens du verset avant de s’auto-évaluer.
 
 ### Passages
 
@@ -117,6 +111,16 @@ Puis ouvrir :
 http://127.0.0.1:8765/
 ```
 
+## Installer l’application
+
+La PWA doit être ouverte depuis une adresse **HTTPS** (par exemple GitHub Pages) ou depuis `localhost` pendant le développement. Elle ne peut pas être installée correctement depuis un fichier ouvert en `file://`.
+
+- **Android / Chrome** : menu Chrome → **Ajouter à l’écran d’accueil** ou **Installer l’application**.
+- **iPhone / iPad** : bouton **Partager** → **Sur l’écran d’accueil** → **Ajouter**.
+- **Ordinateur / Chrome ou Edge** : icône d’installation située à droite de la barre d’adresse.
+
+Une fois installée, Murajaah Flash s’ouvre en mode autonome, sans barre d’adresse. L’interface, les données coraniques et les polices principales sont disponibles hors ligne après le premier chargement. L’audio Minshawi et les pages Mushaf non encore consultées nécessitent une connexion ; les pages Mushaf déjà ouvertes sont mises en cache.
+
 ## Documentation
 
 Le détail complet du projet est séparé dans le dossier [`docs`](docs/).
@@ -128,13 +132,7 @@ Le détail complet du projet est séparé dans le dossier [`docs`](docs/).
 
 ## Sources des textes
 
-Murajaah Flash sépare les sources textuelles pour pouvoir remplacer une traduction sans toucher au texte arabe.
-
-```text
-TextRepository
-├── KFGQPC Hafs — texte arabe Uthmani
-└── Hamidullah — traduction française
-```
+Murajaah Flash utilise un texte arabe Uthmani local pour préparer les trois versets de récitation.
 
 ### Texte arabe
 
@@ -142,25 +140,13 @@ TextRepository
 - Fichier local : `data/quran-uthmani.json`
 - Police : `hafs.18.ttf`
 
-### Traduction française
-
-- Traduction : Muhammad Hamidullah
-- Source : [QUL Resources — Muhammad Hamidullah](https://qul.tarteel.ai/resources/translation/227)
-- Ressource API QUL : `quran.fr.hamidullah`
-- Fichier local : `data/quran-fr-hamidullah.json`
-- Format interne : `{ surah, ayah, text }`
-
-Les données sont embarquées localement : l’application n’a pas besoin d’appeler QUL pendant l’utilisation.
-
-Les conditions d’utilisation de QUL renvoient vers les [Terms of Service de Tarteel](https://www.tarteel.ai/terms). Toute distribution publique ou commerciale doit respecter ces conditions et les crédits de la source.
-
 ## Roadmap courte
 
 - Ajouter des screenshots propres
 - Ajouter des GIF de démonstration
 - Améliorer la fin de session
 - Stabiliser l’expérience sur petits écrans
-- Préparer une vraie version mobile installable
+- Tester l’installation PWA sur plusieurs appareils
 
 ## Statut
 

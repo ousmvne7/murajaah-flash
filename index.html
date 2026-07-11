@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#44357d">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Murajaah">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
   <title>Murajaah Flash — Application complète</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
@@ -120,31 +122,52 @@
           <textarea id="blockageVerse" hidden></textarea>
           <textarea id="afterVerse" hidden></textarea>
 
-          <div class="form-card mode-card">
-            <div class="field-heading">
-              <span class="step-number">1</span>
-              <div><strong>Carte à créer</strong><small>Choisis le travail de mémoire.</small></div>
-            </div>
-            <div class="review-mode-chips" role="radiogroup" aria-label="Type de révision">
-              <button type="button" class="review-mode-chip active" data-review-mode="recitation" role="radio" aria-checked="true" onclick="selectReviewMode('recitation')">
-                Récitation
-                <small>enchaînement</small>
-              </button>
-              <button type="button" class="review-mode-chip" data-review-mode="translation" role="radio" aria-checked="false" onclick="selectReviewMode('translation')">
-                Comprendre
-                <small>sens du verset</small>
-              </button>
-            </div>
-          </div>
-
-          <div class="auto-fill-card">
-            <div class="auto-fill-copy">
-              <strong id="passageCopyTitle">Choisis ton passage</strong>
-              <span id="passageCopyText">Sélectionne la sourate et le verset cible. L’app prépare automatiquement le verset avant et le verset après.</span>
+          <div class="auto-fill-card premium-passage-card">
+            <div class="passage-card-head">
+              <span class="passage-card-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6.5 4.5h7.2a2.8 2.8 0 0 1 2.8 2.8v12.2H8.2a3.7 3.7 0 0 1-3.7-3.7V6.5a2 2 0 0 1 2-2Z"/>
+                  <path d="M8.2 4.5v15"/>
+                  <path d="M11.5 8.2l1.1 1.1 2-2"/>
+                </svg>
+              </span>
+              <div class="auto-fill-copy">
+                <strong id="passageCopyTitle">Choisis ton passage</strong>
+                <span id="passageCopyText">Sélectionne la sourate et le verset cible. L’app prépare automatiquement le verset avant et le verset après.</span>
+              </div>
+              <div class="passage-card-art" aria-hidden="true">
+                <svg viewBox="0 0 180 140" fill="none">
+                  <path d="M32 105c21-18 43-18 59 1 17-19 39-19 58-1" stroke="rgba(255,255,255,.26)" stroke-width="8" stroke-linecap="round"/>
+                  <path d="M38 36c20-8 38-4 53 12v55C76 88 57 83 38 91V36Z" fill="url(#bookA)"/>
+                  <path d="M142 36c-20-8-38-4-53 12v55c15-15 34-20 53-12V36Z" fill="url(#bookB)"/>
+                  <path d="M89 49v55" stroke="rgba(255,255,255,.48)" stroke-width="3"/>
+                  <path d="M49 51c11-2 21 0 31 6M49 66c12-2 22 0 31 6M132 51c-11-2-21 0-31 6M132 66c-12-2-22 0-31 6" stroke="rgba(255,255,255,.50)" stroke-width="3" stroke-linecap="round"/>
+                  <path d="M40 104h100" stroke="rgba(21,18,73,.34)" stroke-width="7" stroke-linecap="round"/>
+                  <path d="M25 27l4 8 8 4-8 4-4 8-4-8-8-4 8-4 4-8ZM142 17l3 6 6 3-6 3-3 6-3-6-6-3 6-3 3-6Z" fill="rgba(255,255,255,.78)"/>
+                  <defs>
+                    <linearGradient id="bookA" x1="38" y1="36" x2="91" y2="103" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffffff" stop-opacity=".70"/>
+                      <stop offset="1" stop-color="#8f7cff" stop-opacity=".45"/>
+                    </linearGradient>
+                    <linearGradient id="bookB" x1="142" y1="36" x2="89" y2="103" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#d8ceff" stop-opacity=".80"/>
+                      <stop offset="1" stop-color="#6f54ef" stop-opacity=".42"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
             </div>
             <button type="button" class="quran-picker-open" onclick="openQuranPicker()">
+              <span class="picker-target-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="7"/>
+                  <circle cx="12" cy="12" r="2.5"/>
+                  <path d="M12 2.7v3.1M12 18.2v3.1M2.7 12h3.1M18.2 12h3.1"/>
+                </svg>
+              </span>
               <span>Choisir un verset</span>
               <b id="quranPickerSummary">Sourate + verset cible</b>
+              <span class="picker-arrow" aria-hidden="true">›</span>
             </button>
             <div class="auto-preview" id="autoPreview" hidden>
               <div class="auto-preview-list" id="autoPreviewList"></div>
@@ -155,22 +178,24 @@
             </div>
           </div>
 
-          <div class="form-card translation-card" id="translationSection">
+          <div class="audio-card premium-audio-card" id="userAudioSection">
             <div class="field-heading">
-              <span class="step-number">2</span>
-              <div><strong>Traduction française</strong><small>Pour réviser le sens en rappel actif.</small></div>
-            </div>
-            <textarea id="translation" class="translation-input" rows="4" placeholder="Écris ou colle la traduction française du verset cible…"></textarea>
-            <p class="translation-hint" id="translationHint">Optionnel pour la récitation · requis pour le mode traduction.</p>
-          </div>
-
-          <div class="audio-card" id="userAudioSection">
-            <div class="field-heading">
-              <span class="step-number">🎙</span>
+              <span class="step-number audio-step-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 14.5a3.5 3.5 0 0 0 3.5-3.5V6.5a3.5 3.5 0 0 0-7 0V11a3.5 3.5 0 0 0 3.5 3.5Z"/>
+                  <path d="M18.5 10.5a6.5 6.5 0 0 1-13 0"/>
+                  <path d="M12 17v4"/>
+                  <path d="M8.5 21h7"/>
+                </svg>
+              </span>
               <div><strong>Élan audio</strong><small>Optionnel · lancé au début de la révision.</small></div>
+              <div class="audio-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
             </div>
             <div class="inline-recorder">
-              <button type="button" class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙 Enregistrer</button>
+              <button type="button" class="record-btn" id="recordBtn" onclick="toggleRecording()">
+                <span aria-hidden="true">♬</span>
+                Enregistrer
+              </button>
               <input type="file" id="audioCaptureFallback" accept="audio/*" capture="user" hidden onchange="importCapturedAudio(event)">
               <button type="button" class="audio-action listen-btn" id="previewAudioBtn" aria-label="Réécouter l’audio avant d’enregistrer le passage" onclick="previewRecordedAudio()" disabled>▶ Écouter</button>
               <button type="button" class="audio-action" id="deleteAudioBtn" aria-label="Supprimer l’audio" onclick="deleteRecordedAudio()" disabled>×</button>
@@ -178,16 +203,21 @@
             </div>
           </div>
 
-          <div class="sequence-heading"><span>Repère personnel</span></div>
+          <div class="sequence-heading refined-heading">
+            <span class="heading-bubble" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7.5" r="3.5"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg>
+            </span>
+            <span>Repère personnel</span>
+          </div>
           <div class="form-card detail-card">
             <div class="field">
               <label>Type d’hésitation</label>
               <input type="hidden" id="difficulty" value="transition">
               <div class="difficulty-chips" role="radiogroup" aria-label="Type d’hésitation">
-                <button type="button" class="difficulty-chip active" data-difficulty="transition" role="radio" aria-checked="true" onclick="selectDifficulty('transition')">Enchaînement</button>
-                <button type="button" class="difficulty-chip" data-difficulty="beginning" role="radio" aria-checked="false" onclick="selectDifficulty('beginning')">Début</button>
-                <button type="button" class="difficulty-chip" data-difficulty="similar" role="radio" aria-checked="false" onclick="selectDifficulty('similar')">Confusion</button>
-                <button type="button" class="difficulty-chip" data-difficulty="forgotten" role="radio" aria-checked="false" onclick="selectDifficulty('forgotten')">Oubli fréquent</button>
+                <button type="button" class="difficulty-chip active" data-difficulty="transition" role="radio" aria-checked="true" onclick="selectDifficulty('transition')"><span class="chip-icon">⌁</span>Enchaînement</button>
+                <button type="button" class="difficulty-chip" data-difficulty="beginning" role="radio" aria-checked="false" onclick="selectDifficulty('beginning')"><span class="chip-icon">↺</span>Début</button>
+                <button type="button" class="difficulty-chip" data-difficulty="similar" role="radio" aria-checked="false" onclick="selectDifficulty('similar')"><span class="chip-icon">?</span>Confusion</button>
+                <button type="button" class="difficulty-chip" data-difficulty="forgotten" role="radio" aria-checked="false" onclick="selectDifficulty('forgotten')"><span class="chip-icon">▱</span>Oubli fréquent</button>
               </div>
             </div>
             <div class="field">
@@ -261,6 +291,10 @@
               <div><strong>Données locales</strong><span>Tes passages et audios restent sur cet appareil.</span></div>
               <span style="font-size:24px">🔒</span>
             </div>
+            <button class="setting-row setting-row-button" type="button" onclick="openMushafPrototype()">
+              <div><strong>Prototype Mushaf visuel</strong><span>Test isolé sur la page 3.</span></div>
+              <span class="setting-arrow">›</span>
+            </button>
           </div>
           <div class="section-title"><h2>Données</h2></div>
           <button class="secondary-btn" onclick="exportData()">Exporter mes cartes</button>
@@ -300,18 +334,35 @@
             <p><strong id="introDueCount">0</strong> passage<span id="introPlural">s</span> à revoir aujourd’hui.</p>
             <small id="introEstimate">Une session courte suffit pour rester à jour.</small>
           </div>
+          <div class="review-visual-choice" role="radiogroup" aria-label="Mode d'affichage de la révision">
+            <button class="active" type="button" data-review-visual="normal" onclick="selectReviewVisualMode('normal')" role="radio" aria-checked="true">
+              <span>Mode normal</span>
+              <small>Carte actuelle</small>
+            </button>
+            <button type="button" data-review-visual="mushaf" onclick="selectReviewVisualMode('mushaf')" role="radio" aria-checked="false">
+              <span>Mode Mushaf</span>
+              <small>Page visuelle</small>
+            </button>
+          </div>
           <button class="primary-btn intro-start-btn" onclick="beginReviewSession()">
             Commencer la révision
             <span id="introStartCount">0</span>
           </button>
-          <div class="review-session-picker" role="radiogroup" aria-label="Type de session">
-            <button type="button" class="review-session-chip active" data-session-mode="recitation" role="radio" aria-checked="true" onclick="selectSessionReviewMode('recitation')">
-              Récitation
-              <small id="sessionRecitationCount">0</small>
-            </button>
-            <button type="button" class="review-session-chip" data-session-mode="translation" role="radio" aria-checked="false" onclick="selectSessionReviewMode('translation')">
-              Comprendre
-              <small id="sessionTranslationCount">0</small>
+          <div class="review-extra-options">
+            <div class="section-divider"><span>Autres options</span></div>
+            <button class="review-option-card hifdh-launch-card" type="button" onclick="openHifdhTest()">
+              <span class="option-icon trophy" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v4a5 5 0 0 1-10 0V4Z"/>
+                  <path d="M7 7H4a3 3 0 0 0 3 3"/><path d="M17 7h3a3 3 0 0 1-3 3"/>
+                </svg>
+              </span>
+              <span>
+                <strong>Tester mon hifdh</strong>
+                <small>Teste un hizb et détecte tes points faibles.</small>
+              </span>
+              <b>NOUVEAU</b>
+              <svg class="option-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
         </div>
@@ -344,8 +395,14 @@
           </article>
         </div>
         <div class="review-controls">
-          <div class="review-instruction" id="reviewInstruction">Récite maintenant le verset qui vient juste après.</div>
-          <button class="primary-btn reveal-btn" id="revealBtn" onclick="advanceReviewStage()">Révéler le verset attendu</button>
+          <div class="review-instruction" id="reviewInstruction"></div>
+          <button class="primary-btn reveal-btn" id="revealBtn" onclick="advanceReviewStage()">
+            <svg class="reveal-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="3" width="6" height="11" rx="3"/>
+              <path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v4M9 21h6"/>
+            </svg>
+            <span id="revealBtnLabel">Révéler le verset attendu</span>
+          </button>
           <div class="rating-wrap" id="ratingWrap">
             <p class="rating-title">As-tu enchaîné les deux versets sans hésiter ?</p>
             <div class="ratings">
@@ -375,6 +432,222 @@
           <button class="secondary-btn retry-btn" id="retryNowBtn" onclick="reviewFailedNow()">Revoir maintenant <span id="retryCount">0</span></button>
           <button class="primary-btn summary-home-btn" onclick="exitReview()">Retour à l’accueil</button>
         </div>
+      </div>
+    </section>
+
+    <section class="hifdh-screen" id="hifdhScreen">
+      <header class="hifdh-header">
+        <button type="button" class="hifdh-back" aria-label="Retour" onclick="closeHifdhTest()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </button>
+        <h1 id="hifdhHeaderTitle">Tester mon hifdh</h1>
+        <button type="button" class="review-close hifdh-close" aria-label="Fermer" onclick="closeHifdhTest()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.35" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </header>
+
+      <div class="hifdh-body" id="hifdhSetup">
+        <section class="hifdh-panel">
+          <h2>Choisir un hizb</h2>
+          <button type="button" class="hifdh-select-card" onclick="toggleHifdhHizbPicker()">
+            <span class="hifdh-select-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2h5a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H3Z"/><path d="M21 18a1 1 0 0 0 1-1V5a2 2 0 0 0-2-2h-5a3 3 0 0 0-3 3v15a3 3 0 0 1 3-3h6Z"/></svg>
+            </span>
+            <span>
+              <strong id="hifdhSelectedHizb">Hizb 1</strong>
+              <small id="hifdhSelectedRange">Pages 1 - 10</small>
+            </span>
+            <svg class="hifdh-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="hifdh-picker" id="hifdhHizbPicker" role="dialog" aria-modal="true" aria-labelledby="hifdhPickerTitle" onclick="if (event.target === this) closeHifdhHizbPicker()" hidden>
+            <section class="hifdh-picker-sheet">
+              <div class="hifdh-picker-handle" aria-hidden="true"></div>
+              <header class="hifdh-picker-head">
+                <h2 id="hifdhPickerTitle">Choisir un hizb</h2>
+                <button type="button" class="hifdh-picker-close" aria-label="Fermer la sélection" onclick="closeHifdhHizbPicker()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                </button>
+              </header>
+              <label class="hifdh-picker-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <input type="search" id="hifdhHizbSearch" placeholder="Rechercher un hizb…" autocomplete="off" oninput="filterHifdhPicker(this.value)">
+              </label>
+              <div class="hifdh-picker-list" id="hifdhHizbList"></div>
+              <footer class="hifdh-picker-footer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m12 3 1.35 4.1L17.5 8.5l-4.15 1.4L12 14l-1.35-4.1L6.5 8.5l4.15-1.4L12 3Z"/></svg>
+                <span>Total : 60 hizb disponibles</span>
+              </footer>
+            </section>
+          </div>
+
+          <div class="hifdh-divider"></div>
+          <h2>Nombre de questions</h2>
+          <div class="hifdh-counts" role="radiogroup" aria-label="Nombre de questions">
+            <button type="button" data-hifdh-count="5" onclick="selectHifdhQuestionCount(5)">5 questions</button>
+            <button type="button" data-hifdh-count="10" class="active" onclick="selectHifdhQuestionCount(10)">10 questions</button>
+            <button type="button" data-hifdh-count="20" onclick="selectHifdhQuestionCount(20)">20 questions</button>
+          </div>
+          <button type="button" class="hifdh-start-btn" onclick="startHifdhTest()">
+            <span aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.4v13.2a1 1 0 0 0 1.55.83l9.2-6.6a1 1 0 0 0 0-1.66l-9.2-6.6A1 1 0 0 0 8 5.4Z"/></svg>
+            </span>
+            Lancer le test
+          </button>
+          <p class="hifdh-estimate" id="hifdhEstimate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+            <span>Environ 5 min</span>
+          </p>
+        </section>
+
+        <section class="hifdh-panel hifdh-benefits">
+          <div class="hifdh-benefits-copy">
+            <h2>Ce test te permet de :</h2>
+            <ul>
+              <li>Mesurer la solidité de ta mémorisation sur tout le hizb.</li>
+              <li>Identifier tes points faibles.</li>
+              <li>Ajouter facilement les passages à revoir.</li>
+            </ul>
+          </div>
+          <svg class="hifdh-benefits-art" viewBox="0 0 160 150" fill="none" aria-hidden="true">
+            <rect x="27" y="18" width="91" height="112" rx="14" fill="#EFEBFF"/>
+            <rect x="38" y="31" width="69" height="88" rx="9" fill="white" stroke="#8674E2" stroke-width="4"/>
+            <path d="M57 91V74M72 91V59M87 91V68" stroke="#5743C5" stroke-width="7" stroke-linecap="round"/>
+            <rect x="58" y="10" width="32" height="17" rx="7" fill="#5743C5"/>
+            <circle cx="116" cy="107" r="31" fill="#E7F8EF" stroke="#63CA91" stroke-width="4"/>
+            <circle cx="116" cy="107" r="18" stroke="#63CA91" stroke-width="4"/>
+            <circle cx="116" cy="107" r="7" fill="#63CA91"/>
+            <path d="m116 107 29-29M135 79l11-2-2 11" stroke="#5743C5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="m16 64 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7ZM133 39l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5Z" fill="#C9C0F6"/>
+          </svg>
+        </section>
+
+        <nav class="hifdh-setup-nav" aria-label="Raccourcis du test">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Historique</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M8 4h8v3a4 4 0 0 1-8 0V4Z"/><path d="M8 6H4v1a4 4 0 0 0 4 4M16 6h4v1a4 4 0 0 1-4 4M12 11v5M8 20h8M9 16h6"/></svg>Meilleurs scores</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.15.38.37.72.67 1 .3.28.69.42 1.1.4h.1v4h-.1a1.7 1.7 0 0 0-1.77.6Z"/></svg>Paramètres</span>
+        </nav>
+      </div>
+
+      <div class="hifdh-body hifdh-test-body" id="hifdhQuestion" hidden>
+        <div class="hifdh-progress-row">
+          <span id="hifdhProgressLabel">Question 1 / 10</span>
+          <div><i id="hifdhProgressFill"></i></div>
+          <b id="hifdhProgressPercent">10%</b>
+        </div>
+        <section class="hifdh-question-meta">
+          <div>
+            <span class="hifdh-select-icon" aria-hidden="true">📖</span>
+            <small>Hizb sélectionné</small>
+            <strong id="hifdhQuestionHizb">Hizb 1</strong>
+            <em id="hifdhQuestionRange">Pages 1 - 10</em>
+          </div>
+          <div>
+            <small>Verset de départ</small>
+            <strong id="hifdhQuestionRef">Al-Baqarah · 2:2</strong>
+          </div>
+          <div>
+            <small>Après ce verset, récite</small>
+            <strong class="green">les 2 versets suivants</strong>
+          </div>
+        </section>
+
+        <article class="hifdh-verse-card">
+          <div class="arabic" id="hifdhStartVerse" dir="rtl"></div>
+          <button type="button" class="hifdh-audio-btn" onclick="playHifdhAudio()">
+            <span id="hifdhAudioIcon">▶</span>
+            <b>Écoute le verset de départ</b>
+          </button>
+          <audio id="hifdhAudio" preload="none" playsinline></audio>
+        </article>
+
+        <section class="hifdh-task-card">
+          <div class="hifdh-task-head">
+            <span>🧠</span>
+            <div>
+              <h2>Poursuis les 2 versets suivants de mémoire.</h2>
+              <p>Prends ton temps et récite à voix haute.</p>
+            </div>
+          </div>
+          <div class="hifdh-hidden-lines" id="hifdhHiddenLines">
+            <p><b>1</b><span></span><em>?</em></p>
+            <p><b>2</b><span></span><em>?</em></p>
+          </div>
+          <div class="hifdh-answer-block" id="hifdhAnswerBlock" hidden>
+            <div>
+              <small id="hifdhNextOneRef">Verset suivant 1</small>
+              <div class="arabic" id="hifdhNextOne" dir="rtl"></div>
+            </div>
+            <div>
+              <small id="hifdhNextTwoRef">Verset suivant 2</small>
+              <div class="arabic" id="hifdhNextTwo" dir="rtl"></div>
+            </div>
+          </div>
+        </section>
+
+        <button type="button" class="hifdh-reveal-btn" id="hifdhRevealBtn" onclick="revealHifdhAnswer()">
+          <span>◎</span>
+          Révéler la réponse
+        </button>
+        <div class="hifdh-ratings" id="hifdhRatings" hidden>
+          <button type="button" class="yes" onclick="rateHifdhQuestion('yes')">Acquis<small>solide</small></button>
+          <button type="button" class="almost" onclick="rateHifdhQuestion('almost')">Presque<small>à revoir</small></button>
+          <button type="button" class="no" onclick="rateHifdhQuestion('no')">À revoir<small>fragile</small></button>
+        </div>
+        <button type="button" class="hifdh-quit-btn" onclick="finishHifdhTest(true)">Quitter le test</button>
+        <p class="hifdh-tip">Sois honnête avec toi-même. L’objectif est de progresser, pas d’être parfait.</p>
+      </div>
+
+      <div class="hifdh-body hifdh-summary" id="hifdhSummary" hidden>
+        <section class="hifdh-panel">
+          <h2>Résumé du test</h2>
+          <p id="hifdhSummaryLead">Test terminé.</p>
+          <div class="hifdh-summary-grid">
+            <div><b id="hifdhScore">0%</b><span>Score</span></div>
+            <div><b id="hifdhYes">0</b><span>Acquis</span></div>
+            <div><b id="hifdhAlmost">0</b><span>Presque</span></div>
+            <div><b id="hifdhNo">0</b><span>À revoir</span></div>
+          </div>
+        </section>
+        <section class="hifdh-panel">
+          <h2>Passages faibles détectés</h2>
+          <div class="hifdh-weak-list" id="hifdhWeakList"></div>
+        </section>
+        <button type="button" class="hifdh-start-btn" onclick="openHifdhTest()">Nouveau test</button>
+        <button type="button" class="secondary-btn hifdh-home-btn" onclick="closeHifdhTest()">Retour</button>
+      </div>
+    </section>
+
+    <section class="mushaf-prototype" id="mushafPrototype" aria-hidden="true">
+      <div class="mushaf-prototype-shell">
+        <header class="mushaf-prototype-header">
+          <div>
+            <strong>Mode Mushaf</strong>
+            <span>Prototype · page 3</span>
+          </div>
+          <button type="button" aria-label="Fermer le prototype" onclick="closeMushafPrototype()">×</button>
+        </header>
+        <div class="mushaf-prototype-tabs" id="mushafPrototypeTabs">
+          <span class="active">Verset avant</span>
+          <span>Verset cible</span>
+          <span>Verset de liaison</span>
+        </div>
+        <div class="mushaf-prototype-card">
+          <div class="mushaf-prototype-meta">
+            <span>Al-Baqarah</span>
+            <span>Page 3</span>
+          </div>
+          <div class="mushaf-svg-stage" id="mushafPrototypeStage" aria-live="polite">
+            <div class="mushaf-loading">Chargement du prototype…</div>
+          </div>
+        </div>
+        <div class="mushaf-task-card">
+          <div>
+            <strong id="mushafPrototypeTaskTitle">Verset avant</strong>
+            <span id="mushafPrototypeTaskText">Observe la page entière et repère l’élan sans perdre l’emplacement.</span>
+          </div>
+          <button type="button" aria-label="Écouter l’élan">▶</button>
+        </div>
+        <button class="primary-btn mushaf-prototype-action" id="mushafPrototypeNextBtn" type="button" onclick="advanceMushafPrototype()">Voir le verset cible</button>
       </div>
     </section>
 
@@ -417,6 +690,7 @@
     <div class="toast" id="toast"></div>
   </main>
 
+  <script src="js/pwa.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

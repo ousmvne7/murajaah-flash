@@ -14,7 +14,6 @@ murajaah-flash/
     app.js
   data/
     quran-uthmani.json
-    quran-fr-hamidullah.json
     quran-pages.json
   assets/
   docs/
@@ -55,23 +54,18 @@ Chaque passage contient notamment :
 
 ## TextRepository
 
-Les textes sources sont volontairement séparés par responsabilité.
+Murajaah Flash utilise uniquement le texte arabe Uthmani nécessaire à la révision de récitation.
 
 ```text
 TextRepository
-├── KFGQPC Hafs
-│   └── data/quran-uthmani.json
-└── Hamidullah
-    └── data/quran-fr-hamidullah.json
+└── KFGQPC Hafs
+    └── data/quran-uthmani.json
 ```
-
-Le texte arabe et les traductions ne doivent pas être mélangés dans un même repository logique.
 
 Objectif :
 
-- changer une traduction sans modifier le moteur Quran ;
-- ajouter d’autres traductions plus tard ;
-- garder le mode Réciter indépendant du mode Comprendre ;
+- garder le moteur Quran simple et fiable ;
+- garder les autres usages dans des projets séparés ;
 - éviter toute dépendance réseau pendant l’utilisation.
 
 ## Stockage

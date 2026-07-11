@@ -2,12 +2,17 @@
   "name": "Murajaah Flash",
   "short_name": "Murajaah",
   "description": "Application de murajaah ciblée pour renforcer les passages du Coran où la mémoire hésite.",
-  "start_url": "./index.html",
+  "id": "./",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#f5f7fa",
   "theme_color": "#44357d",
+  "lang": "fr",
+  "dir": "ltr",
   "orientation": "portrait",
+  "categories": ["education", "lifestyle"],
   "icons": [
     {
       "src": "assets/icon-192.png",

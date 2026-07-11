@@ -1,40 +1,48 @@
 "use strict";
 
+// Sécurité : le splash ne doit jamais bloquer l'application.
+// Même si une erreur apparaît plus bas pendant l'initialisation,
+// l'écran d'ouverture disparaît automatiquement.
+setTimeout(() => {
+  const splash = document.getElementById("splashScreen");
+  if (!splash) return;
+  splash.classList.add("hidden");
+  setTimeout(() => splash.remove(), 420);
+}, 2400);
+
 // ---------------------------------------------------------------------------
 // Configuration et état de l'application
 // ---------------------------------------------------------------------------
 
     const STORAGE_KEY = "murajaah_flash_v2_cards";
     const ACTIVITY_KEY = "murajaah_flash_v2_activity";
+    const HIFDH_HISTORY_KEY = "murajaah_flash_v2_hifdh_tests";
     const ELAN_RECITER_BASE = "https://everyayah.com/data/Minshawy_Murattal_128kbps";
     const ELAN_PLAYBACK_RATE = 1.25;
+    const TOTAL_MUSHAF_PAGES = 604;
     const TEXT_REPOSITORIES = {
       kfgqpc: {
         label: "KFGQPC Hafs",
         path: "data/quran-uthmani.json"
       }
     };
-    const TRANSLATION_REPOSITORIES = {
-      hamidullah: {
-        label: "Muhammad Hamidullah",
-        language: "fr",
-        path: "data/quran-fr-hamidullah.json",
-        source: "QUL Resources"
-      }
-    };
     const DAY = 86400000;
-    let cards = load(STORAGE_KEY, []).map(card => ({
-      ...card,
-      type: card.type || "recitation",
-      translation: card.translation || "",
-      beforeVerse: card.beforeVerse || card.prompt || "",
-      blockageVerse: card.blockageVerse || card.answer || "",
-      afterVerse: card.afterVerse || ""
-    }));
+    let cards = load(STORAGE_KEY, [])
+      .filter(card => !card.type || card.type === "recitation")
+      .map(card => ({
+        ...card,
+        type: "recitation",
+        beforeVerse: card.beforeVerse || card.prompt || "",
+        blockageVerse: card.blockageVerse || card.answer || "",
+        afterVerse: card.afterVerse || ""
+      }));
     let activity = load(ACTIVITY_KEY, {});
+    let hifdhHistory = load(HIFDH_HISTORY_KEY, []);
     let activeFilter = "all";
     let reviewPool = [];
     let reviewSessionMode = "recitation";
+    let reviewVisualMode = "normal";
+    let mushafReviewRenderToken = 0;
     let reviewQueue = [];
     let reviewIndex = 0;
     let reviewStage = 0;
@@ -50,10 +58,12 @@
     let previewPlayer = null;
     let quranData = null;
     let quranPagesData = null;
-    let translationRepository = null;
-    let translationIndex = null;
     let pendingAutoFill = null;
     let quranPickerState = { surahId: "2", ayah: 2 };
+    let hifdhSelectedHizb = 1;
+    let hifdhQuestionCount = 10;
+    let hifdhTest = null;
+    let hifdhPickerCloseTimer = null;
 
     function load(key, fallback) {
       try {
@@ -66,6 +76,7 @@
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
         localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activity));
+        localStorage.setItem(HIFDH_HISTORY_KEY, JSON.stringify(hifdhHistory));
         return true;
       } catch (_) {
         toast("Stockage plein : supprime un ancien audio ou raccourcis l’enregistrement.");
@@ -132,6 +143,7 @@
       if (!target) return;
       document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
       target.classList.add("active");
+      target.scrollTop = 0;
       document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.screen === name));
       if (name === "home") renderDashboard();
       if (name === "library") renderLibrary();
@@ -140,6 +152,10 @@
         renderSettings();
       }
       window.scrollTo(0, 0);
+      requestAnimationFrame(() => {
+        target.scrollTop = 0;
+        window.scrollTo(0, 0);
+      });
     }
 
     function openProfile(tab = "progress") {
@@ -317,6 +333,10 @@
       return [difficulty.level, difficulty.label];
     }
 
+    function cardTypeLabel() {
+      return "Récitation";
+    }
+
     function nextReviewLabel(card) {
       const next = card.nextReview || Date.now();
       const today = startOfToday();
@@ -336,14 +356,10 @@
       return "revient le " + new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(new Date(next));
     }
 
-    function cardTypeLabel(card) {
-      return card?.type === "translation" ? "Comprendre" : "Récitation";
-    }
-
     function renderLibrary() {
       const query = document.getElementById("searchInput").value.trim().toLowerCase();
       let filtered = cards.filter(card => !card.archived);
-      if (query) filtered = filtered.filter(card => [card.surah, card.ayah, card.type, card.beforeVerse, card.blockageVerse, card.afterVerse, card.translation, card.note].join(" ").toLowerCase().includes(query));
+      if (query) filtered = filtered.filter(card => [card.surah, card.ayah, card.beforeVerse, card.blockageVerse, card.afterVerse, card.note].join(" ").toLowerCase().includes(query));
       if (activeFilter === "due") filtered = filtered.filter(card => (card.nextReview || 0) <= startOfToday() + DAY - 1);
       if (activeFilter === "fragile") filtered = filtered.filter(card => ["very-fragile", "fragile"].includes(autoDifficulty(card).level));
       if (activeFilter === "mastered") filtered = filtered.filter(card => autoDifficulty(card).level === "mastered");
@@ -366,10 +382,18 @@
             </div>
           </div>
           <div class="arabic">${escapeHtml(cleanQuranDisplayText(card.blockageVerse))}</div>
-          ${card.type === "translation" && card.translation ? `<p class="memory-translation">${escapeHtml(card.translation)}</p>` : ""}
           <div class="memory-bottom"><span class="status ${status[0]}">${status[1]}</span><span>${nextReviewLabel(card)}</span></div>
         </article>`;
       }).join("");
+    }
+
+    function resetLibraryFilters() {
+      activeFilter = "all";
+      const searchInput = document.getElementById("searchInput");
+      if (searchInput) searchInput.value = "";
+      document.querySelectorAll(".filter-chip").forEach(chip => {
+        chip.classList.toggle("active", chip.dataset.filter === "all");
+      });
     }
 
     function setFilter(filter, button) {
@@ -534,27 +558,6 @@
       return quranData;
     }
 
-    async function loadTranslationRepository() {
-      if (translationRepository && translationIndex) {
-        return { data: translationRepository, index: translationIndex };
-      }
-
-      const response = await fetch(TRANSLATION_REPOSITORIES.hamidullah.path);
-      if (!response.ok) throw new Error("Translation data unavailable");
-
-      translationRepository = await response.json();
-      translationIndex = new Map(
-        translationRepository.map(item => [`${item.surah}:${item.ayah}`, item.text])
-      );
-
-      return { data: translationRepository, index: translationIndex };
-    }
-
-    async function translationForAyah(surahId, ayah) {
-      const { index } = await loadTranslationRepository();
-      return index.get(`${Number(surahId)}:${Number(ayah)}`) || "";
-    }
-
     async function loadQuranPagesData() {
       if (quranPagesData) return quranPagesData;
       const response = await fetch("data/quran-pages.json");
@@ -617,7 +620,7 @@
       const chapter = resolveSurah(data, card.surah || "");
       if (!chapter) return null;
 
-      const audioAyah = card.type === "translation" ? targetAyah : targetAyah - 1;
+      const audioAyah = targetAyah - 1;
       if (audioAyah <= 0) return null;
       const fileName = elanAudioFileName(chapter.id, audioAyah);
       return {
@@ -655,9 +658,8 @@
       });
 
       if (chapter) {
-        const pickerMode = document.getElementById("reviewMode")?.value || "recitation";
-        const minAyah = pickerMode === "translation" ? 1 : 2;
-        const maxAyah = pickerMode === "translation" ? chapter.versesCount : Math.max(2, chapter.versesCount - 1);
+        const minAyah = 2;
+        const maxAyah = Math.max(2, chapter.versesCount - 1);
         const safeAyah = Math.min(Math.max(minAyah, quranPickerState.ayah), maxAyah);
         quranPickerState.ayah = safeAyah;
         for (let i = minAyah; i <= maxAyah; i++) {
@@ -759,8 +761,6 @@
         await loadQuranPagesData();
         const chapter = resolveSurah(data, surahValue);
         const targetAyah = Number.parseInt(ayahValue, 10);
-        const selectedMode = document.getElementById("reviewMode").value || "recitation";
-
         if (!chapter) {
           toast("Sourate non reconnue. Essaie le numéro, ex. 2.");
           return;
@@ -769,11 +769,11 @@
           toast("Verset introuvable dans cette sourate.");
           return;
         }
-        if (selectedMode === "recitation" && targetAyah <= 1) {
+        if (targetAyah <= 1) {
           toast("Impossible : il faut un verset avant le verset cible.");
           return;
         }
-        if (selectedMode === "recitation" && targetAyah >= chapter.versesCount) {
+        if (targetAyah >= chapter.versesCount) {
           toast("Impossible : il faut un verset après le verset cible.");
           return;
         }
@@ -781,31 +781,24 @@
         const before = chapter.verses[String(targetAyah - 1)] || "";
         const target = chapter.verses[String(targetAyah)];
         const after = chapter.verses[String(targetAyah + 1)] || "";
-        if (!target || (selectedMode === "recitation" && (!before || !after))) {
-          toast(selectedMode === "translation" ? "Le verset cible n’a pas pu être trouvé." : "Les trois versets n’ont pas pu être trouvés.");
+        if (!target || !before || !after) {
+          toast("Les trois versets n’ont pas pu être trouvés.");
           return;
         }
-
-        const translation = selectedMode === "translation"
-          ? await translationForAyah(chapter.id, targetAyah)
-          : "";
 
         pendingAutoFill = {
           surah: chapter.name,
           ayah: String(targetAyah),
           beforeVerse: before,
           blockageVerse: target,
-          afterVerse: after,
-          translation
+          afterVerse: after
         };
 
-        const previewItems = selectedMode === "translation"
-          ? [{ label: "Verset cible", ref: formatVerseReference(chapter.name, targetAyah, quranPageFor(chapter.name, targetAyah)), text: target, surah: chapter.name, ayah: targetAyah }]
-          : [
-              { label: "Verset avant", ref: formatVerseReference(chapter.name, targetAyah - 1, quranPageFor(chapter.name, targetAyah - 1)), text: before, surah: chapter.name, ayah: targetAyah - 1 },
-              { label: "Verset cible", ref: formatVerseReference(chapter.name, targetAyah, quranPageFor(chapter.name, targetAyah)), text: target, surah: chapter.name, ayah: targetAyah },
-              { label: "Verset après", ref: formatVerseReference(chapter.name, targetAyah + 1, quranPageFor(chapter.name, targetAyah + 1)), text: after, surah: chapter.name, ayah: targetAyah + 1 }
-            ];
+        const previewItems = [
+          { label: "Verset avant", ref: formatVerseReference(chapter.name, targetAyah - 1, quranPageFor(chapter.name, targetAyah - 1)), text: before, surah: chapter.name, ayah: targetAyah - 1 },
+          { label: "Verset cible", ref: formatVerseReference(chapter.name, targetAyah, quranPageFor(chapter.name, targetAyah)), text: target, surah: chapter.name, ayah: targetAyah },
+          { label: "Verset après", ref: formatVerseReference(chapter.name, targetAyah + 1, quranPageFor(chapter.name, targetAyah + 1)), text: after, surah: chapter.name, ayah: targetAyah + 1 }
+        ];
         renderAutoPreview(previewItems);
       } catch (_) {
         toast("Base Quran indisponible. Lance l’app depuis le serveur ou GitHub Pages.");
@@ -814,8 +807,7 @@
 
     function applyAutoFill() {
       if (!pendingAutoFill) {
-        const mode = document.getElementById("reviewMode")?.value || "recitation";
-        toast(mode === "translation" ? "Prévisualise d’abord le verset cible." : "Prévisualise d’abord les trois versets.");
+        toast("Prévisualise d’abord les trois versets.");
         return;
       }
       document.getElementById("surah").value = pendingAutoFill.surah;
@@ -823,11 +815,6 @@
       document.getElementById("beforeVerse").value = pendingAutoFill.beforeVerse;
       document.getElementById("blockageVerse").value = pendingAutoFill.blockageVerse;
       document.getElementById("afterVerse").value = pendingAutoFill.afterVerse;
-      const translationInput = document.getElementById("translation");
-      if (translationInput && !translationInput.value.trim() && pendingAutoFill.translation) {
-        translationInput.value = pendingAutoFill.translation;
-      }
-      toast("Champs remplis. Vérifie puis enregistre.");
     }
 
     function clearAutoPreview(clearPending = true) {
@@ -848,33 +835,15 @@
       });
     }
 
-    function selectReviewMode(value = "recitation") {
-      const mode = ["recitation", "translation"].includes(value) ? value : "recitation";
+    function selectReviewMode() {
       const input = document.getElementById("reviewMode");
-      if (input) input.value = mode;
-      document.querySelectorAll(".review-mode-chip").forEach(chip => {
-        const active = chip.dataset.reviewMode === mode;
-        chip.classList.toggle("active", active);
-        chip.setAttribute("aria-checked", active ? "true" : "false");
-      });
-      const section = document.getElementById("translationSection");
-      const hint = document.getElementById("translationHint");
+      if (input) input.value = "recitation";
       const audioSection = document.getElementById("userAudioSection");
-      if (section) section.classList.toggle("is-optional", mode === "recitation");
-      if (audioSection) audioSection.hidden = mode === "translation";
-      if (hint) {
-        hint.textContent = mode === "recitation"
-          ? "Optionnel · utile si tu veux transformer ce passage plus tard en carte Comprendre."
-          : "Requis · cette traduction sera cachée pendant la révision.";
-      }
+      if (audioSection) audioSection.hidden = false;
       const title = document.getElementById("passageCopyTitle");
       const text = document.getElementById("passageCopyText");
-      if (title) title.textContent = mode === "translation" ? "Choisis le verset" : "Choisis ton passage";
-      if (text) {
-        text.textContent = mode === "translation"
-          ? "Sélectionne uniquement le verset cible. La carte servira à retrouver son sens."
-          : "Sélectionne la sourate et le verset cible. L’app prépare automatiquement le verset avant et le verset après.";
-      }
+      if (title) title.textContent = "Choisis ton passage";
+      if (text) text.textContent = "Sélectionne la sourate et le verset cible. L’app prépare automatiquement le verset avant et le verset après.";
     }
 
     function saveCard(event) {
@@ -884,14 +853,8 @@
       const beforeVerse = document.getElementById("beforeVerse").value.trim();
       const blockageVerse = document.getElementById("blockageVerse").value.trim();
       const afterVerse = document.getElementById("afterVerse").value.trim();
-      const selectedMode = document.getElementById("reviewMode").value || "recitation";
-      if (!blockageVerse || (selectedMode === "recitation" && (!beforeVerse || !afterVerse))) {
+      if (!blockageVerse || !beforeVerse || !afterVerse) {
         toast("Choisis puis valide un passage Quran avant d’enregistrer.");
-        return;
-      }
-      const translation = document.getElementById("translation").value.trim();
-      if (selectedMode === "translation" && !translation) {
-        toast("Ajoute une traduction française pour créer la carte traduction.");
         return;
       }
       const baseData = {
@@ -900,10 +863,9 @@
         beforeVerse,
         blockageVerse,
         afterVerse,
-        translation,
         difficulty: document.getElementById("difficulty").value,
         note: document.getElementById("note").value.trim(),
-        audioData: selectedMode === "translation" ? "" : (recordedAudio || ""),
+        audioData: recordedAudio || "",
         createdAt: existing?.createdAt || Date.now(),
         nextReview: existing?.nextReview || Date.now(),
         strength: existing?.strength || 0,
@@ -915,21 +877,22 @@
         const data = {
           ...baseData,
           id: editId,
-          type: selectedMode,
-          audioData: selectedMode === "translation" ? "" : (recordedAudio || "")
+          type: "recitation",
+          audioData: recordedAudio || ""
         };
         cards = cards.map(card => card.id === editId ? data : card);
       } else {
         cards.push({
           ...baseData,
           id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-          type: selectedMode,
-          audioData: selectedMode === "translation" ? "" : (recordedAudio || "")
+          type: "recitation",
+          audioData: recordedAudio || ""
         });
       }
       persist();
       resetForm();
-      toast(existing ? "Passage modifié." : selectedMode === "translation" ? "Carte Comprendre ajoutée." : "Passage ajouté à ta prochaine session.");
+      resetLibraryFilters();
+      toast(existing ? "Passage modifié." : "Passage ajouté à ta prochaine session.");
       showScreen("library");
     }
 
@@ -942,9 +905,8 @@
       document.getElementById("beforeVerse").value = card.beforeVerse || card.prompt || "";
       document.getElementById("blockageVerse").value = card.blockageVerse || card.answer || "";
       document.getElementById("afterVerse").value = card.afterVerse || "";
-      selectReviewMode(card.type || "recitation");
+      selectReviewMode();
       selectDifficulty(card.difficulty || "transition");
-      document.getElementById("translation").value = card.translation || "";
       document.getElementById("note").value = card.note || "";
       recordedAudio = card.audioData || "";
       updateRecorderUI(recordedAudio ? "ready" : "empty");
@@ -953,18 +915,15 @@
         ayah: card.ayah || "",
         beforeVerse: card.beforeVerse || card.prompt || "",
         blockageVerse: card.blockageVerse || card.answer || "",
-        afterVerse: card.afterVerse || "",
-        translation: card.translation || ""
+        afterVerse: card.afterVerse || ""
       };
       updateQuranPickerTitle();
       const editAyah = /^\d+$/.test(String(card.ayah || "")) ? Number.parseInt(card.ayah, 10) : null;
-      const previewItems = (card.type || "recitation") === "translation"
-        ? [{ label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse, surah: card.surah, ayah: editAyah || "" }]
-        : [
-            { label: "Verset avant", ref: verseReference(card, -1), text: pendingAutoFill.beforeVerse, surah: card.surah, ayah: editAyah ? editAyah - 1 : "" },
-            { label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse, surah: card.surah, ayah: editAyah || "" },
-            { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse, surah: card.surah, ayah: editAyah ? editAyah + 1 : "" }
-          ];
+      const previewItems = [
+        { label: "Verset avant", ref: verseReference(card, -1), text: pendingAutoFill.beforeVerse, surah: card.surah, ayah: editAyah ? editAyah - 1 : "" },
+        { label: "Verset cible", ref: verseReference(card, 0), text: pendingAutoFill.blockageVerse, surah: card.surah, ayah: editAyah || "" },
+        { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse, surah: card.surah, ayah: editAyah ? editAyah + 1 : "" }
+      ];
       renderAutoPreview(previewItems);
       document.getElementById("formTitle").textContent = "Modifie ton passage";
       document.getElementById("saveBtn").textContent = "Enregistrer les modifications";
@@ -987,9 +946,7 @@
     }
 
     function updateReviewIntroCounts() {
-      const recitationCount = reviewPool.filter(card => (card.type || "recitation") === "recitation").length;
-      const translationCount = reviewPool.filter(card => card.type === "translation").length;
-      const activeCount = reviewPool.filter(card => (card.type || "recitation") === reviewSessionMode).length;
+      const activeCount = reviewPool.length;
       const estimatedMinutes = Math.max(1, Math.ceil(activeCount * 0.45));
 
       document.getElementById("introDueCount").textContent = activeCount;
@@ -998,48 +955,37 @@
       document.getElementById("introEstimate").textContent = activeCount
         ? `≈ ${estimatedMinutes} min pour cette session.`
         : "Aucune carte à revoir dans ce mode aujourd’hui.";
-      document.getElementById("sessionRecitationCount").textContent = recitationCount;
-      document.getElementById("sessionTranslationCount").textContent = translationCount;
-
-      document.querySelectorAll(".review-session-chip").forEach(chip => {
-        const active = chip.dataset.sessionMode === reviewSessionMode;
-        const count = chip.dataset.sessionMode === "translation" ? translationCount : recitationCount;
-        chip.classList.toggle("active", active);
-        chip.disabled = count === 0;
-        chip.setAttribute("aria-checked", active ? "true" : "false");
-      });
+      const introStart = document.querySelector(".intro-start-btn");
+      if (introStart) introStart.disabled = activeCount === 0;
       reviewQueue = reviewPool
-        .filter(card => (card.type || "recitation") === reviewSessionMode)
         .sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
-    }
-
-    function selectSessionReviewMode(mode = "recitation") {
-      if (!["recitation", "translation"].includes(mode)) return;
-      const count = reviewPool.filter(card => (card.type || "recitation") === mode).length;
-      if (!count) return;
-      reviewSessionMode = mode;
-      updateReviewIntroCounts();
     }
 
     async function startReview() {
       try {
         await loadQuranData();
+        await loadQuranPagesData();
       } catch (_) {
         quranData = null;
       }
       reviewPool = dueCards().sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
-      if (!reviewPool.length) {
-        toast(cards.length ? "Tu es à jour pour aujourd’hui." : "Ajoute d’abord un passage.");
-        if (!cards.length) showScreen("add");
-        return;
-      }
-      reviewSessionMode = reviewPool.some(card => (card.type || "recitation") === "recitation") ? "recitation" : "translation";
+      reviewSessionMode = "recitation";
+      selectReviewVisualMode("normal");
       updateReviewIntroCounts();
       document.getElementById("reviewIntro").classList.add("active");
       document.getElementById("reviewSession").style.display = "none";
       document.getElementById("reviewSummary").classList.remove("active");
       document.getElementById("reviewScreen").classList.add("active");
       document.getElementById("bottomNav").style.display = "none";
+    }
+
+    function selectReviewVisualMode(mode = "normal") {
+      reviewVisualMode = mode === "mushaf" ? "mushaf" : "normal";
+      document.querySelectorAll("[data-review-visual]").forEach(button => {
+        const active = button.dataset.reviewVisual === reviewVisualMode;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-checked", active ? "true" : "false");
+      });
     }
 
     function beginReviewSession() {
@@ -1057,11 +1003,10 @@
     function renderReviewCard() {
       const card = reviewQueue[reviewIndex];
       if (!card) return finishReview();
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       document.getElementById("reviewCounter").textContent = `${reviewIndex + 1} / ${reviewQueue.length}`;
       document.getElementById("reviewProgress").style.width = `${(reviewIndex + 1) / reviewQueue.length * 100}%`;
       reviewStage = 0;
-      setReviewStep(card.type === "translation" ? 1 : 0);
+      setReviewStep(0);
       renderReviewVerses(card, 0);
       setupElanAudio(card);
       const reviewAudio = document.getElementById("reviewAudio");
@@ -1093,15 +1038,37 @@
         reviewAudio.load();
       }
       document.getElementById("ratingWrap").classList.remove("visible");
-      document.querySelector(".rating-title").textContent = card.type === "translation"
-        ? "As-tu retrouvé le sens du verset ?"
-        : "As-tu enchaîné les deux versets sans hésiter ?";
-      document.getElementById("reviewInstruction").style.display = "block";
-      document.getElementById("reviewInstruction").textContent = card.type === "translation"
-        ? "Retrouve le sens du verset en français."
-        : "Récite de mémoire le passage qui vient après.";
-      document.getElementById("revealBtn").style.display = "block";
-      document.getElementById("revealBtn").textContent = card.type === "translation" ? "Révéler la traduction" : "Révéler le passage";
+      document.querySelector(".rating-title").textContent = "As-tu enchaîné les deux versets sans hésiter ?";
+      setReviewInstruction("Récite de mémoire le passage qui vient après.", true);
+      document.getElementById("revealBtn").style.display = "flex";
+      document.getElementById("revealBtnLabel").textContent = "Révéler le passage";
+    }
+
+    function setReviewInstruction(text, visible = true) {
+      const instruction = document.getElementById("reviewInstruction");
+      if (!instruction) return;
+      instruction.style.display = visible ? "grid" : "none";
+      if (!visible) return;
+      instruction.innerHTML = `
+        <span class="review-task-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.5 4.5A3 3 0 0 0 5 7.1a3.3 3.3 0 0 0 .5 6.4A3 3 0 0 0 9.5 18V4.5Z"/>
+            <path d="M14.5 4.5A3 3 0 0 1 19 7.1a3.3 3.3 0 0 1-.5 6.4A3 3 0 0 1 14.5 18V4.5Z"/>
+            <path d="M9.5 8H8M9.5 13H8M14.5 8H16M14.5 13H16M12 3v18"/>
+          </svg>
+        </span>
+        <span class="review-task-copy">
+          <strong>Tâche</strong>
+          <small>${escapeHtml(text)}</small>
+        </span>
+        <span class="review-task-sound" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M4.4 9.3v5.4h3.1l4.7 3.7V5.6L7.5 9.3H4.4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M16.1 8.8c.9.9 1.4 2 1.4 3.2s-.5 2.3-1.4 3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M19 6.5c1.5 1.5 2.4 3.4 2.4 5.5S20.5 16 19 17.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+      `;
     }
 
     function advanceReviewStage() {
@@ -1110,28 +1077,18 @@
       const reviewAudio = document.getElementById("reviewAudio");
       reviewAudio.pause();
       resetElanAudio();
-      if (card.type === "translation") {
-        reviewStage = 1;
-        setReviewStep(1);
-        renderReviewVerses(card, 1);
-        document.getElementById("reviewInstruction").style.display = "none";
-        document.getElementById("revealBtn").style.display = "none";
-        document.getElementById("ratingWrap").classList.add("visible");
-        speakTranslationAudio(true);
-        return;
-      }
       if (reviewStage === 0) {
         reviewStage = 1;
         setReviewStep(1);
         renderReviewVerses(card, 1);
-        document.getElementById("reviewInstruction").textContent = "Continue ensuite la récitation sans couper l’élan.";
-        document.getElementById("revealBtn").textContent = "Voir le verset après";
+        setReviewInstruction("Continue ensuite la récitation sans couper l’élan.", true);
+        document.getElementById("revealBtnLabel").textContent = "Voir le verset après";
         return;
       }
       reviewStage = 2;
       setReviewStep(2);
       renderReviewVerses(card, 2);
-      document.getElementById("reviewInstruction").style.display = "none";
+      setReviewInstruction("", false);
       document.getElementById("revealBtn").style.display = "none";
       document.getElementById("ratingWrap").classList.add("visible");
     }
@@ -1163,60 +1120,18 @@
       list.appendChild(elan);
     }
 
-    function renderTranslationReviewVerses(card, stage) {
+    function renderReviewVerses(card, stage) {
       const list = document.getElementById("reviewVerseList");
       list.innerHTML = "";
-      list.className = "verse-surface translation-surface single";
+      list.classList.remove("mushaf-review-surface");
+      document.getElementById("reviewSession")?.classList.remove("mushaf-active");
+      mushafReviewRenderToken++;
 
-      const pageHead = document.createElement("div");
-      pageHead.className = "review-page-head";
-      pageHead.innerHTML = `
-        <span>${escapeHtml(card.surah || "Passage personnel")}</span>
-        <span>${escapeHtml(card.ayah ? verseReference(card, 0).replace((card.surah || "Passage personnel") + " — ", "") : "Comprendre")}</span>
-      `;
-      list.appendChild(pageHead);
-
-      const item = document.createElement("div");
-      item.className = "review-verse-item mushaf-line active translation-arabic-line";
-
-      const meta = document.createElement("div");
-      meta.className = "review-meta";
-      meta.textContent = verseReference(card, 0);
-
-      const arabic = document.createElement("div");
-      arabic.className = "arabic";
-      arabic.dir = "rtl";
-      setArabicVerseContent(arabic, card.blockageVerse, card.surah, card.ayah);
-
-      item.append(meta, arabic);
-      list.appendChild(item);
-
-      if (stage === 0) appendElanAudioPanel(list);
-
-      const answer = document.createElement("div");
-      answer.className = stage > 0 ? "translation-answer revealed" : "translation-answer masked";
-      if (stage > 0) {
-        answer.innerHTML = `
-          <span>Sens du verset</span>
-          <p>${escapeHtml(card.translation || "Traduction non renseignée.")}</p>
-          <button type="button" class="translation-audio-btn" onclick="speakTranslationAudio()">Écouter en français</button>
-        `;
-      } else {
-        answer.innerHTML = `
-          <span>Sens caché</span>
-          <div class="mask-lines"><span></span><span></span><span></span></div>
-        `;
-      }
-      list.appendChild(answer);
-    }
-
-    function renderReviewVerses(card, stage) {
-      if (card.type === "translation") {
-        renderTranslationReviewVerses(card, stage);
+      if (reviewVisualMode === "mushaf" && canRenderMushafReview(card)) {
+        renderMushafReviewVerses(card, stage);
         return;
       }
-      const list = document.getElementById("reviewVerseList");
-      list.innerHTML = "";
+
       list.classList.toggle("single", stage === 0);
 
       const pageHead = document.createElement("div");
@@ -1278,6 +1193,91 @@
 
     }
 
+    function canRenderMushafReview(card) {
+      const ayah = String(card.ayah || "").trim();
+      return Boolean(card.surah && /^\d+$/.test(ayah) && resolveSurahId(card.surah));
+    }
+
+    function mushafReviewVerseForStage(card, stage) {
+      const baseAyah = Number.parseInt(card.ayah, 10);
+      const ayah = baseAyah + (stage - 1);
+      const labels = ["Verset avant", "Verset cible", "Verset de liaison"];
+      return {
+        surah: card.surah,
+        surahId: resolveSurahId(card.surah),
+        ayah,
+        page: quranPageFor(card.surah, ayah),
+        label: labels[stage] || "Verset",
+        ref: formatVerseReference(card.surah, ayah, quranPageFor(card.surah, ayah))
+      };
+    }
+
+    function quranpediaMushafSvgUrl(page) {
+      return `https://cdn.jsdelivr.net/gh/quranpedia/quran-svg@main/mushafs/hafs/kfqc/svg/${String(page).padStart(3, "0")}.svg`;
+    }
+
+    function renderMushafReviewVerses(card, stage) {
+      const list = document.getElementById("reviewVerseList");
+      document.getElementById("reviewSession")?.classList.add("mushaf-active");
+      const token = mushafReviewRenderToken;
+      const verse = mushafReviewVerseForStage(card, stage);
+      list.className = "verse-surface mushaf-review-surface";
+      list.innerHTML = `
+        <div class="review-page-head">
+          <span>${escapeHtml(verse.surah || "Passage personnel")}</span>
+          <span>${escapeHtml(verse.page ? `Page ${verse.page} - V${verse.ayah}` : `V${verse.ayah}`)}</span>
+        </div>
+        <div class="review-mushaf-card">
+          <div class="review-mushaf-meta">
+            <strong>${escapeHtml(verse.label)}</strong>
+            <span>${escapeHtml(verse.ref)}</span>
+          </div>
+          <div class="review-mushaf-stage" id="reviewMushafStage">
+            <div class="mushaf-loading">Chargement de la page Mushaf…</div>
+          </div>
+        </div>
+      `;
+
+      if (stage === 0) {
+        appendElanAudioPanel(list);
+        const panel = document.getElementById("elanAudioPanel");
+        const cardEl = list.querySelector(".review-mushaf-card");
+        if (panel && cardEl) list.insertBefore(panel, cardEl);
+      }
+
+      loadMushafReviewSvg(verse, token);
+    }
+
+    async function loadMushafReviewSvg(verse, token) {
+      const stage = document.getElementById("reviewMushafStage");
+      if (!stage || !verse.page) {
+        renderMushafReviewFallback(verse);
+        return;
+      }
+
+      try {
+        const response = await fetch(quranpediaMushafSvgUrl(verse.page));
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const svgText = await response.text();
+        if (token !== mushafReviewRenderToken) return;
+
+        stage.innerHTML = svgText;
+        const svg = stage.querySelector("svg");
+        if (!svg) throw new Error("Aucun <svg> trouvé dans la réponse.");
+        svg.classList.add("mushaf-inline-svg");
+        highlightCurrentMushafAyah(svg, verse.surahId, String(verse.ayah));
+      } catch (error) {
+        console.error("[Murajaah Flash] Impossible de charger la page Mushaf de révision.", error);
+        if (token === mushafReviewRenderToken) renderMushafReviewFallback(verse);
+      }
+    }
+
+    function renderMushafReviewFallback(verse) {
+      const stage = document.getElementById("reviewMushafStage");
+      if (!stage) return;
+      stage.innerHTML = `<div class="mushaf-loading">Page Mushaf indisponible pour ${escapeHtml(verse.ref)}.</div>`;
+    }
+
     function setReviewStep(step) {
       ["stepBefore", "stepTarget", "stepAfter"].forEach((id, index) => {
         document.getElementById(id)?.classList.toggle("active", index === step);
@@ -1294,22 +1294,6 @@
         button.textContent = "▶";
         if (!automatic) toast("Impossible de lire cet audio. Essaie de le réenregistrer.");
       });
-    }
-
-    function speakTranslationAudio(automatic = false) {
-      const card = reviewQueue[reviewIndex];
-      const text = String(card?.translation || "").trim();
-      if (!text) return;
-      if (!("speechSynthesis" in window) || !window.SpeechSynthesisUtterance) {
-        if (!automatic) toast("Lecture vocale indisponible sur ce navigateur.");
-        return;
-      }
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "fr-FR";
-      utterance.rate = 0.94;
-      utterance.pitch = 1;
-      window.speechSynthesis.speak(utterance);
     }
 
     function resetElanAudio() {
@@ -1337,7 +1321,7 @@
       panel.hidden = false;
       button.disabled = true;
       button.textContent = "…";
-      meta.textContent = card.type === "translation" ? "Préparation de l’audio du verset…" : "Préparation de l’élan audio…";
+      meta.textContent = "Préparation de l’élan audio…";
 
       try {
         const info = await getElanAudioInfo(card);
@@ -1475,7 +1459,6 @@
       const audio = document.getElementById("reviewAudio");
       audio.pause();
       audio.currentTime = 0;
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       resetElanAudio();
       document.getElementById("reviewScreen").classList.remove("active");
       document.getElementById("reviewIntro").classList.remove("active");
@@ -1483,6 +1466,389 @@
       document.getElementById("reviewSession").style.display = "flex";
       document.getElementById("bottomNav").style.display = "grid";
       showScreen("home");
+    }
+
+    function hifdhPageRangeForHizb(hizb) {
+      const safeHizb = Math.min(60, Math.max(1, Number.parseInt(hizb, 10) || 1));
+      const start = Math.floor((safeHizb - 1) * TOTAL_MUSHAF_PAGES / 60) + 1;
+      const end = Math.floor(safeHizb * TOTAL_MUSHAF_PAGES / 60);
+      return { start, end };
+    }
+
+    function hifdhRangeLabel(hizb) {
+      const range = hifdhPageRangeForHizb(hizb);
+      return `Pages ${range.start} - ${range.end}`;
+    }
+
+    function openHifdhTest() {
+      hifdhTest = null;
+      const picker = document.getElementById("hifdhHizbPicker");
+      if (picker) {
+        picker.hidden = true;
+        picker.classList.remove("open");
+      }
+      document.getElementById("reviewScreen")?.classList.remove("active");
+      document.getElementById("reviewIntro")?.classList.remove("active");
+      document.getElementById("reviewSession").style.display = "flex";
+      document.getElementById("reviewSummary")?.classList.remove("active");
+      document.getElementById("bottomNav").style.display = "none";
+      document.getElementById("hifdhScreen")?.classList.add("active");
+      document.getElementById("hifdhHeaderTitle").textContent = "Tester mon hifdh";
+      document.getElementById("hifdhSetup").hidden = false;
+      document.getElementById("hifdhQuestion").hidden = true;
+      document.getElementById("hifdhSummary").hidden = true;
+      renderHifdhSetup();
+      window.scrollTo(0, 0);
+    }
+
+    function closeHifdhTest() {
+      stopHifdhAudio();
+      hifdhTest = null;
+      const picker = document.getElementById("hifdhHizbPicker");
+      if (picker) {
+        picker.hidden = true;
+        picker.classList.remove("open");
+      }
+      document.getElementById("hifdhScreen")?.classList.remove("picker-open");
+      document.getElementById("hifdhScreen")?.classList.remove("active");
+      document.getElementById("bottomNav").style.display = "grid";
+      showScreen("home");
+    }
+
+    function renderHifdhSetup() {
+      const picker = document.getElementById("hifdhHizbPicker");
+      const pickerList = document.getElementById("hifdhHizbList");
+      if (pickerList && !pickerList.children.length) {
+        for (let i = 1; i <= 60; i++) {
+          const range = hifdhPageRangeForHizb(i);
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "hifdh-picker-item";
+          button.dataset.hizb = String(i);
+          button.dataset.search = `hizb ${i} pages ${range.start} ${range.end}`;
+          button.innerHTML = `
+            <span class="hifdh-picker-book" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2h5a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H3Z"/><path d="M21 18a1 1 0 0 0 1-1V5a2 2 0 0 0-2-2h-5a3 3 0 0 0-3 3v15a3 3 0 0 1 3-3h6Z"/></svg>
+            </span>
+            <span class="hifdh-picker-copy">
+              <strong>Hizb ${i}</strong>
+              <small>Parcours du hizb</small>
+            </span>
+            <span class="hifdh-picker-pages">Pages ${range.start} - ${range.end}</span>
+            <span class="hifdh-picker-state" aria-hidden="true"></span>`;
+          button.onclick = () => selectHifdhHizb(i);
+          pickerList.appendChild(button);
+        }
+      }
+      document.getElementById("hifdhSelectedHizb").textContent = `Hizb ${hifdhSelectedHizb}`;
+      document.getElementById("hifdhSelectedRange").textContent = hifdhRangeLabel(hifdhSelectedHizb);
+      const estimate = document.querySelector("#hifdhEstimate span");
+      if (estimate) estimate.textContent = `Environ ${Math.max(2, Math.ceil(hifdhQuestionCount * 0.5))} min`;
+      document.querySelectorAll("#hifdhHizbList [data-hizb]").forEach(button => {
+        const selected = Number(button.dataset.hizb) === hifdhSelectedHizb;
+        button.classList.toggle("active", selected);
+        button.setAttribute("aria-pressed", String(selected));
+        const state = button.querySelector(".hifdh-picker-state");
+        if (state) {
+          state.innerHTML = selected
+            ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m7 12 3 3 7-7"/></svg>'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>';
+        }
+      });
+      document.querySelectorAll("[data-hifdh-count]").forEach(button => {
+        button.classList.toggle("active", Number(button.dataset.hifdhCount) === hifdhQuestionCount);
+      });
+    }
+
+    function toggleHifdhHizbPicker() {
+      const picker = document.getElementById("hifdhHizbPicker");
+      if (!picker) return;
+      if (picker.hidden) {
+        window.clearTimeout(hifdhPickerCloseTimer);
+        picker.hidden = false;
+        document.getElementById("hifdhScreen")?.classList.add("picker-open");
+        requestAnimationFrame(() => picker.classList.add("open"));
+        const search = document.getElementById("hifdhHizbSearch");
+        if (search) {
+          search.value = "";
+          filterHifdhPicker("");
+        }
+      } else {
+        closeHifdhHizbPicker();
+      }
+    }
+
+    function closeHifdhHizbPicker() {
+      const picker = document.getElementById("hifdhHizbPicker");
+      if (!picker || picker.hidden) return;
+      picker.classList.remove("open");
+      document.getElementById("hifdhScreen")?.classList.remove("picker-open");
+      window.clearTimeout(hifdhPickerCloseTimer);
+      hifdhPickerCloseTimer = window.setTimeout(() => { picker.hidden = true; }, 180);
+    }
+
+    function filterHifdhPicker(query) {
+      const normalized = String(query || "").trim().toLocaleLowerCase("fr");
+      document.querySelectorAll("#hifdhHizbList [data-hizb]").forEach(button => {
+        button.hidden = normalized && !button.dataset.search.includes(normalized);
+      });
+    }
+
+    function selectHifdhHizb(hizb) {
+      hifdhSelectedHizb = Math.min(60, Math.max(1, Number.parseInt(hizb, 10) || 1));
+      closeHifdhHizbPicker();
+      renderHifdhSetup();
+    }
+
+    function selectHifdhQuestionCount(count) {
+      hifdhQuestionCount = [5, 10, 20].includes(count) ? count : 10;
+      renderHifdhSetup();
+    }
+
+    function verseTextFromChapter(chapter, ayah) {
+      return chapter?.verses?.[String(ayah)] || "";
+    }
+
+    function hifdhAudioUrl(surahId, ayah) {
+      return `${ELAN_RECITER_BASE}/${elanAudioFileName(surahId, ayah)}`;
+    }
+
+    async function hifdhCandidatesForHizb(hizb) {
+      const data = await loadQuranData();
+      await loadQuranPagesData();
+      const range = hifdhPageRangeForHizb(hizb);
+      const candidates = [];
+      Object.values(data.chapters).forEach(chapter => {
+        for (let ayah = 1; ayah <= chapter.versesCount - 2; ayah++) {
+          const page = Number(quranPageFor(chapter.name, ayah));
+          if (!page || page < range.start || page > range.end) continue;
+          const startText = verseTextFromChapter(chapter, ayah);
+          const nextOne = verseTextFromChapter(chapter, ayah + 1);
+          const nextTwo = verseTextFromChapter(chapter, ayah + 2);
+          if (!startText || !nextOne || !nextTwo) continue;
+          candidates.push({
+            id: `${chapter.id}:${ayah}`,
+            surahId: String(chapter.id),
+            surah: chapter.name,
+            ayah,
+            page,
+            startText,
+            nextOne,
+            nextTwo,
+            startRef: formatVerseReference(chapter.name, ayah, page),
+            nextOneRef: formatVerseReference(chapter.name, ayah + 1, quranPageFor(chapter.name, ayah + 1)),
+            nextTwoRef: formatVerseReference(chapter.name, ayah + 2, quranPageFor(chapter.name, ayah + 2))
+          });
+        }
+      });
+      return candidates;
+    }
+
+    function shuffledItems(items) {
+      const copy = [...items];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    async function startHifdhTest() {
+      try {
+        const candidates = await hifdhCandidatesForHizb(hifdhSelectedHizb);
+        if (!candidates.length) {
+          toast("Aucun verset testable trouvé pour ce hizb.");
+          return;
+        }
+        const questions = shuffledItems(candidates).slice(0, Math.min(hifdhQuestionCount, candidates.length));
+        hifdhTest = {
+          hizb: hifdhSelectedHizb,
+          range: hifdhPageRangeForHizb(hifdhSelectedHizb),
+          total: questions.length,
+          index: 0,
+          questions,
+          results: [],
+          startedAt: Date.now()
+        };
+        document.getElementById("hifdhHeaderTitle").textContent = "Test en cours";
+        document.getElementById("hifdhSetup").hidden = true;
+        document.getElementById("hifdhSummary").hidden = true;
+        document.getElementById("hifdhQuestion").hidden = false;
+        renderHifdhQuestion();
+      } catch (error) {
+        console.error("[Murajaah Flash] Test Hifdh indisponible.", error);
+        toast("Impossible de lancer le test. Vérifie que la base Quran est chargée.");
+      }
+    }
+
+    function currentHifdhQuestion() {
+      return hifdhTest?.questions?.[hifdhTest.index] || null;
+    }
+
+    function renderHifdhQuestion() {
+      const question = currentHifdhQuestion();
+      if (!question) return finishHifdhTest(false);
+      stopHifdhAudio();
+      const current = hifdhTest.index + 1;
+      const percent = Math.round((current / hifdhTest.total) * 100);
+      document.getElementById("hifdhProgressLabel").textContent = `Question ${current} / ${hifdhTest.total}`;
+      document.getElementById("hifdhProgressFill").style.width = `${percent}%`;
+      document.getElementById("hifdhProgressPercent").textContent = `${percent}%`;
+      document.getElementById("hifdhQuestionHizb").textContent = `Hizb ${hifdhTest.hizb}`;
+      document.getElementById("hifdhQuestionRange").textContent = hifdhRangeLabel(hifdhTest.hizb);
+      document.getElementById("hifdhQuestionRef").textContent = question.startRef;
+      setArabicVerseContent(document.getElementById("hifdhStartVerse"), question.startText, question.surah, question.ayah);
+      document.getElementById("hifdhNextOneRef").textContent = question.nextOneRef;
+      document.getElementById("hifdhNextTwoRef").textContent = question.nextTwoRef;
+      setArabicVerseContent(document.getElementById("hifdhNextOne"), question.nextOne, question.surah, question.ayah + 1);
+      setArabicVerseContent(document.getElementById("hifdhNextTwo"), question.nextTwo, question.surah, question.ayah + 2);
+      document.getElementById("hifdhAnswerBlock").hidden = true;
+      document.getElementById("hifdhHiddenLines").hidden = false;
+      document.getElementById("hifdhRevealBtn").hidden = false;
+      document.getElementById("hifdhRatings").hidden = true;
+      const audio = document.getElementById("hifdhAudio");
+      audio.src = hifdhAudioUrl(question.surahId, question.ayah);
+      audio.playbackRate = ELAN_PLAYBACK_RATE;
+      audio.load();
+      audio.onplay = () => { document.getElementById("hifdhAudioIcon").textContent = "Ⅱ"; };
+      audio.onpause = () => { document.getElementById("hifdhAudioIcon").textContent = "▶"; };
+      audio.onended = () => { document.getElementById("hifdhAudioIcon").textContent = "↻"; };
+      audio.onerror = () => { document.getElementById("hifdhAudioIcon").textContent = "!"; };
+      window.scrollTo(0, 0);
+    }
+
+    function stopHifdhAudio() {
+      const audio = document.getElementById("hifdhAudio");
+      if (!audio) return;
+      audio.pause();
+      audio.currentTime = 0;
+      document.getElementById("hifdhAudioIcon") && (document.getElementById("hifdhAudioIcon").textContent = "▶");
+    }
+
+    function playHifdhAudio() {
+      const audio = document.getElementById("hifdhAudio");
+      if (!audio?.src) return toast("Audio indisponible.");
+      audio.playbackRate = ELAN_PLAYBACK_RATE;
+      if (!audio.paused) {
+        audio.pause();
+        return;
+      }
+      audio.currentTime = 0;
+      audio.play().catch(() => toast("Impossible de lancer l’audio. Vérifie ta connexion."));
+    }
+
+    function revealHifdhAnswer() {
+      document.getElementById("hifdhAnswerBlock").hidden = false;
+      document.getElementById("hifdhHiddenLines").hidden = true;
+      document.getElementById("hifdhRevealBtn").hidden = true;
+      document.getElementById("hifdhRatings").hidden = false;
+    }
+
+    function rateHifdhQuestion(rating) {
+      const question = currentHifdhQuestion();
+      if (!question) return;
+      stopHifdhAudio();
+      hifdhTest.results.push({
+        ...question,
+        rating,
+        reviewedAt: Date.now()
+      });
+      hifdhTest.index++;
+      if (navigator.vibrate) navigator.vibrate(18);
+      renderHifdhQuestion();
+    }
+
+    function finishHifdhTest(cancelled = false) {
+      stopHifdhAudio();
+      if (!hifdhTest) return closeHifdhTest();
+      const results = hifdhTest.results || [];
+      const yes = results.filter(item => item.rating === "yes").length;
+      const almost = results.filter(item => item.rating === "almost").length;
+      const no = results.filter(item => item.rating === "no").length;
+      const total = results.length || hifdhTest.total || 1;
+      const score = Math.round(((yes + almost * 0.5) / total) * 100);
+      const weak = results.filter(item => item.rating !== "yes");
+      if (!cancelled || results.length) {
+        hifdhHistory.unshift({
+          id: Date.now().toString(36),
+          hizb: hifdhTest.hizb,
+          total,
+          yes,
+          almost,
+          no,
+          score,
+          weak: weak.map(item => ({ surah: item.surah, ayah: item.ayah, rating: item.rating })),
+          createdAt: Date.now()
+        });
+        hifdhHistory = hifdhHistory.slice(0, 30);
+        persist();
+      }
+      if (cancelled) {
+        closeHifdhTest();
+        return;
+      }
+      document.getElementById("hifdhHeaderTitle").textContent = "Résumé";
+      document.getElementById("hifdhSetup").hidden = true;
+      document.getElementById("hifdhQuestion").hidden = true;
+      document.getElementById("hifdhSummary").hidden = false;
+      document.getElementById("hifdhSummaryLead").textContent = `Hizb ${hifdhTest.hizb} · ${total} question${total > 1 ? "s" : ""} travaillée${total > 1 ? "s" : ""}.`;
+      document.getElementById("hifdhScore").textContent = `${score}%`;
+      document.getElementById("hifdhYes").textContent = yes;
+      document.getElementById("hifdhAlmost").textContent = almost;
+      document.getElementById("hifdhNo").textContent = no;
+      renderHifdhWeakList(weak);
+      window.scrollTo(0, 0);
+    }
+
+    function renderHifdhWeakList(weak) {
+      const list = document.getElementById("hifdhWeakList");
+      list.innerHTML = "";
+      if (!weak.length) {
+        list.innerHTML = `<p class="empty-state">Aucun passage faible détecté. Solide.</p>`;
+        return;
+      }
+      weak.forEach((item, index) => {
+        const row = document.createElement("div");
+        row.className = "hifdh-weak-item";
+        row.innerHTML = `
+          <strong>${escapeHtml(formatVerseReference(item.surah, item.ayah + 1, quranPageFor(item.surah, item.ayah + 1)))}</strong>
+          <small>${item.rating === "no" ? "À revoir" : "Presque"} · depuis ${escapeHtml(item.startRef)}</small>
+          <button type="button" onclick="addHifdhWeakCard(${index})">Ajouter à mes passages</button>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function addHifdhWeakCard(index) {
+      const weak = (hifdhTest?.results || []).filter(item => item.rating !== "yes");
+      const item = weak[index];
+      if (!item) return;
+      const targetAyah = item.ayah + 1;
+      cards.push({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+        type: "recitation",
+        surah: item.surah,
+        ayah: String(targetAyah),
+        beforeVerse: item.startText,
+        blockageVerse: item.nextOne,
+        afterVerse: item.nextTwo,
+        difficulty: "transition",
+        note: `Créé depuis le test Hifdh · Hizb ${hifdhTest.hizb}`,
+        audioData: "",
+        createdAt: Date.now(),
+        nextReview: Date.now(),
+        strength: 0,
+        interval: 0,
+        reviews: 0
+      });
+      persist();
+      renderLibrary();
+      toast("Passage ajouté à ta bibliothèque.");
+      const button = document.querySelectorAll(".hifdh-weak-item button")[index];
+      if (button) {
+        button.textContent = "Ajouté";
+        button.disabled = true;
+      }
     }
 
     function renderSettings() {
@@ -1569,6 +1935,255 @@
       }).catch(error => {
         console.error("[Murajaah Flash] Technical font error: KFGQPC Hafs v18 failed to load.", error);
       });
+    }
+
+    const MUSHAF_PROTOTYPE_URL = "https://cdn.jsdelivr.net/gh/quranpedia/quran-svg@main/mushafs/hafs/kfqc/svg/003.svg";
+    const MUSHAF_PROTOTYPE_CURRENT_SURAH = "2";
+    const MUSHAF_PROTOTYPE_CURRENT_AYAH = "10";
+    let mushafPrototypeStep = 0;
+    const MUSHAF_PROTOTYPE_STEPS = [
+      {
+        title: "Verset avant",
+        text: "Observe la page entière et repère l’élan sans perdre l’emplacement.",
+        button: "Voir le verset cible"
+      },
+      {
+        title: "Verset cible",
+        text: "Récite de mémoire le passage que tu veux renforcer.",
+        button: "Voir le verset de liaison"
+      },
+      {
+        title: "Verset de liaison",
+        text: "Continue ensuite la récitation pour vérifier la fluidité.",
+        button: "Revenir à Murajaah"
+      }
+    ];
+
+    function openMushafPrototype() {
+      const prototype = document.getElementById("mushafPrototype");
+      const stage = document.getElementById("mushafPrototypeStage");
+      if (!prototype || !stage) return;
+
+      mushafPrototypeStep = 0;
+      prototype.classList.add("active");
+      prototype.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+
+      stage.innerHTML = `<div class="mushaf-loading">Chargement de la page Mushaf…</div>`;
+      renderMushafPrototypeStep();
+      loadInlineMushafPrototype(stage);
+    }
+
+    async function loadInlineMushafPrototype(stage) {
+      try {
+        const response = await fetch(MUSHAF_PROTOTYPE_URL);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const svgText = await response.text();
+        stage.innerHTML = svgText;
+
+        const svg = stage.querySelector("svg");
+        if (!svg) throw new Error("Aucun <svg> trouvé dans la réponse.");
+
+        svg.classList.add("mushaf-inline-svg");
+
+        const report = inspectInlineMushafSvg(svg);
+        window.__mushafSvgReport = report;
+        console.log("[Murajaah Flash] Rapport SVG Mushaf inline", report);
+        console.table(report.semanticAttributes);
+        console.table(report.verseLike);
+        highlightCurrentMushafAyah(svg, MUSHAF_PROTOTYPE_CURRENT_SURAH, MUSHAF_PROTOTYPE_CURRENT_AYAH);
+      } catch (error) {
+        console.error("[Murajaah Flash] Impossible de charger le SVG Mushaf inline.", error);
+        stage.innerHTML = `<div class="mushaf-loading">Impossible de charger le SVG Mushaf.</div>`;
+      }
+    }
+
+    function highlightCurrentMushafAyah(svg, surah, ayah) {
+      svg.querySelectorAll(".mushaf-spotlight-layer, .mushaf-spotlight-defs").forEach(element => element.remove());
+
+      const currentAyah = svg.querySelector(
+        `.ayahPolygon[surah="${surah}"][ayah="${ayah}"]`
+      );
+
+      if (!currentAyah) {
+        console.warn(`[Murajaah Flash] Polygon introuvable pour le verset ${surah}:${ayah}.`);
+        return;
+      }
+
+      drawMushafSpotlightMask(svg, currentAyah);
+      console.log(`[Murajaah Flash] Spotlight Mushaf ${surah}:${ayah}`);
+    }
+
+    function drawMushafSpotlightMask(svg, ayahPolygon) {
+      const namespace = "http://www.w3.org/2000/svg";
+      const canvas = getSvgCanvasBox(svg);
+      const maskId = `mushaf-spotlight-mask-${Date.now()}`;
+
+      const defs = document.createElementNS(namespace, "defs");
+      defs.classList.add("mushaf-spotlight-defs");
+
+      const mask = document.createElementNS(namespace, "mask");
+      mask.setAttribute("id", maskId);
+      mask.setAttribute("maskUnits", "userSpaceOnUse");
+      mask.setAttribute("x", String(canvas.x));
+      mask.setAttribute("y", String(canvas.y));
+      mask.setAttribute("width", String(canvas.width));
+      mask.setAttribute("height", String(canvas.height));
+
+      const maskBase = document.createElementNS(namespace, "rect");
+      maskBase.setAttribute("x", String(canvas.x));
+      maskBase.setAttribute("y", String(canvas.y));
+      maskBase.setAttribute("width", String(canvas.width));
+      maskBase.setAttribute("height", String(canvas.height));
+      maskBase.setAttribute("fill", "white");
+
+      const hole = ayahPolygon.cloneNode(false);
+      hole.removeAttribute("id");
+      hole.classList.remove("ayahPolygon", "is-current");
+      hole.setAttribute("fill", "black");
+      hole.setAttribute("fill-opacity", "1");
+      hole.setAttribute("stroke", "none");
+
+      mask.append(maskBase, hole);
+      defs.appendChild(mask);
+
+      const layer = document.createElementNS(namespace, "g");
+      layer.classList.add("mushaf-spotlight-layer");
+      layer.setAttribute("pointer-events", "none");
+
+      const overlay = document.createElementNS(namespace, "rect");
+      overlay.classList.add("mushaf-spotlight-overlay");
+      overlay.setAttribute("x", String(canvas.x));
+      overlay.setAttribute("y", String(canvas.y));
+      overlay.setAttribute("width", String(canvas.width));
+      overlay.setAttribute("height", String(canvas.height));
+      overlay.setAttribute("mask", `url(#${maskId})`);
+
+      const glow = ayahPolygon.cloneNode(false);
+      glow.removeAttribute("id");
+      glow.classList.remove("ayahPolygon", "is-current");
+      glow.classList.add("mushaf-spotlight-glow");
+
+      layer.append(overlay, glow);
+      svg.append(defs, layer);
+    }
+
+    function getSvgCanvasBox(svg) {
+      const viewBox = svg.viewBox?.baseVal;
+      if (viewBox && viewBox.width && viewBox.height) {
+        return {
+          x: viewBox.x,
+          y: viewBox.y,
+          width: viewBox.width,
+          height: viewBox.height
+        };
+      }
+      const box = safeGetSvgBBox(svg);
+      return box || { x: 0, y: 0, width: 1000, height: 1600 };
+    }
+
+    function safeGetSvgBBox(element) {
+      try {
+        return element.getBBox();
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function inspectInlineMushafSvg(svg) {
+      const elements = Array.from(svg.querySelectorAll("*"));
+      const unique = values => [...new Set(values.filter(Boolean))].sort();
+      const classes = unique(elements.flatMap(element =>
+        String(element.getAttribute("class") || "").split(/\s+/).filter(Boolean)
+      ));
+      const ids = unique(elements.map(element => element.id).filter(Boolean));
+      const dataAttributes = unique(elements.flatMap(element =>
+        Array.from(element.attributes || [])
+          .filter(attribute => attribute.name.startsWith("data-"))
+          .map(attribute => attribute.name)
+      ));
+      const semanticAttributes = ["surah", "ayah", "number", "verse"].map(name => {
+        const match = elements.find(element => element.hasAttribute(name));
+        return {
+          name,
+          count: elements.filter(element => element.hasAttribute(name)).length,
+          sample: match ? match.getAttribute(name) : null
+        };
+      });
+      const tagCounts = ["g", "path", "text", "use", "polygon"].reduce((counts, tag) => {
+        counts[tag] = svg.querySelectorAll(tag).length;
+        return counts;
+      }, {});
+      const verseLike = elements.filter(element => {
+        const id = (element.id || "").toLowerCase();
+        const className = String(element.getAttribute("class") || "").toLowerCase();
+        const dataNames = Array.from(element.attributes || [])
+          .filter(attribute => attribute.name.startsWith("data-"))
+          .map(attribute => attribute.name.toLowerCase());
+        return (
+          id.includes("ayah") ||
+          id.includes("verse") ||
+          className.includes("ayah") ||
+          className.includes("verse") ||
+          element.hasAttribute("surah") ||
+          element.hasAttribute("ayah") ||
+          element.hasAttribute("number") ||
+          element.hasAttribute("verse") ||
+          dataNames.some(name => name.includes("ayah") || name.includes("verse") || name.includes("surah"))
+        );
+      }).slice(0, 20).map(element => ({
+        tag: element.tagName,
+        id: element.id || null,
+        class: element.getAttribute("class") || null,
+        data: Array.from(element.attributes || [])
+          .filter(attribute => attribute.name.startsWith("data-"))
+          .map(attribute => `${attribute.name}="${attribute.value}"`),
+        surah: element.getAttribute("surah"),
+        ayah: element.getAttribute("ayah"),
+        number: element.getAttribute("number"),
+        verse: element.getAttribute("verse")
+      }));
+
+      return {
+        classes,
+        idCount: ids.length,
+        ids: ids.slice(0, 200),
+        dataAttributes,
+        semanticAttributes,
+        tagCounts,
+        verseLike
+      };
+    }
+
+    function renderMushafPrototypeStep() {
+      const current = MUSHAF_PROTOTYPE_STEPS[mushafPrototypeStep] || MUSHAF_PROTOTYPE_STEPS[0];
+      document.querySelectorAll("#mushafPrototypeTabs span").forEach((tab, index) => {
+        tab.classList.toggle("active", index === mushafPrototypeStep);
+      });
+      const title = document.getElementById("mushafPrototypeTaskTitle");
+      const text = document.getElementById("mushafPrototypeTaskText");
+      const button = document.getElementById("mushafPrototypeNextBtn");
+      if (title) title.textContent = current.title;
+      if (text) text.textContent = current.text;
+      if (button) button.textContent = current.button;
+    }
+
+    function advanceMushafPrototype() {
+      if (mushafPrototypeStep >= MUSHAF_PROTOTYPE_STEPS.length - 1) {
+        closeMushafPrototype();
+        return;
+      }
+      mushafPrototypeStep++;
+      renderMushafPrototypeStep();
+    }
+
+    function closeMushafPrototype() {
+      const prototype = document.getElementById("mushafPrototype");
+      if (!prototype) return;
+      prototype.classList.remove("active");
+      prototype.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
     }
 
     verifyQuranFontLoaded();
