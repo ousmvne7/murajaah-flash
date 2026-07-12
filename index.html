@@ -291,10 +291,6 @@
               <div><strong>Données locales</strong><span>Tes passages et audios restent sur cet appareil.</span></div>
               <span style="font-size:24px">🔒</span>
             </div>
-            <button class="setting-row setting-row-button" type="button" onclick="openMushafPrototype()">
-              <div><strong>Prototype Mushaf visuel</strong><span>Test isolé sur la page 3.</span></div>
-              <span class="setting-arrow">›</span>
-            </button>
           </div>
           <div class="section-title"><h2>Données</h2></div>
           <button class="secondary-btn" onclick="exportData()">Exporter mes cartes</button>
@@ -325,28 +321,28 @@
     <section class="review-screen" id="reviewScreen">
       <div class="review-intro" id="reviewIntro">
         <header class="review-intro-header">
+          <span class="review-intro-head-icon review-intro-notification" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+            <i></i>
+          </span>
           <h1>Mes révisions</h1>
-          <button class="review-close" aria-label="Quitter la révision" onclick="exitReview()">×</button>
+          <button class="review-intro-head-icon" type="button" aria-label="Ouvrir les réglages" onclick="exitReview(); openProfile('settings')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.15.38.37.72.67 1 .3.28.69.42 1.1.4h.1v4h-.1a1.7 1.7 0 0 0-1.77.6Z"/></svg>
+          </button>
         </header>
         <div class="review-intro-body">
           <div class="review-alert-card">
-            <div class="review-alert-icon">↻</div>
+            <div class="review-alert-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 1 1-2.05-4.95L20 10"/></svg>
+            </div>
             <p><strong id="introDueCount">0</strong> passage<span id="introPlural">s</span> à revoir aujourd’hui.</p>
-            <small id="introEstimate">Une session courte suffit pour rester à jour.</small>
-          </div>
-          <div class="review-visual-choice" role="radiogroup" aria-label="Mode d'affichage de la révision">
-            <button class="active" type="button" data-review-visual="normal" onclick="selectReviewVisualMode('normal')" role="radio" aria-checked="true">
-              <span>Mode normal</span>
-              <small>Carte actuelle</small>
-            </button>
-            <button type="button" data-review-visual="mushaf" onclick="selectReviewVisualMode('mushaf')" role="radio" aria-checked="false">
-              <span>Mode Mushaf</span>
-              <small>Page visuelle</small>
-            </button>
+            <small id="introEstimate">≈ 1 min pour cette session</small>
           </div>
           <button class="primary-btn intro-start-btn" onclick="beginReviewSession()">
-            Commencer la révision
+            <svg class="intro-start-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2h5a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H3Z"/><path d="M21 18a1 1 0 0 0 1-1V5a2 2 0 0 0-2-2h-5a3 3 0 0 0-3 3v15a3 3 0 0 1 3-3h6Z"/></svg>
+            <strong>Commencer la révision</strong>
             <span id="introStartCount">0</span>
+            <svg class="intro-start-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </button>
           <div class="review-extra-options">
             <div class="section-divider"><span>Autres options</span></div>
@@ -359,12 +355,37 @@
               </span>
               <span>
                 <strong>Tester mon hifdh</strong>
-                <small>Teste un hizb et détecte tes points faibles.</small>
+                <small>Teste un hizb et détecte<br>tes points faibles pour progresser.</small>
               </span>
               <b>NOUVEAU</b>
               <svg class="option-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
+
+          <section class="review-intro-benefits" aria-label="Les bénéfices de Murajaah Flash">
+            <div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3M22 12h-3M12 22v-3M2 12h3"/></svg>
+              <strong>Ciblé</strong>
+              <small>Concentre-toi sur les passages que tu dois renforcer.</small>
+            </div>
+            <div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9M10 19V5M16 19v-8M3 19h18"/><path d="m4 8 5-3 5 4 6-6"/></svg>
+              <strong>Suivi</strong>
+              <small>Analyse tes résultats et vois ta progression.</small>
+            </div>
+            <div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.2 2.1 3-.4.5 3 2.7 1.4-1.4 2.7 1.4 2.7-2.7 1.4-.5 3-3-.4L12 21l-2.2-2.1-3 .4-.5-3-2.7-1.4L5 12.2 3.6 9.5l2.7-1.4.5-3 3 .4L12 3Z"/><path d="m9 12 2 2 4-4"/></svg>
+              <strong>Efficace</strong>
+              <small>Révise intelligemment et gagne en confiance.</small>
+            </div>
+          </section>
+
+          <button class="review-last-session" type="button" onclick="exitReview(); openProfile('progress')">
+            <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span>
+            <span><strong>Dernière session</strong><small id="introLastSession">Aucune session</small></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+
         </div>
       </div>
       <div id="reviewSession">
@@ -448,9 +469,14 @@
         </div>
         <div class="hifdh-review-header-controls" id="hifdhTestHeaderControls" hidden>
           <div class="hifdh-stage-tabs" aria-label="Étapes du test">
-            <span class="active" data-hifdh-stage="start">Verset de départ</span>
-            <span data-hifdh-stage="answer">Suite du passage</span>
-            <span data-hifdh-stage="check">Vérification</span>
+            <span class="active" data-hifdh-stage="start">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
+              Récitation
+            </span>
+            <span data-hifdh-stage="answer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r=".8" fill="currentColor"/><circle cx="3.5" cy="12" r=".8" fill="currentColor"/><circle cx="3.5" cy="18" r=".8" fill="currentColor"/></svg>
+              Suite du passage
+            </span>
           </div>
           <div class="hifdh-progress-row">
             <span id="hifdhProgressLabel">Question 1 / 10</span>
@@ -565,7 +591,14 @@
           <article class="hifdh-verse-card">
             <div class="verse-surface hifdh-verse-surface single">
               <div class="review-verse-item mushaf-line active hifdh-start-line">
+                <div class="hifdh-recitation-orbit" aria-hidden="true">
+                  <span></span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
+                  <span></span>
+                </div>
+                <p class="hifdh-stage-prompt" id="hifdhStagePrompt">Récite de mémoire le verset suivant</p>
                 <div class="arabic" id="hifdhStartVerse" dir="rtl"></div>
+                <div class="hifdh-verse-divider" aria-hidden="true"><i></i><span></span><i></i></div>
               </div>
               <div class="hifdh-audio-btn elan-audio-panel" id="hifdhAudioPanel">
                 <div>
@@ -579,6 +612,12 @@
             </div>
             <audio id="hifdhAudio" preload="none" playsinline></audio>
           </article>
+
+          <section class="hifdh-live-stats" aria-label="Résultats du test en cours">
+            <div class="success"><b id="hifdhLiveYes">0</b><span>Acquis</span></div>
+            <div class="almost"><b id="hifdhLiveAlmost">0</b><span>Presque</span></div>
+            <div class="review"><b id="hifdhLiveNo">0</b><span>À revoir</span></div>
+          </section>
         </div>
 
         <div class="hifdh-fixed-controls">
@@ -589,7 +628,7 @@
               </span>
               <div>
                 <h2 id="hifdhTaskTitle">Consigne</h2>
-                <p id="hifdhTaskText">Récite les deux versets suivants de mémoire.</p>
+                <p id="hifdhTaskText">Récite le verset suivant de mémoire.</p>
               </div>
             </div>
           </section>
@@ -602,7 +641,7 @@
           </button>
 
           <div class="hifdh-rating-wrap" id="hifdhRatings" hidden>
-            <p class="rating-title">As-tu récité les deux versets sans hésiter ?</p>
+            <p class="rating-title">As-tu enchaîné les deux versets sans hésiter ?</p>
             <div class="hifdh-ratings">
               <button type="button" class="yes" onclick="rateHifdhQuestion('yes')">Acquis<small>solide</small></button>
               <button type="button" class="almost" onclick="rateHifdhQuestion('almost')">Presque<small>à renforcer</small></button>
@@ -629,40 +668,6 @@
         </section>
         <button type="button" class="hifdh-start-btn" onclick="openHifdhTest()">Nouveau test</button>
         <button type="button" class="secondary-btn hifdh-home-btn" onclick="closeHifdhTest()">Retour</button>
-      </div>
-    </section>
-
-    <section class="mushaf-prototype" id="mushafPrototype" aria-hidden="true">
-      <div class="mushaf-prototype-shell">
-        <header class="mushaf-prototype-header">
-          <div>
-            <strong>Mode Mushaf</strong>
-            <span>Prototype · page 3</span>
-          </div>
-          <button type="button" aria-label="Fermer le prototype" onclick="closeMushafPrototype()">×</button>
-        </header>
-        <div class="mushaf-prototype-tabs" id="mushafPrototypeTabs">
-          <span class="active">Verset avant</span>
-          <span>Verset cible</span>
-          <span>Verset de liaison</span>
-        </div>
-        <div class="mushaf-prototype-card">
-          <div class="mushaf-prototype-meta">
-            <span>Al-Baqarah</span>
-            <span>Page 3</span>
-          </div>
-          <div class="mushaf-svg-stage" id="mushafPrototypeStage" aria-live="polite">
-            <div class="mushaf-loading">Chargement du prototype…</div>
-          </div>
-        </div>
-        <div class="mushaf-task-card">
-          <div>
-            <strong id="mushafPrototypeTaskTitle">Verset avant</strong>
-            <span id="mushafPrototypeTaskText">Observe la page entière et repère l’élan sans perdre l’emplacement.</span>
-          </div>
-          <button type="button" aria-label="Écouter l’élan">▶</button>
-        </div>
-        <button class="primary-btn mushaf-prototype-action" id="mushafPrototypeNextBtn" type="button" onclick="advanceMushafPrototype()">Voir le verset cible</button>
       </div>
     </section>
 
