@@ -63,6 +63,7 @@ setTimeout(() => {
     let hifdhSelectedHizb = 1;
     let hifdhQuestionCount = 10;
     let hifdhTest = null;
+    let hifdhRevealStage = 0;
     let hifdhPickerCloseTimer = null;
 
     function load(key, fallback) {
@@ -1014,7 +1015,7 @@ setTimeout(() => {
       reviewAudio.pause();
       reviewAudio.currentTime = 0;
       reviewAudioBtn.classList.remove("playing");
-      reviewAudioBtn.textContent = "▶";
+      setAudioControlState(reviewAudioBtn, "play");
       reviewAudioBtn.classList.toggle("visible", Boolean(card.audioData));
       document.querySelector(".flashcard")?.classList.toggle("has-audio", Boolean(card.audioData));
       if (card.audioData) {
@@ -1022,15 +1023,15 @@ setTimeout(() => {
         reviewAudio.load();
         reviewAudio.onplay = () => {
           reviewAudioBtn.classList.add("playing");
-          reviewAudioBtn.textContent = "🔊";
+          setAudioControlState(reviewAudioBtn, "pause");
         };
         reviewAudio.onended = () => {
           reviewAudioBtn.classList.remove("playing");
-          reviewAudioBtn.textContent = "↻";
+          setAudioControlState(reviewAudioBtn, "replay");
         };
         reviewAudio.onerror = () => {
           reviewAudioBtn.classList.remove("playing");
-          reviewAudioBtn.textContent = "!";
+          setAudioControlState(reviewAudioBtn, "error");
         };
         playReviewAudio(true);
       } else {
@@ -1041,7 +1042,7 @@ setTimeout(() => {
       document.querySelector(".rating-title").textContent = "As-tu enchaîné les deux versets sans hésiter ?";
       setReviewInstruction("Récite de mémoire le passage qui vient après.", true);
       document.getElementById("revealBtn").style.display = "flex";
-      document.getElementById("revealBtnLabel").textContent = "Révéler le passage";
+      document.getElementById("revealBtnLabel").textContent = "Voir le verset cible";
     }
 
     function setReviewInstruction(text, visible = true) {
@@ -1058,7 +1059,7 @@ setTimeout(() => {
           </svg>
         </span>
         <span class="review-task-copy">
-          <strong>Tâche</strong>
+          <strong>Consigne</strong>
           <small>${escapeHtml(text)}</small>
         </span>
         <span class="review-task-sound" aria-hidden="true">
@@ -1082,7 +1083,7 @@ setTimeout(() => {
         setReviewStep(1);
         renderReviewVerses(card, 1);
         setReviewInstruction("Continue ensuite la récitation sans couper l’élan.", true);
-        document.getElementById("revealBtnLabel").textContent = "Voir le verset après";
+        document.getElementById("revealBtnLabel").textContent = "Voir le verset de liaison";
         return;
       }
       reviewStage = 2;
@@ -1113,7 +1114,7 @@ setTimeout(() => {
           <span id="elanAudioMeta">Préparation de l’élan audio…</span>
         </div>
         <div class="elan-actions">
-          <button type="button" id="elanAudioBtn" onclick="playElanAudio()" disabled>…</button>
+          <button type="button" id="elanAudioBtn" onclick="playElanAudio()" disabled>${audioControlMarkup("loading")}</button>
           <span>1.25x</span>
         </div>
       `;
@@ -1284,6 +1285,24 @@ setTimeout(() => {
       });
     }
 
+    function audioControlMarkup(state = "play") {
+      const icons = {
+        play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 7 7 5-7 5V7Z" fill="currentColor"/></svg>',
+        pause: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 7v10M15 7v10"/></svg>',
+        replay: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 8a7 7 0 1 0 1 6"/><path d="M19 4v4h-4"/></svg>',
+        loading: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5M12 16.5h.01"/></svg>'
+      };
+      return icons[state] || icons.play;
+    }
+
+    function setAudioControlState(button, state = "play") {
+      if (!button) return;
+      button.innerHTML = audioControlMarkup(state);
+      button.dataset.audioState = state;
+      button.classList.toggle("playing", state === "pause");
+    }
+
     function playReviewAudio(automatic = false) {
       const audio = document.getElementById("reviewAudio");
       if (!audio.src) return;
@@ -1291,7 +1310,7 @@ setTimeout(() => {
       audio.play().catch(() => {
         const button = document.getElementById("reviewAudioBtn");
         button.classList.remove("playing");
-        button.textContent = "▶";
+        setAudioControlState(button, "play");
         if (!automatic) toast("Impossible de lire cet audio. Essaie de le réenregistrer.");
       });
     }
@@ -1307,7 +1326,7 @@ setTimeout(() => {
       if (panel) panel.hidden = true;
       if (button) {
         button.disabled = true;
-        button.textContent = "▶";
+        setAudioControlState(button, "play");
       }
     }
 
@@ -1320,14 +1339,14 @@ setTimeout(() => {
       if (!panel || !meta || !button) return;
       panel.hidden = false;
       button.disabled = true;
-      button.textContent = "…";
+      setAudioControlState(button, "loading");
       meta.textContent = "Préparation de l’élan audio…";
 
       try {
         const info = await getElanAudioInfo(card);
         if (reviewStage !== 0 || reviewQueue[reviewIndex]?.id !== card.id) return resetElanAudio();
         if (!info) {
-          button.textContent = "!";
+          setAudioControlState(button, "error");
           meta.textContent = "Audio disponible seulement pour un passage Quran reconnu.";
           return;
         }
@@ -1337,18 +1356,18 @@ setTimeout(() => {
         audio.load();
         meta.textContent = `${info.label} · Minshawi`;
         button.disabled = false;
-        button.textContent = "▶";
-        audio.onplay = () => { button.textContent = "Ⅱ"; };
-        audio.onpause = () => { button.textContent = "▶"; };
-        audio.onended = () => { button.textContent = "↻"; };
+        setAudioControlState(button, "play");
+        audio.onplay = () => { setAudioControlState(button, "pause"); };
+        audio.onpause = () => { setAudioControlState(button, "play"); };
+        audio.onended = () => { setAudioControlState(button, "replay"); };
         audio.onerror = () => {
-          button.textContent = "!";
+          setAudioControlState(button, "error");
           button.disabled = false;
           meta.textContent = "Audio indisponible pour ce verset.";
         };
         playElanAudio(true);
       } catch (_) {
-        button.textContent = "!";
+        setAudioControlState(button, "error");
         meta.textContent = "Ouvre l’app via localhost ou GitHub Pages pour charger l’audio.";
       }
     }
@@ -1364,7 +1383,7 @@ setTimeout(() => {
       audio.currentTime = 0;
       audio.play().catch(() => {
         const button = document.getElementById("elanAudioBtn");
-        if (button) button.textContent = "▶";
+        if (button) setAudioControlState(button, "play");
         if (!automatic) toast("Impossible de lancer l’élan audio. Vérifie ta connexion.");
       });
     }
@@ -1493,7 +1512,9 @@ setTimeout(() => {
       document.getElementById("reviewSummary")?.classList.remove("active");
       document.getElementById("bottomNav").style.display = "none";
       document.getElementById("hifdhScreen")?.classList.add("active");
+      document.getElementById("hifdhScreen")?.classList.remove("test-running");
       document.getElementById("hifdhHeaderTitle").textContent = "Tester mon hifdh";
+      document.getElementById("hifdhTestHeaderControls").hidden = true;
       document.getElementById("hifdhSetup").hidden = false;
       document.getElementById("hifdhQuestion").hidden = true;
       document.getElementById("hifdhSummary").hidden = true;
@@ -1510,7 +1531,9 @@ setTimeout(() => {
         picker.classList.remove("open");
       }
       document.getElementById("hifdhScreen")?.classList.remove("picker-open");
+      document.getElementById("hifdhScreen")?.classList.remove("test-running");
       document.getElementById("hifdhScreen")?.classList.remove("active");
+      document.getElementById("hifdhTestHeaderControls").hidden = true;
       document.getElementById("bottomNav").style.display = "grid";
       showScreen("home");
     }
@@ -1670,10 +1693,12 @@ setTimeout(() => {
           results: [],
           startedAt: Date.now()
         };
-        document.getElementById("hifdhHeaderTitle").textContent = "Test en cours";
+        document.getElementById("hifdhHeaderTitle").textContent = "Test hifdh";
+        document.getElementById("hifdhTestHeaderControls").hidden = false;
         document.getElementById("hifdhSetup").hidden = true;
         document.getElementById("hifdhSummary").hidden = true;
         document.getElementById("hifdhQuestion").hidden = false;
+        document.getElementById("hifdhScreen")?.classList.add("test-running");
         renderHifdhQuestion();
       } catch (error) {
         console.error("[Murajaah Flash] Test Hifdh indisponible.", error);
@@ -1696,24 +1721,27 @@ setTimeout(() => {
       document.getElementById("hifdhProgressPercent").textContent = `${percent}%`;
       document.getElementById("hifdhQuestionHizb").textContent = `Hizb ${hifdhTest.hizb}`;
       document.getElementById("hifdhQuestionRange").textContent = hifdhRangeLabel(hifdhTest.hizb);
-      document.getElementById("hifdhQuestionRef").textContent = question.startRef;
+      document.getElementById("hifdhAudioMeta").textContent = `${question.startRef} · Minshawi`;
       setArabicVerseContent(document.getElementById("hifdhStartVerse"), question.startText, question.surah, question.ayah);
-      document.getElementById("hifdhNextOneRef").textContent = question.nextOneRef;
-      document.getElementById("hifdhNextTwoRef").textContent = question.nextTwoRef;
-      setArabicVerseContent(document.getElementById("hifdhNextOne"), question.nextOne, question.surah, question.ayah + 1);
-      setArabicVerseContent(document.getElementById("hifdhNextTwo"), question.nextTwo, question.surah, question.ayah + 2);
-      document.getElementById("hifdhAnswerBlock").hidden = true;
-      document.getElementById("hifdhHiddenLines").hidden = false;
+      document.getElementById("hifdhAudioPanel").hidden = false;
+      document.getElementById("hifdhTaskCard").hidden = false;
+      document.getElementById("hifdhTaskTitle").textContent = "Consigne";
+      document.getElementById("hifdhTaskText").textContent = "Récite les deux versets suivants de mémoire.";
       document.getElementById("hifdhRevealBtn").hidden = false;
+      document.getElementById("hifdhRevealLabel").textContent = "Vérifier la suite";
       document.getElementById("hifdhRatings").hidden = true;
+      hifdhRevealStage = 0;
+      setHifdhStage("start");
       const audio = document.getElementById("hifdhAudio");
       audio.src = hifdhAudioUrl(question.surahId, question.ayah);
       audio.playbackRate = ELAN_PLAYBACK_RATE;
       audio.load();
-      audio.onplay = () => { document.getElementById("hifdhAudioIcon").textContent = "Ⅱ"; };
-      audio.onpause = () => { document.getElementById("hifdhAudioIcon").textContent = "▶"; };
-      audio.onended = () => { document.getElementById("hifdhAudioIcon").textContent = "↻"; };
-      audio.onerror = () => { document.getElementById("hifdhAudioIcon").textContent = "!"; };
+      audio.onplay = () => { setAudioControlState(document.getElementById("hifdhAudioIcon"), "pause"); };
+      audio.onpause = () => { setAudioControlState(document.getElementById("hifdhAudioIcon"), "play"); };
+      audio.onended = () => { setAudioControlState(document.getElementById("hifdhAudioIcon"), "replay"); };
+      audio.onerror = () => { setAudioControlState(document.getElementById("hifdhAudioIcon"), "error"); };
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
       window.scrollTo(0, 0);
     }
 
@@ -1722,7 +1750,7 @@ setTimeout(() => {
       if (!audio) return;
       audio.pause();
       audio.currentTime = 0;
-      document.getElementById("hifdhAudioIcon") && (document.getElementById("hifdhAudioIcon").textContent = "▶");
+      setAudioControlState(document.getElementById("hifdhAudioIcon"), "play");
     }
 
     function playHifdhAudio() {
@@ -1738,10 +1766,43 @@ setTimeout(() => {
     }
 
     function revealHifdhAnswer() {
-      document.getElementById("hifdhAnswerBlock").hidden = false;
-      document.getElementById("hifdhHiddenLines").hidden = true;
-      document.getElementById("hifdhRevealBtn").hidden = true;
-      document.getElementById("hifdhRatings").hidden = false;
+      const question = currentHifdhQuestion();
+      if (!question) return;
+      const verse = document.getElementById("hifdhStartVerse");
+      const audioPanel = document.getElementById("hifdhAudioPanel");
+      const task = document.getElementById("hifdhTaskCard");
+      const taskTitle = document.getElementById("hifdhTaskTitle");
+      const taskText = document.getElementById("hifdhTaskText");
+      const button = document.getElementById("hifdhRevealBtn");
+      const label = document.getElementById("hifdhRevealLabel");
+      const ratings = document.getElementById("hifdhRatings");
+
+      if (hifdhRevealStage === 0) {
+        hifdhRevealStage = 1;
+        stopHifdhAudio();
+        audioPanel.hidden = true;
+        setArabicVerseContent(verse, question.nextOne, question.surah, question.ayah + 1);
+        taskTitle.textContent = "Continue";
+        taskText.textContent = "Récite maintenant le verset qui vient ensuite.";
+        label.textContent = "Voir le deuxième verset";
+        setHifdhStage("answer");
+        return;
+      }
+
+      hifdhRevealStage = 2;
+      setArabicVerseContent(verse, question.nextTwo, question.surah, question.ayah + 2);
+      task.hidden = true;
+      button.hidden = true;
+      ratings.hidden = false;
+      setHifdhStage("check");
+    }
+
+    function setHifdhStage(stage) {
+      document.querySelectorAll("[data-hifdh-stage]").forEach(item => {
+        const key = item.dataset.hifdhStage;
+        item.classList.toggle("active", key === stage);
+        item.classList.toggle("done", (stage === "answer" && key === "start") || (stage === "check" && key !== "check"));
+      });
     }
 
     function rateHifdhQuestion(rating) {
@@ -1788,6 +1849,8 @@ setTimeout(() => {
         return;
       }
       document.getElementById("hifdhHeaderTitle").textContent = "Résumé";
+      document.getElementById("hifdhScreen")?.classList.remove("test-running");
+      document.getElementById("hifdhTestHeaderControls").hidden = true;
       document.getElementById("hifdhSetup").hidden = true;
       document.getElementById("hifdhQuestion").hidden = true;
       document.getElementById("hifdhSummary").hidden = false;
