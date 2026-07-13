@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "murajaah-flash";
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v14-review-states";
 const APP_CACHE = `${CACHE_PREFIX}-app-${CACHE_VERSION}`;
 const MUSHAF_CACHE = `${CACHE_PREFIX}-mushaf-${CACHE_VERSION}`;
 
@@ -8,6 +8,10 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
   "./css/styles.css",
+  "./css/home.css?v=10",
+  "./css/library.css?v=2",
+  "./css/hifdh-setup.css",
+  "./css/review-intro.css?v=3",
   "./js/pwa.js",
   "./js/app.js",
   "./assets/icon.svg",

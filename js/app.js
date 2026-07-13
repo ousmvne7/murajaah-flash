@@ -39,6 +39,7 @@ setTimeout(() => {
     let activity = load(ACTIVITY_KEY, {});
     let hifdhHistory = load(HIFDH_HISTORY_KEY, []);
     let activeFilter = "all";
+    let librarySort = "recent";
     let reviewPool = [];
     let reviewSessionMode = "recitation";
     let reviewQueue = [];
@@ -143,7 +144,10 @@ setTimeout(() => {
       document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
       target.classList.add("active");
       target.scrollTop = 0;
-      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.screen === name));
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        const activeScreen = name === "library" ? "review" : name;
+        btn.classList.toggle("active", btn.dataset.screen === activeScreen);
+      });
       if (name === "home") renderDashboard();
       if (name === "library") renderLibrary();
       if (name === "progress") {
@@ -193,7 +197,7 @@ setTimeout(() => {
       document.getElementById("streakLabel").textContent = days + " jour" + (days > 1 ? "s" : "");
       const startBtn = document.getElementById("startReviewBtn");
       startBtn.disabled = cards.length > 0 && session.remaining === 0;
-      startBtn.textContent = session.remaining ? "Commencer la révision" : cards.length ? "Tout est à jour ✓" : "Ajoute ton premier passage";
+      document.getElementById("startReviewLabel").textContent = session.remaining ? "Commencer la révision" : cards.length ? "Tout est à jour ✓" : "Ajoute ton premier passage";
     }
 
     function reviewedOn(date) {
@@ -356,34 +360,74 @@ setTimeout(() => {
     }
 
     function renderLibrary() {
-      const query = document.getElementById("searchInput").value.trim().toLowerCase();
-      let filtered = cards.filter(card => !card.archived);
+      const searchInput = document.getElementById("searchInput");
+      const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+      const activeCards = cards.filter(card => !card.archived);
+      const endOfToday = startOfToday() + DAY - 1;
+      const categoryFor = card => {
+        if ((card.nextReview || 0) <= endOfToday) return "due";
+        return autoDifficulty(card).level === "mastered" ? "mastered" : "reinforce";
+      };
+      const categoryCounts = activeCards.reduce((counts, card) => {
+        counts[categoryFor(card)]++;
+        return counts;
+      }, { mastered: 0, reinforce: 0, due: 0 });
+      const total = activeCards.length;
+      const setText = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+      };
+
+      setText("libraryTotalCount", total);
+      setText("libraryMasteredCount", categoryCounts.mastered);
+      setText("libraryReinforceCount", categoryCounts.reinforce);
+      setText("libraryDueCount", categoryCounts.due);
+      setText("libraryMasteredPercent", `${total ? Math.round(categoryCounts.mastered / total * 100) : 0}%`);
+      setText("libraryReinforcePercent", `${total ? Math.round(categoryCounts.reinforce / total * 100) : 0}%`);
+      setText("libraryDuePercent", `${total ? Math.round(categoryCounts.due / total * 100) : 0}%`);
+      setText("libraryAllChipCount", `(${total})`);
+      setText("libraryMasteredChipCount", `(${categoryCounts.mastered})`);
+      setText("libraryReinforceChipCount", `(${categoryCounts.reinforce})`);
+      setText("libraryDueChipCount", `(${categoryCounts.due})`);
+
+      let filtered = [...activeCards];
       if (query) filtered = filtered.filter(card => [card.surah, card.ayah, card.beforeVerse, card.blockageVerse, card.afterVerse, card.note].join(" ").toLowerCase().includes(query));
-      if (activeFilter === "due") filtered = filtered.filter(card => (card.nextReview || 0) <= startOfToday() + DAY - 1);
-      if (activeFilter === "fragile") filtered = filtered.filter(card => ["very-fragile", "fragile"].includes(autoDifficulty(card).level));
-      if (activeFilter === "mastered") filtered = filtered.filter(card => autoDifficulty(card).level === "mastered");
-      filtered.sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
-      document.getElementById("librarySubtitle").textContent = `${cards.length} passage${cards.length !== 1 ? "s" : ""} enregistré${cards.length !== 1 ? "s" : ""}.`;
+      if (activeFilter === "due") filtered = filtered.filter(card => categoryFor(card) === "due");
+      if (activeFilter === "fragile") filtered = filtered.filter(card => categoryFor(card) === "reinforce");
+      if (activeFilter === "mastered") filtered = filtered.filter(card => categoryFor(card) === "mastered");
+      filtered.sort(librarySort === "recent"
+        ? (a, b) => (b.createdAt || 0) - (a.createdAt || 0)
+        : (a, b) => (a.nextReview || 0) - (b.nextReview || 0));
       const list = document.getElementById("cardList");
       if (!filtered.length) {
-        list.innerHTML = `<div class="empty"><div class="empty-icon">📖</div><h3>${cards.length ? "Aucun résultat" : "Ta bibliothèque est vide"}</h3><p>${cards.length ? "Essaie un autre filtre ou une autre recherche." : "Ajoute un passage à revoir pour commencer ta murajaah ciblée."}</p>${cards.length ? "" : '<button class="primary-btn" onclick="showScreen(\'add\')">Ajouter un passage</button>'}</div>`;
+        list.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 5.25A2.25 2.25 0 0 1 5.75 3H10a2 2 0 0 1 2 2v15.5a2.75 2.75 0 0 0-2.75-2.75H3.5Z"/><path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"/></svg></div><h3>${total ? "Aucun résultat" : "Ta bibliothèque est vide"}</h3><p>${total ? "Essaie un autre filtre ou une autre recherche." : "Ajoute un passage pour commencer ta murajaah ciblée."}</p>${total ? "" : '<button class="primary-btn" onclick="showScreen(\'add\')">Ajouter un passage</button>'}</div>`;
         return;
       }
       list.innerHTML = filtered.map(card => {
-        const status = statusFor(card);
-        const label = verseReference(card, 0);
+        const category = categoryFor(card);
+        const statusLabel = category === "mastered" ? "Maîtrisé" : category === "due" ? "À revoir" : "À renforcer";
+        const reference = verseReference(card, 0);
+        const title = card.surah ? `${card.surah} · V${card.ayah || "—"}` : reference;
+        const pageMatch = reference.match(/Page\s+(\d+)/i);
+        const subtitle = pageMatch ? `Page ${pageMatch[1]} · Verset cible` : "Passage ciblé";
+        const addedDate = card.createdAt
+          ? `Ajouté le ${new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", year: "numeric" }).format(new Date(card.createdAt))}`
+          : nextReviewLabel(card);
         return `<article class="memory-card">
-          <div class="memory-top">
-            <div class="memory-meta">${escapeHtml(label)}<span class="memory-type">${escapeHtml(cardTypeLabel(card))}</span></div>
-            <div class="memory-actions">
-              <button class="tiny-btn" aria-label="Modifier" onclick="editCard('${card.id}')">✎</button>
-              <button class="tiny-btn" aria-label="Supprimer" onclick="askDelete('${card.id}')">×</button>
-            </div>
-          </div>
-          <div class="arabic">${escapeHtml(cleanQuranDisplayText(card.blockageVerse))}</div>
-          <div class="memory-bottom"><span class="status ${status[0]}">${status[1]}</span><span>${nextReviewLabel(card)}</span></div>
+          <span class="library-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.25A2.25 2.25 0 0 1 5.75 3H10a2 2 0 0 1 2 2v15.5a2.75 2.75 0 0 0-2.75-2.75H3.5Z"/><path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"/></svg></span>
+          <span class="library-card-copy"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(subtitle)}</span><small>${escapeHtml(addedDate)}</small></span>
+          <span class="library-card-status ${category}">${statusLabel}</span>
+          <svg class="library-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+          <button class="library-card-main" type="button" aria-label="Modifier ${escapeHtml(title)}" onclick="editCard('${card.id}')"></button>
         </article>`;
       }).join("");
+    }
+
+    function toggleLibrarySort() {
+      librarySort = librarySort === "recent" ? "due" : "recent";
+      const label = document.getElementById("librarySortLabel");
+      if (label) label.textContent = librarySort === "recent" ? "Récent" : "À revoir";
+      renderLibrary();
     }
 
     function resetLibraryFilters() {
@@ -947,13 +991,33 @@ setTimeout(() => {
     function updateReviewIntroCounts() {
       const activeCount = reviewPool.length;
       const estimatedMinutes = Math.max(1, Math.ceil(activeCount * 0.45));
+      const reviewedToday = reviewedTodayCount();
+      const plannedToday = reviewedToday + activeCount;
+      const dailyProgress = plannedToday ? Math.round(reviewedToday / plannedToday * 100) : 100;
+      const fragile = cards.filter(card => !card.archived && ["very-fragile", "fragile"].includes(autoDifficulty(card).level)).length;
+      const mastery = confidence();
 
       document.getElementById("introDueCount").textContent = activeCount;
       document.getElementById("introStartCount").textContent = activeCount;
       document.getElementById("introPlural").textContent = activeCount > 1 ? "s" : "";
       document.getElementById("introEstimate").textContent = activeCount
-        ? `≈ ${estimatedMinutes} min pour cette session.`
-        : "Aucun passage à revoir aujourd’hui.";
+        ? `≈ ${estimatedMinutes} min`
+        : "À jour";
+      document.getElementById("introPlannedCount").textContent = activeCount
+        ? `≈ ${estimatedMinutes} min`
+        : "Session terminée";
+      document.getElementById("introReviewedProgress").textContent = `${reviewedToday} / ${plannedToday} révisés`;
+      document.getElementById("introDailyProgress").style.width = `${dailyProgress}%`;
+      document.getElementById("introReviewedToday").textContent = reviewedToday;
+      document.getElementById("introFragileCount").textContent = fragile;
+      document.getElementById("introTotalCount").textContent = cards.filter(card => !card.archived).length;
+      document.getElementById("introConfidenceValue").textContent = `${mastery}%`;
+      document.getElementById("introConfidenceRing").style.setProperty("--progress", `${mastery}%`);
+      document.getElementById("introProgressTitle").textContent = mastery >= 70
+        ? "Bonne régularité !"
+        : mastery >= 35
+          ? "Tu progresses bien !"
+          : "Construis ta régularité !";
       const activityDays = Object.keys(activity)
         .filter(key => Number(activity[key]?.reviewed || 0) > 0)
         .sort()
@@ -1427,7 +1491,7 @@ setTimeout(() => {
       document.getElementById("bottomNav").style.display = "none";
       document.getElementById("hifdhScreen")?.classList.add("active");
       document.getElementById("hifdhScreen")?.classList.remove("test-running");
-      document.getElementById("hifdhHeaderTitle").textContent = "Tester mon hifdh";
+      document.getElementById("hifdhHeaderTitle").textContent = "Test Hifdh";
       document.getElementById("hifdhTestHeaderControls").hidden = true;
       document.getElementById("hifdhSetup").hidden = false;
       document.getElementById("hifdhQuestion").hidden = true;
