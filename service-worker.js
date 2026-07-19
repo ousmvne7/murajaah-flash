@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "murajaah-flash";
-const CACHE_VERSION = "v14-review-states";
+const CACHE_VERSION = "v38-review-translation-position";
 const APP_CACHE = `${CACHE_PREFIX}-app-${CACHE_VERSION}`;
 const MUSHAF_CACHE = `${CACHE_PREFIX}-mushaf-${CACHE_VERSION}`;
 
@@ -8,12 +8,20 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
   "./css/styles.css",
-  "./css/home.css?v=10",
-  "./css/library.css?v=2",
+  "./css/home.css?v=18",
+  "./css/journal.css?v=4",
+  "./assets/home-hero-bg.png",
+  "./css/library.css?v=3",
   "./css/hifdh-setup.css",
-  "./css/review-intro.css?v=3",
+  "./css/review-intro.css?v=5",
+  "./css/typography.css?v=3",
+  "./css/visual-audit.css?v=6",
+  "./css/design-system.css?v=11",
   "./js/pwa.js",
-  "./js/app.js",
+  "./js/icon-system.js?v=15",
+  "./js/app.js?v=translation5",
+  "./assets/icons/lucide.svg?v=8",
+  "./assets/icons/LUCIDE_LICENSE.txt",
   "./assets/icon.svg",
   "./assets/favicon-32.png",
   "./assets/icon-192.png",
@@ -22,8 +30,9 @@ const APP_SHELL = [
   "./assets/bismillah.png",
   "./assets/fonts/hafs.18.woff2",
   "./assets/fonts/hafs.18.ttf",
-  "./data/quran-uthmani.json",
-  "./data/quran-pages.json"
+  "./data/hafsData_v18.json",
+  "./data/quran-pages.json",
+  "./data/quran-fr-hamidullah.json"
 ];
 
 self.addEventListener("install", event => {

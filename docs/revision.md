@@ -70,6 +70,30 @@ Le passage reste fragile.
 
 Il peut être revu immédiatement ou très bientôt.
 
+### Couleurs fonctionnelles
+
+Les trois réponses gardent toujours le même code couleur :
+
+- **Acquis** : vert ;
+- **Presque** : orange ;
+- **À revoir** : rouge.
+
+Ce code est sémantique et reste identique dans Révision ciblée, Test Hifdh, les compteurs et les résumés.
+
+## Test Hifdh
+
+Le Test Hifdh complète la révision ciblée. L’utilisateur choisit un hizb et un nombre de questions, récite la suite d’un verset de départ, révèle le verset suivant avec `CircleArrowRight`, puis s’auto-évalue.
+
+La page utilise le violet comme couleur principale. La jauge d’avancement reste verte et les trois états d’évaluation conservent leurs couleurs fonctionnelles.
+
+## Traduction à la demande
+
+Révision ciblée et Test Hifdh proposent un bouton `Languages` nommé **Traduction**. Il charge localement `data/quran-fr-hamidullah.json`, affiche la traduction française sous le verset actif et la masque au second appui.
+
+Dans la session de Révision ciblée, la barre « Verset avant / Verset cible / Verset de liaison » reste dans l’en-tête. Le bouton **Traduction** remplace la pastille du verset actif, directement en haut du texte arabe.
+
+L’état reste actif pendant la session et suit automatiquement le verset actuellement révélé. Cette couche française est indépendante du texte KFGQPC Hafs v18 : aucune transformation, substitution ou modification de police n’est appliquée au Mushaf.
+
 ## Difficulté automatique
 
 L’application garde un court historique des dernières réponses du passage.

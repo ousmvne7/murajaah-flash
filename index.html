@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#44357d">
+  <meta name="theme-color" content="#0A5A43">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Murajaah">
@@ -15,21 +15,40 @@
   <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/home.css?v=10">
-  <link rel="stylesheet" href="css/library.css?v=2">
+  <link rel="stylesheet" href="css/home.css?v=18">
+  <link rel="stylesheet" href="css/journal.css?v=4">
+  <link rel="stylesheet" href="css/library.css?v=3">
   <link rel="stylesheet" href="css/hifdh-setup.css">
-  <link rel="stylesheet" href="css/review-intro.css?v=3">
+  <link rel="stylesheet" href="css/review-intro.css?v=5">
+  <link rel="stylesheet" href="css/typography.css?v=3">
+  <link rel="stylesheet" href="css/visual-audit.css?v=6">
+  <link rel="stylesheet" href="css/design-system.css?v=11">
 </head>
 <body>
   <main class="app">
     <section class="screen active" id="homeScreen">
-      <header class="topbar">
-        <div class="brand">MURAJAAH<small>FLASH</small></div>
-        <button class="icon-btn" aria-label="Ouvrir l’espace progression et réglages" onclick="openProfile('progress')">
-          <svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.13.38.35.72.65 1 .3.28.68.42 1.1.4h.1v4h-.1c-.42-.02-.8.12-1.1.4-.3.28-.52.62-.65 1z"/></svg>
-        </button>
-      </header>
-      <div class="content">
+      <div class="home-hero">
+        <header class="topbar">
+          <div class="home-logo-lockup home-logo-text-only" aria-label="Murajaah Flash">
+            <span class="home-logo-copy">
+              <span class="brand">MURAJAAH<small>FLASH</small></span>
+              <span class="home-tagline">Ton Hifdh, chaque jour plus fort.</span>
+              <span class="home-tagline-rule" aria-hidden="true"></span>
+            </span>
+          </div>
+          <button class="icon-btn home-profile-btn" aria-label="Ouvrir le profil" onclick="openProfile('progress')">
+            <svg viewBox="0 0 24 24" width="20" fill="currentColor" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M5.4 20.4v-1.1A6.6 6.6 0 0 1 12 12.7a6.6 6.6 0 0 1 6.6 6.6v1.1Z"/></svg>
+            <span class="sr-only">Profil</span>
+          </button>
+        </header>
+        <div class="home-arch" aria-hidden="true">
+          <span class="home-arch-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3.5 5.25A2.25 2.25 0 0 1 5.75 3H10a2 2 0 0 1 2 2v15.5a2.75 2.75 0 0 0-2.75-2.75H3.5Z"></path>
+              <path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"></path>
+            </svg>
+          </span>
+        </div>
         <div class="greeting">
           <span class="greeting-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,9 +60,14 @@
             <h1>Assalamu alaykoum</h1>
             <p id="todayLabel">Aujourd’hui</p>
           </div>
-          <div class="streak" id="streakLabel">0 jour</div>
+          <div class="streak">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 2.5c.7 3.1-.5 4.7-2 6.3-1.3 1.4-2.5 2.8-2.5 5A4.2 4.2 0 0 0 12.2 18a4.4 4.4 0 0 0 4.4-4.5c0-1.8-.8-3.4-2.2-5.2.1 2.1-.8 3.2-2 4.1.4-3.2-1.3-5.6.1-9.9Z"/><path d="M9.2 17.3c.3 2 1.4 3.2 3 4.2 1.7-1.1 2.7-2.4 2.8-4.3"/></svg>
+            <span id="streakLabel">0 jour</span>
+          </div>
         </div>
+      </div>
 
+      <div class="content">
         <article class="focus-card">
           <div class="focus-head">
             <div>
@@ -90,18 +114,29 @@
           </button>
         </div>
 
-        <div class="section-title"><h2>Aujourd’hui</h2><button class="text-btn" onclick="showScreen('library')">Tout voir</button></div>
-        <div class="stats-grid">
-          <div class="stat-card red"><b id="reviewedToday">0</b><span>Révisés</span><small>Bravo !</small></div>
-          <div class="stat-card orange"><b id="fragileCount">0</b><span>À renforcer</span><small>Continue !</small></div>
-          <div class="stat-card green"><b id="totalCount">0</b><span>Total</span><small>Passages</small></div>
-        </div>
+        <section class="home-quick-actions" aria-label="Actions rapides">
+          <h2>Actions rapides</h2>
+          <div class="home-quick-grid">
+            <button type="button" onclick="showScreen('add')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5.5" width="16" height="15" rx="2.5"/><path d="M8 3v5M16 3v5M4 10h16M12 13.5v4M10 15.5h4"/></svg>
+              <span>Ajouter<br>un passage</span>
+            </button>
+            <button type="button" onclick="showScreen('library')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 5.25A2.25 2.25 0 0 1 5.75 3H10a2 2 0 0 1 2 2v15.5a2.75 2.75 0 0 0-2.75-2.75H3.5Z"/><path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"/></svg>
+              <span>Mes passages</span>
+            </button>
+            <button type="button" onclick="openJournal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19V10M12 19V5M19 19v-7"/><path d="M3.5 19.5h17"/></svg>
+              <span>Bilan</span>
+            </button>
+          </div>
+        </section>
       </div>
     </section>
 
     <section class="screen" id="libraryScreen">
       <header class="library-header">
-        <button class="library-header-btn" type="button" aria-label="Revenir au mode révision" onclick="startReview()">
+        <button class="library-header-btn page-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="navigateBack('home')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
         </button>
         <div class="library-heading">
@@ -147,17 +182,18 @@
           <button type="button" onclick="startReview()">Voir les révisions</button>
         </aside>
 
-        <button class="library-add-btn" type="button" aria-label="Ajouter un passage" onclick="showScreen('add')">+</button>
+        <button class="library-add-btn" type="button" aria-label="Ajouter un passage" onclick="showScreen('add')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
       </div>
     </section>
 
     <section class="screen" id="addScreen">
-      <header class="topbar">
+      <header class="topbar subpage-topbar">
+        <button class="icon-btn page-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="resetForm(); navigateBack('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
         <div class="brand">MURAJAAH<small>FLASH</small></div>
-        <button class="icon-btn" aria-label="Fermer" onclick="resetForm(); showScreen('home')">×</button>
+        <span class="topbar-spacer" aria-hidden="true"></span>
       </header>
       <div class="content">
-        <div class="page-title"><p class="eyebrow">Nouveau passage</p><h1 id="formTitle">Ajoute un passage</h1><p>Choisis le verset cible, vérifie la séquence, puis ajoute l’audio si tu veux.</p></div>
+        <div class="page-title"><p class="eyebrow">Nouveau passage</p><h1 id="formTitle">Ajoute un passage</h1><p>Choisis le verset cible, vérifie la séquence et planifie sa première révision.</p></div>
         <form id="cardForm" onsubmit="saveCard(event)">
           <input type="hidden" id="editId">
           <input type="hidden" id="surah">
@@ -212,7 +248,7 @@
               </span>
               <span>Choisir un verset</span>
               <b id="quranPickerSummary">Sourate + verset cible</b>
-              <span class="picker-arrow" aria-hidden="true">›</span>
+              <span class="picker-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
             </button>
             <div class="auto-preview" id="autoPreview" hidden>
               <div class="auto-preview-list" id="autoPreviewList"></div>
@@ -223,30 +259,20 @@
             </div>
           </div>
 
-          <div class="audio-card premium-audio-card" id="userAudioSection">
-            <div class="field-heading">
-              <span class="step-number audio-step-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 14.5a3.5 3.5 0 0 0 3.5-3.5V6.5a3.5 3.5 0 0 0-7 0V11a3.5 3.5 0 0 0 3.5 3.5Z"/>
-                  <path d="M18.5 10.5a6.5 6.5 0 0 1-13 0"/>
-                  <path d="M12 17v4"/>
-                  <path d="M8.5 21h7"/>
-                </svg>
-              </span>
-              <div><strong>Élan audio</strong><small>Optionnel · lancé au début de la révision.</small></div>
-              <div class="audio-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-            </div>
-            <div class="inline-recorder">
-              <button type="button" class="record-btn" id="recordBtn" onclick="toggleRecording()">
-                <span aria-hidden="true">♬</span>
-                Enregistrer
-              </button>
-              <input type="file" id="audioCaptureFallback" accept="audio/*" capture="user" hidden onchange="importCapturedAudio(event)">
-              <button type="button" class="audio-action listen-btn" id="previewAudioBtn" aria-label="Réécouter l’audio avant d’enregistrer le passage" onclick="previewRecordedAudio()" disabled>▶ Écouter</button>
-              <button type="button" class="audio-action" id="deleteAudioBtn" aria-label="Supprimer l’audio" onclick="deleteRecordedAudio()" disabled>×</button>
-              <div class="record-status"><span class="record-dot" id="recordDot"></span><span id="recordStatus">Audio facultatif</span></div>
-            </div>
-          </div>
+          <section class="first-review-card" id="firstReviewCard" aria-labelledby="firstReviewTitle">
+            <span class="first-review-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+            </span>
+            <span class="first-review-copy">
+              <strong id="firstReviewTitle">Première révision</strong>
+              <small>Quand veux-tu commencer ce passage ?</small>
+            </span>
+            <input type="hidden" id="firstReviewDelay" value="0">
+            <span class="first-review-options" role="radiogroup" aria-label="Date de la première révision">
+              <button type="button" class="active" data-first-review-delay="0" role="radio" aria-checked="true" onclick="selectFirstReviewDelay(0)">Aujourd’hui</button>
+              <button type="button" data-first-review-delay="1" role="radio" aria-checked="false" onclick="selectFirstReviewDelay(1)">Demain</button>
+            </span>
+          </section>
 
           <div class="sequence-heading refined-heading">
             <span class="heading-bubble" aria-hidden="true">
@@ -259,10 +285,10 @@
               <label>Type d’hésitation</label>
               <input type="hidden" id="difficulty" value="transition">
               <div class="difficulty-chips" role="radiogroup" aria-label="Type d’hésitation">
-                <button type="button" class="difficulty-chip active" data-difficulty="transition" role="radio" aria-checked="true" onclick="selectDifficulty('transition')"><span class="chip-icon">⌁</span>Enchaînement</button>
-                <button type="button" class="difficulty-chip" data-difficulty="beginning" role="radio" aria-checked="false" onclick="selectDifficulty('beginning')"><span class="chip-icon">↺</span>Début</button>
-                <button type="button" class="difficulty-chip" data-difficulty="similar" role="radio" aria-checked="false" onclick="selectDifficulty('similar')"><span class="chip-icon">?</span>Confusion</button>
-                <button type="button" class="difficulty-chip" data-difficulty="forgotten" role="radio" aria-checked="false" onclick="selectDifficulty('forgotten')"><span class="chip-icon">▱</span>Oubli fréquent</button>
+                <button type="button" class="difficulty-chip active" data-difficulty="transition" role="radio" aria-checked="true" onclick="selectDifficulty('transition')"><span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m10.2 13.8-1.4 1.4a3.4 3.4 0 0 1-4.8-4.8l2.4-2.4a3.4 3.4 0 0 1 4.8 0"/><path d="m13.8 10.2 1.4-1.4a3.4 3.4 0 0 1 4.8 4.8L17.6 16a3.4 3.4 0 0 1-4.8 0"/><path d="m8.8 15.2 6.4-6.4"/></svg></span>Enchaînement</button>
+                <button type="button" class="difficulty-chip" data-difficulty="beginning" role="radio" aria-checked="false" onclick="selectDifficulty('beginning')"><span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5"/><path d="M4 4v4.5h4.5"/></svg></span>Début</button>
+                <button type="button" class="difficulty-chip" data-difficulty="similar" role="radio" aria-checked="false" onclick="selectDifficulty('similar')"><span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="11" height="11" rx="2"/><rect x="9" y="9" width="11" height="11" rx="2"/></svg></span>Confusion</button>
+                <button type="button" class="difficulty-chip" data-difficulty="forgotten" role="radio" aria-checked="false" onclick="selectDifficulty('forgotten')"><span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V22l-6-3.5L6 22V4.5Z"/></svg></span>Oubli fréquent</button>
               </div>
             </div>
             <div class="field">
@@ -279,9 +305,10 @@
     </section>
 
     <section class="screen" id="progressScreen">
-      <header class="topbar">
+      <header class="topbar subpage-topbar">
+        <button class="icon-btn page-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="navigateBack('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
         <div class="brand">MURAJAAH<small>FLASH</small></div>
-        <button class="icon-btn" aria-label="Retour à l’accueil" onclick="showScreen('home')">×</button>
+        <span class="topbar-spacer" aria-hidden="true"></span>
       </header>
       <div class="content">
         <div class="profile-tabs" role="tablist" aria-label="Progression et réglages">
@@ -330,11 +357,11 @@
             </div>
             <div class="setting-row">
               <div><strong>Répétition intelligente</strong><span>À revoir : aujourd’hui · Presque : demain · Acquis : espacé.</span></div>
-              <span style="font-size:24px">🧠</span>
+              <span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 4.5a3 3 0 0 0-5 2.2 3.2 3.2 0 0 0 .6 1.8A3.5 3.5 0 0 0 6 15.2V18a2 2 0 0 0 2 2h2V5.5a2 2 0 0 0-.5-1Z"/><path d="M14.5 4.5a3 3 0 0 1 5 2.2 3.2 3.2 0 0 1-.6 1.8 3.5 3.5 0 0 1-.9 6.7V18a2 2 0 0 1-2 2h-2V5.5a2 2 0 0 1 .5-1ZM7 9.5h3M14 9.5h3M7 15h3M14 15h3"/></svg></span>
             </div>
             <div class="setting-row">
               <div><strong>Données locales</strong><span>Tes passages et audios restent sur cet appareil.</span></div>
-              <span style="font-size:24px">🔒</span>
+              <span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg></span>
             </div>
           </div>
           <div class="section-title"><h2>Données</h2></div>
@@ -344,31 +371,100 @@
       </div>
     </section>
 
+    <section class="screen journal-screen" id="journalScreen" aria-labelledby="journalTitle">
+      <header class="journal-header">
+        <div class="journal-topline">
+          <button class="page-back-btn journal-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="navigateBack('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
+          <div class="brand">MURAJAAH<small>FLASH</small></div>
+          <button class="journal-profile-btn" type="button" aria-label="Ouvrir le profil" onclick="openProfile('progress')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="7.5" r="3.5"/>
+              <path d="M5.5 21v-2.1a6.5 6.5 0 0 1 13 0V21"/>
+            </svg>
+          </button>
+        </div>
+        <h1 id="journalTitle">Journal de révision</h1>
+        <p>Enregistre tes révisions libres et garde le fil de ton Hifdh.</p>
+      </header>
+
+      <div class="journal-content">
+        <article class="journal-overview" aria-label="Résumé et prochaine étape">
+          <div class="journal-overview-block">
+            <span>Dernière révision</span>
+            <strong id="journalLastHizb">Aucune</strong>
+            <small id="journalLastMeta">Commence ton journal aujourd’hui</small>
+          </div>
+          <div class="journal-overview-block journal-next-block">
+            <span>Prochaine étape</span>
+            <strong id="journalNextHizb">Hizb 1</strong>
+            <small id="journalNextMeta">Commencer dans l’ordre</small>
+            <button type="button" aria-label="Ajouter cette prochaine révision" onclick="openJournalFormForNext()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </article>
+
+        <button class="journal-add-cta" type="button" onclick="openJournalForm()">
+          <span><strong>Ajouter une révision</strong><small>Enregistre un hizb que tu as révisé</small></span>
+          <span class="journal-add-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </button>
+
+        <section class="journal-section" aria-labelledby="journalWeekTitle">
+          <div class="journal-section-head">
+            <h2 id="journalWeekTitle">Cette semaine</h2>
+            <button id="journalHistoryToggle" type="button" onclick="toggleJournalHistory()">Voir tout
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+          <div class="journal-history" id="journalWeekList"></div>
+        </section>
+
+        <section class="journal-section" aria-labelledby="journalFrequencyTitle">
+          <div class="journal-section-head">
+            <h2 id="journalFrequencyTitle">Fréquence de révision</h2>
+            <span>Hizbs à suivre</span>
+          </div>
+          <div class="journal-frequency-grid" id="journalFrequencyGrid"></div>
+        </section>
+
+        <article class="journal-week-summary" aria-labelledby="journalSummaryTitle">
+          <h2 id="journalSummaryTitle">Cette semaine</h2>
+          <div>
+            <span><strong id="journalDaysCount">0</strong><small>jour suivi</small></span>
+            <span><strong id="journalReviewsCount">0</strong><small>révision</small></span>
+            <span><strong id="journalMinutesCount">0 min</strong><small>temps total</small></span>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <nav class="bottom-nav" id="bottomNav">
-      <button class="nav-btn active" data-screen="home" onclick="showScreen('home')">
+      <button class="nav-btn active" data-screen="home" onclick="openMainSection('home')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
         Accueil
       </button>
-      <button class="nav-btn" data-screen="review" onclick="startReview()">
+      <button class="nav-btn" data-screen="review" onclick="openMainSection('review')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M3.5 5.25A2.25 2.25 0 0 1 5.75 3H10a2 2 0 0 1 2 2v15.5a2.75 2.75 0 0 0-2.75-2.75H3.5Z"/>
           <path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"/>
         </svg>
         Révision
       </button>
-      <button class="nav-btn" data-screen="hifdh" onclick="openHifdhTest()">
+      <button class="nav-btn" data-screen="hifdh" onclick="openMainSection('hifdh')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <rect x="6" y="3.5" width="12" height="17" rx="2"/>
           <path d="M9.25 3.5h5.5v3h-5.5zM9 12l2 2 4-4.5"/>
         </svg>
         Test Hifdh
       </button>
-      <button class="nav-btn" data-screen="profile" onclick="openProfile('progress')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="7.5" r="3.5"/>
-          <path d="M5.5 21v-2.1a6.5 6.5 0 0 1 13 0V21"/>
+      <button class="nav-btn" data-screen="journal" onclick="openMainSection('journal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 19V11M12 19V5M19 19v-7"/>
+          <path d="M3.5 19.5h17"/>
         </svg>
-        Profil
+        Bilan
       </button>
     </nav>
 
@@ -380,11 +476,9 @@
           </button>
           <div class="review-intro-title">
             <h1>Mode Révision</h1>
-            <p>Révise tes passages avec la méthode<br>de répétition espacée</p>
+            <p>Révise tes passages avec la méthode de répétition espacée</p>
           </div>
-          <button class="review-intro-head-icon" type="button" aria-label="Ouvrir les réglages" onclick="exitReview(); openProfile('settings')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.15.38.37.72.67 1 .3.28.69.42 1.1.4h.1v4h-.1a1.7 1.7 0 0 0-1.77.6Z"/></svg>
-          </button>
+          <span class="review-intro-head-spacer" aria-hidden="true"></span>
         </header>
         <div class="review-intro-body">
           <article class="review-daily-card">
@@ -448,8 +542,9 @@
       </div>
       <div id="reviewSession">
         <header class="review-header">
+          <button class="review-session-back page-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="exitReview()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
           <div class="review-title">Murajaah</div>
-          <button class="review-close" aria-label="Quitter la révision" onclick="exitReview()">×</button>
+          <span class="review-header-spacer" aria-hidden="true"></span>
           <div class="review-prompt">
             <span id="stepBefore">Verset avant</span>
             <span id="stepTarget">Verset cible</span>
@@ -477,8 +572,9 @@
           <div class="review-instruction" id="reviewInstruction"></div>
           <button class="primary-btn reveal-btn" id="revealBtn" onclick="advanceReviewStage()">
             <svg class="reveal-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M2.8 12s3.5-5.7 9.2-5.7 9.2 5.7 9.2 5.7-3.5 5.7-9.2 5.7S2.8 12 2.8 12Z"/>
-              <circle cx="12" cy="12" r="2.8"/>
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M8 12h8"/>
+              <path d="m12 8 4 4-4 4"/>
             </svg>
             <span id="revealBtnLabel">Voir le verset cible</span>
           </button>
@@ -493,6 +589,7 @@
         </div>
       </div>
       <div class="summary" id="reviewSummary">
+        <button class="summary-back-btn page-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="exitReview()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
         <div class="summary-icon" aria-hidden="true">
           <svg viewBox="0 0 48 48" role="img">
             <circle cx="24" cy="24" r="20"></circle>
@@ -509,7 +606,7 @@
         <div class="summary-next" id="summaryNext"></div>
         <div class="summary-actions">
           <button class="secondary-btn retry-btn" id="retryNowBtn" onclick="reviewFailedNow()">Revoir maintenant <span id="retryCount">0</span></button>
-          <button class="primary-btn summary-home-btn" onclick="exitReview()">Retour à l’accueil</button>
+          <button class="primary-btn summary-home-btn" onclick="exitReview('home')">Retour à l’accueil</button>
         </div>
       </div>
     </section>
@@ -521,9 +618,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
           </button>
           <h1 id="hifdhHeaderTitle">Test Hifdh</h1>
-          <button type="button" class="review-close hifdh-close" aria-label="Fermer" onclick="closeHifdhTest()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.35" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
-          </button>
+          <span class="hifdh-header-spacer" aria-hidden="true"></span>
         </div>
         <p class="hifdh-header-subtitle">Teste un hizb entier et détecte tes points faibles.</p>
         <div class="hifdh-review-header-controls" id="hifdhTestHeaderControls" hidden>
@@ -663,15 +758,19 @@
 
           <article class="hifdh-verse-card">
             <div class="verse-surface hifdh-verse-surface single">
+              <div class="hifdh-translation-tools">
+                <button type="button" class="translation-toggle" id="hifdhTranslationToggle" aria-pressed="false" onclick="toggleHifdhTranslation()">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+                  <span>Traduction</span>
+                </button>
+              </div>
               <div class="review-verse-item mushaf-line active hifdh-start-line">
-                <div class="hifdh-recitation-orbit" aria-hidden="true">
-                  <span></span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
-                  <span></span>
-                </div>
-                <p class="hifdh-stage-prompt" id="hifdhStagePrompt">Récite de mémoire le verset suivant</p>
                 <div class="arabic" id="hifdhStartVerse" dir="rtl"></div>
-                <div class="hifdh-verse-divider" aria-hidden="true"><i></i><span></span><i></i></div>
+              </div>
+              <div class="verse-translation-panel hifdh-translation-panel" id="hifdhTranslationPanel" hidden>
+                <strong>Traduction</strong>
+                <p id="hifdhTranslationText"></p>
+                <small>Muhammad Hamidullah</small>
               </div>
               <div class="hifdh-audio-btn elan-audio-panel" id="hifdhAudioPanel">
                 <div>
@@ -694,21 +793,9 @@
         </div>
 
         <div class="hifdh-fixed-controls">
-          <section class="hifdh-task-card" id="hifdhTaskCard">
-            <div class="hifdh-task-head">
-              <span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2.5"/><path d="M9 4.5h6M8.5 9h7M8.5 13h7M8.5 17h4"/></svg>
-              </span>
-              <div>
-                <h2 id="hifdhTaskTitle">Consigne</h2>
-                <p id="hifdhTaskText">Récite le verset suivant de mémoire.</p>
-              </div>
-            </div>
-          </section>
-
           <button type="button" class="hifdh-reveal-btn" id="hifdhRevealBtn" onclick="revealHifdhAnswer()">
             <span class="hifdh-reveal-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.8 12s3.5-5.7 9.2-5.7 9.2 5.7 9.2 5.7-3.5 5.7-9.2 5.7S2.8 12 2.8 12Z"/><circle cx="12" cy="12" r="2.8"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="m12 8 4 4-4 4"/></svg>
             </span>
             <strong id="hifdhRevealLabel">Vérifier la suite</strong>
           </button>
@@ -751,7 +838,7 @@
             <span>Verset cible</span>
             <strong id="quranPickerTitle">Choisir un verset</strong>
           </div>
-          <button type="button" onclick="closeQuranPicker()" aria-label="Fermer">×</button>
+          <button type="button" onclick="closeQuranPicker()" aria-label="Fermer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
         </div>
         <div class="quran-picker-columns">
           <div class="quran-picker-column" id="quranSurahColumn" aria-label="Liste des sourates"></div>
@@ -772,6 +859,44 @@
       </div>
     </div>
 
+    <div class="journal-sheet" id="journalSheet" hidden role="dialog" aria-modal="true" aria-labelledby="journalFormTitle">
+      <button class="journal-sheet-backdrop" type="button" aria-label="Fermer" onclick="closeJournalForm()"></button>
+      <form class="journal-form" id="journalForm" onsubmit="saveJournalRevision(event)">
+        <div class="journal-form-head">
+          <div><span>Journal de révision</span><h2 id="journalFormTitle">Ajouter une révision</h2></div>
+          <button type="button" aria-label="Fermer" onclick="closeJournalForm()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <input type="hidden" id="journalEntryId">
+        <label class="journal-field">
+          <span>Hizb révisé</span>
+          <select id="journalHizb" required></select>
+        </label>
+        <div class="journal-form-grid">
+          <label class="journal-field"><span>Date</span><input id="journalDate" type="date" required></label>
+          <label class="journal-field"><span>Durée</span><span class="journal-duration-field"><input id="journalDuration" type="number" min="1" max="600" inputmode="numeric" value="20" required><i>min</i></span></label>
+        </div>
+        <fieldset class="journal-feeling-field">
+          <legend>Ressenti</legend>
+          <input type="hidden" id="journalFeeling" value="fluid">
+          <div>
+            <button class="active" type="button" data-journal-feeling="fluid" onclick="selectJournalFeeling('fluid')">Fluide</button>
+            <button type="button" data-journal-feeling="medium" onclick="selectJournalFeeling('medium')">Moyen</button>
+            <button type="button" data-journal-feeling="difficult" onclick="selectJournalFeeling('difficult')">Difficile</button>
+          </div>
+        </fieldset>
+        <label class="journal-field">
+          <span>Note <small>facultatif</small></span>
+          <textarea id="journalNote" maxlength="180" rows="3" placeholder="Ex. Quelques hésitations au début"></textarea>
+        </label>
+        <div class="journal-form-actions">
+          <button class="journal-delete-btn" id="journalDeleteBtn" type="button" hidden onclick="deleteJournalRevision()">Supprimer</button>
+          <button class="journal-save-btn" type="submit">Enregistrer la révision</button>
+        </div>
+      </form>
+    </div>
+
     <div class="splash-screen" id="splashScreen" aria-label="Ouverture de Murajaah Flash">
       <img class="splash-bismillah" src="assets/bismillah.png" alt="بسم الله الرحمن الرحيم">
       <div class="splash-brand">
@@ -784,6 +909,7 @@
   </main>
 
   <script src="js/pwa.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/icon-system.js?v=15"></script>
+  <script src="js/app.js?v=translation5"></script>
 </body>
 </html>

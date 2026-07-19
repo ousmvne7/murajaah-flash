@@ -1,0 +1,878 @@
+/* Murajaah Flash design system - interface only, never Quran glyph rendering. */
+
+:root {
+  --mf-primary: #0a5a43;
+  --mf-primary-strong: #073d2f;
+  --mf-primary-soft: #e3f3ec;
+  --mf-hifdh: #5439af;
+  --mf-hifdh-strong: #44357d;
+  --mf-hifdh-soft: #f0e9ff;
+  --mf-journal: #2457c5;
+  --mf-journal-strong: #183f98;
+  --mf-journal-soft: #eef4ff;
+  --mf-ink: #172338;
+  --mf-muted: #6d7b8f;
+  --mf-line: #e6ebf1;
+  --mf-canvas: #f8f7f3;
+  --mf-surface: #fff;
+  --mf-success: #239b66;
+  --mf-warning: #e9852d;
+  --mf-danger: #dd4b5c;
+  --mf-radius: 8px;
+  --mf-shadow-card: 0 4px 16px rgba(23, 35, 56, .06);
+  --mf-shadow-nav: 0 -4px 18px rgba(23, 35, 56, .08);
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0;
+}
+
+body {
+  color: var(--mf-ink);
+  background: #e7ece9;
+}
+
+.app,
+.screen {
+  background-color: var(--mf-canvas);
+}
+
+.mf-icon {
+  width: 1em;
+  height: 1em;
+  display: block;
+  overflow: visible;
+  flex: none;
+  color: inherit;
+  shape-rendering: geometricPrecision;
+}
+
+.page-back-btn,
+.journal-back-btn,
+.review-session-back,
+.summary-back-btn,
+.icon-btn,
+.library-header-btn,
+.journal-profile-btn,
+.hifdh-back,
+.hifdh-picker-close,
+.quran-picker-top button,
+.journal-form-head > button {
+  border-radius: var(--mf-radius) !important;
+}
+
+:is(.primary-btn, .secondary-btn, .danger-btn,
+    .intro-start-btn, .hifdh-start-btn,
+    .journal-save-btn, .journal-delete-btn,
+    .quran-picker-confirm) {
+  min-height: 44px;
+  border-radius: var(--mf-radius) !important;
+}
+
+:is(input, select, textarea,
+    .filter-chip, .difficulty-chip,
+    .hifdh-counts button, .journal-feeling-field button) {
+  font: inherit;
+}
+
+:is(input, select, textarea) {
+  border-radius: var(--mf-radius) !important;
+}
+
+:is(.focus-card, .greeting, .home-mode-card, .home-quick-actions,
+    .library-search, .library-stats, .library-card, .library-help,
+    .auto-fill-card, .sequence-card, .audio-card, .notes-card,
+    .progress-hero, .progress-summary-grid, .progress-panel, .settings-list,
+    .journal-overview, .journal-add-cta, .journal-history,
+    .journal-frequency-card, .journal-week-summary,
+    .review-daily-card, .review-quick-actions, .review-progress-card,
+    .hifdh-panel, .hifdh-how-card, .hifdh-progress-tip,
+    .hifdh-question-meta, .hifdh-task-card,
+    .modal-card, .journal-form) {
+  border-radius: var(--mf-radius) !important;
+}
+
+:is(.home-mode-card, .home-quick-actions,
+    .library-search, .library-stats, .library-card, .library-help,
+    .auto-fill-card, .sequence-card, .audio-card, .notes-card,
+    .progress-summary-grid, .progress-panel, .settings-list,
+    .journal-overview, .journal-history, .journal-frequency-card,
+    .journal-week-summary, .review-quick-actions, .review-progress-card,
+    .hifdh-panel, .hifdh-how-card, .hifdh-progress-tip) {
+  border: 1px solid var(--mf-line) !important;
+  background-color: var(--mf-surface) !important;
+  box-shadow: var(--mf-shadow-card) !important;
+}
+
+#homeScreen .home-profile-btn,
+#homeScreen .greeting-icon,
+#homeScreen .home-mode-icon,
+#progressScreen .setting-icon,
+#reviewIntro .review-quick-icon {
+  border-radius: var(--mf-radius) !important;
+}
+
+#homeScreen .focus-card,
+#reviewIntro .review-daily-card {
+  border: 0 !important;
+  background: var(--mf-primary) !important;
+  box-shadow: 0 8px 22px rgba(10, 90, 67, .16) !important;
+}
+
+#homeScreen .focus-card::before,
+#homeScreen .focus-card::after,
+#reviewIntro .review-daily-card::before,
+#reviewIntro .review-daily-card::after,
+#homeScreen .home-mode-card::after {
+  opacity: 0 !important;
+}
+
+#homeScreen .focus-card .primary-btn,
+#reviewIntro .intro-start-btn {
+  color: var(--mf-primary) !important;
+  background: var(--mf-surface) !important;
+  box-shadow: none !important;
+}
+
+#homeScreen .progress-fill {
+  background: #72dda5 !important;
+}
+
+#homeScreen .focus-card .primary-btn svg {
+  color: #fff !important;
+  background: var(--mf-primary) !important;
+  border-radius: var(--mf-radius) !important;
+}
+
+#homeScreen .review-mode-card .home-mode-icon {
+  color: var(--mf-primary);
+  background: var(--mf-primary-soft);
+}
+
+#homeScreen .hifdh-mode-card .home-mode-icon {
+  color: var(--mf-hifdh);
+  background: var(--mf-hifdh-soft);
+}
+
+#homeScreen .home-mode-card,
+#homeScreen .home-quick-actions {
+  background-image: none !important;
+}
+
+#journalScreen .journal-add-cta,
+#journalScreen .journal-save-btn {
+  border: 0 !important;
+  background: var(--mf-journal) !important;
+  box-shadow: 0 8px 22px rgba(36, 87, 197, .15) !important;
+}
+
+#hifdhScreen .hifdh-start-btn,
+#hifdhScreen.test-running .hifdh-reveal-btn {
+  background: var(--mf-hifdh) !important;
+  box-shadow: 0 8px 22px rgba(84, 57, 175, .16) !important;
+}
+
+#hifdhScreen .hifdh-start-btn span {
+  background: rgba(255, 255, 255, .18) !important;
+  box-shadow: none !important;
+}
+
+.bottom-nav {
+  border-color: var(--mf-line) !important;
+  border-radius: var(--mf-radius) var(--mf-radius) 0 0 !important;
+  background: var(--mf-surface) !important;
+  box-shadow: var(--mf-shadow-nav) !important;
+}
+
+.bottom-nav .nav-btn {
+  border-radius: var(--mf-radius) !important;
+  color: var(--mf-muted);
+  background: var(--mf-surface);
+}
+
+.bottom-nav .nav-btn.active {
+  color: #fff;
+  background: var(--mf-ink);
+  box-shadow: none;
+}
+
+.bottom-nav .nav-btn[data-screen="review"].active {
+  background: var(--mf-primary);
+  box-shadow: none;
+}
+
+.bottom-nav .nav-btn[data-screen="hifdh"].active {
+  background: var(--mf-hifdh);
+  box-shadow: none;
+}
+
+.bottom-nav .nav-btn[data-screen="journal"].active {
+  background: var(--mf-journal);
+  box-shadow: none;
+}
+
+/* One accent per page: accent, its soft tint, white, and neutral text only. */
+:is(#homeScreen, #libraryScreen, #addScreen, #progressScreen,
+    #journalScreen, #reviewScreen, #hifdhScreen) {
+  background-color: var(--mf-surface) !important;
+}
+
+/* Accueil keeps its established mixed green/violet visual language. */
+#homeScreen .content { padding-bottom: 16px !important; }
+
+/* Revision, library and add flow - emerald green. */
+:is(#libraryScreen, #addScreen) {
+  --navy: var(--mf-primary);
+  --navy-2: var(--mf-primary);
+  --blue: var(--mf-primary);
+  --sky: var(--mf-primary-soft);
+  --green: var(--mf-primary);
+  --green-dark: var(--mf-primary);
+  --green-soft: var(--mf-primary-soft);
+  --orange: var(--mf-primary);
+  --orange-soft: var(--mf-primary-soft);
+  --red: var(--mf-primary);
+  --red-soft: var(--mf-primary-soft);
+  background: #fff !important;
+}
+
+#libraryScreen {
+  --library-green: var(--mf-primary);
+  --library-green-light: var(--mf-primary);
+  --library-purple: var(--mf-primary);
+}
+
+#libraryScreen .library-header {
+  background: var(--mf-primary) !important;
+  box-shadow: 0 8px 22px rgba(10, 90, 67, .14) !important;
+}
+
+#libraryScreen :is(.library-stat-icon, .library-card-icon, .empty-icon) {
+  color: var(--mf-primary) !important;
+  background: var(--mf-primary-soft) !important;
+}
+
+#libraryScreen :is(.library-stat small, .library-card-status) {
+  color: var(--mf-primary) !important;
+}
+
+#libraryScreen :is(.library-card-status.mastered,
+                    .library-card-status.reinforce,
+                    .library-card-status.due) {
+  background: var(--mf-primary-soft) !important;
+}
+
+#libraryScreen .filter-chip.active,
+#libraryScreen .library-add-btn,
+#libraryScreen .library-help button {
+  border-color: var(--mf-primary) !important;
+  background: var(--mf-primary) !important;
+  box-shadow: none !important;
+}
+
+#addScreen .topbar { border-bottom-color: var(--mf-line) !important; }
+
+#addScreen :is(.brand small, .page-title .eyebrow, .icon-btn,
+               .field-heading strong, .chip-icon) {
+  color: var(--mf-primary) !important;
+}
+
+#addScreen :is(.icon-btn, .chip-icon) {
+  background: var(--mf-primary-soft) !important;
+}
+
+#addScreen .difficulty-chip.active {
+  color: var(--mf-primary) !important;
+  border-color: rgba(10, 90, 67, .25) !important;
+  background: var(--mf-primary-soft) !important;
+}
+
+#addScreen .primary-btn {
+  color: #fff !important;
+  background: var(--mf-primary) !important;
+  box-shadow: none !important;
+}
+
+/* Ajouter un passage: parcours sobre, utile et centré sur la planification. */
+#addScreen .premium-passage-card {
+  padding: 0 !important;
+  border: 1px solid var(--mf-line) !important;
+  border-radius: var(--mf-radius) !important;
+  background: #fff !important;
+  box-shadow: var(--mf-shadow-card) !important;
+}
+
+#addScreen .premium-passage-card::before,
+#addScreen .premium-passage-card::after,
+#addScreen .passage-card-art {
+  display: none !important;
+}
+
+#addScreen .passage-card-head {
+  min-height: 0;
+  margin: 0;
+  padding: 16px;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  background: #f5faf7;
+  border-bottom: 1px solid var(--mf-line);
+}
+
+#addScreen .passage-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--mf-radius) !important;
+  color: var(--mf-primary);
+  background: var(--mf-primary-soft);
+  box-shadow: none;
+}
+
+#addScreen .auto-fill-copy {
+  gap: 4px;
+}
+
+#addScreen .auto-fill-copy strong {
+  color: var(--mf-ink);
+}
+
+#addScreen .auto-fill-copy span {
+  color: var(--mf-muted);
+}
+
+#addScreen .quran-picker-open {
+  width: calc(100% - 24px);
+  min-height: 62px;
+  margin: 12px;
+  border: 1px solid var(--mf-line);
+  border-radius: var(--mf-radius);
+  background: #fff;
+  box-shadow: none;
+}
+
+#addScreen .picker-target-icon {
+  border-radius: var(--mf-radius);
+  color: var(--mf-primary);
+  background: var(--mf-primary-soft);
+}
+
+#addScreen .auto-preview {
+  padding: 0 12px 12px;
+}
+
+#addScreen .first-review-card {
+  margin-top: 12px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--mf-line);
+  border-radius: var(--mf-radius);
+  background: #fff;
+  box-shadow: var(--mf-shadow-card);
+}
+
+#addScreen .first-review-card[hidden] {
+  display: none;
+}
+
+#addScreen .first-review-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--mf-radius);
+  color: var(--mf-primary);
+  background: var(--mf-primary-soft);
+}
+
+#addScreen .first-review-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+#addScreen .first-review-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+#addScreen .first-review-copy strong {
+  color: var(--mf-ink);
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+#addScreen .first-review-copy small {
+  color: var(--mf-muted);
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.35;
+}
+
+#addScreen .first-review-options {
+  grid-column: 1 / -1;
+  padding: 3px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px;
+  border-radius: var(--mf-radius);
+  background: #eef2f0;
+}
+
+#addScreen .first-review-options button {
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--mf-muted);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+#addScreen .first-review-options button.active {
+  color: #fff;
+  background: var(--mf-primary);
+  box-shadow: 0 2px 7px rgba(10, 90, 67, .15);
+}
+
+#addScreen .sequence-heading {
+  margin-top: 20px;
+}
+
+#addScreen .sequence-heading::after {
+  background: linear-gradient(90deg, rgba(10, 90, 67, .55), rgba(10, 90, 67, 0));
+}
+
+#addScreen .sequence-heading span:not(.heading-bubble) {
+  color: var(--mf-primary);
+}
+
+#addScreen .heading-bubble {
+  color: var(--mf-primary);
+  background: var(--mf-primary-soft);
+}
+
+#addScreen .detail-card {
+  border: 1px solid var(--mf-line) !important;
+  border-radius: var(--mf-radius) !important;
+  background: #fff !important;
+  box-shadow: var(--mf-shadow-card) !important;
+}
+
+#addScreen .difficulty-chip.active {
+  color: var(--mf-primary) !important;
+  border-color: rgba(10, 90, 67, .24) !important;
+  background: var(--mf-primary-soft) !important;
+  box-shadow: none !important;
+}
+
+#reviewIntro.review-intro,
+#reviewSession .review-main,
+#reviewSession .review-controls {
+  background: #fff !important;
+}
+
+#reviewIntro .review-intro-header,
+#reviewIntro .review-daily-card,
+#reviewSession .review-header {
+  background: var(--mf-primary) !important;
+  box-shadow: 0 8px 22px rgba(10, 90, 67, .14) !important;
+}
+
+#reviewIntro :is(.review-stat.fragile, .review-stat.total) :is(b, small),
+#reviewIntro :is(.review-stat.fragile, .review-stat.total) i,
+#reviewIntro :is(.review-quick-icon, .review-progress-ring),
+#reviewIntro .review-progress-card > span:nth-child(2) strong {
+  color: var(--mf-primary) !important;
+}
+
+#reviewIntro :is(.review-stat.fragile, .review-stat.total) i,
+#reviewIntro :is(.review-quick-icon, .review-progress-ring) {
+  background: var(--mf-primary-soft) !important;
+}
+
+#reviewIntro .review-progress-ring {
+  background: conic-gradient(var(--mf-primary) var(--progress), var(--mf-primary-soft) 0) !important;
+}
+
+#reviewSession .review-prompt span.active {
+  color: #fff !important;
+  background: var(--mf-primary) !important;
+  box-shadow: none !important;
+}
+
+#reviewSession .rating-btn.yes,
+#hifdhScreen .hifdh-ratings .yes {
+  color: #fff !important;
+  background: linear-gradient(145deg, #68bc7a, #4fa765) !important;
+}
+
+#reviewSession .rating-btn.almost,
+#hifdhScreen .hifdh-ratings .almost {
+  color: #172338 !important;
+  background: linear-gradient(145deg, #efbd4d, #dda72e) !important;
+}
+
+#reviewSession .rating-btn.no,
+#hifdhScreen .hifdh-ratings .no {
+  color: #fff !important;
+  background: linear-gradient(145deg, #d15a67, #ba4553) !important;
+}
+
+#reviewSession :is(.review-meta, .review-task-icon, .review-task-sound) {
+  color: var(--mf-primary) !important;
+  border-color: rgba(10, 90, 67, .16) !important;
+  background: var(--mf-primary-soft) !important;
+}
+
+#reviewSession .rating-title { border-left-color: var(--mf-primary) !important; }
+
+/* Test Hifdh - violet. */
+#hifdhScreen {
+  --navy: var(--mf-hifdh);
+  --navy-2: var(--mf-hifdh);
+  --blue: var(--mf-hifdh);
+  --sky: var(--mf-hifdh-soft);
+  --green: #48c98b;
+  --green-dark: #239b66;
+  --green-soft: #e9f9f1;
+  --orange: #e9852d;
+  --orange-soft: #fff3e7;
+  --red: #dd4b5c;
+  --red-soft: #ffedf0;
+  background: #fff !important;
+}
+
+#hifdhScreen :is(.hifdh-select-icon, .hifdh-picker-book,
+                  .hifdh-question-meta-icon, .hifdh-task-head > span) {
+  color: var(--mf-hifdh) !important;
+  background: var(--mf-hifdh-soft) !important;
+}
+
+#hifdhScreen :is(.hifdh-counts button.active, .hifdh-picker-item.active) {
+  color: var(--mf-hifdh) !important;
+  border-color: rgba(84, 57, 175, .28) !important;
+  background: var(--mf-hifdh-soft) !important;
+  box-shadow: none !important;
+}
+
+#hifdhScreen .hifdh-picker-item.active .hifdh-picker-state {
+  color: #fff !important;
+  background: var(--mf-hifdh) !important;
+  box-shadow: none !important;
+}
+
+#hifdhScreen .hifdh-progress-row i {
+  background: linear-gradient(90deg, #48c98b, #66d6a1) !important;
+  box-shadow: 0 0 16px rgba(72, 201, 139, .30) !important;
+}
+
+#hifdhScreen .hifdh-stage-tabs span.active {
+  color: #123a2b !important;
+  background: linear-gradient(135deg, #48c98b, #66d6a1) !important;
+  box-shadow: 0 10px 24px rgba(35, 155, 102, .24) !important;
+}
+
+#hifdhScreen .hifdh-start-line {
+  min-height: 0 !important;
+  gap: 14px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+#hifdhScreen .hifdh-fixed-controls .hifdh-reveal-btn { margin: 0; }
+
+#hifdhScreen .hifdh-live-stats .review b {
+  color: var(--red) !important;
+}
+
+/* Bilan - sapphire blue. */
+#journalScreen {
+  background: #fff !important;
+}
+
+#journalScreen :is(.journal-feeling-pill.fluid,
+                   .journal-feeling-pill.medium,
+                   .journal-feeling-pill.difficult) {
+  color: var(--mf-journal) !important;
+  background: var(--mf-journal-soft) !important;
+}
+
+#journalScreen .journal-frequency-card.current {
+  border-color: rgba(36, 87, 197, .22) !important;
+  background: var(--mf-journal-soft) !important;
+}
+
+#journalScreen .journal-frequency-card span.never {
+  color: var(--mf-journal) !important;
+}
+
+#journalScreen .journal-delete-btn {
+  color: var(--mf-journal) !important;
+  border-color: rgba(36, 87, 197, .18) !important;
+  background: var(--mf-journal-soft) !important;
+}
+
+/* Profile - dark navy. */
+#progressScreen {
+  --navy: var(--mf-ink);
+  --navy-2: #6250a5;
+  --blue: var(--mf-ink);
+  --sky: #eef2f7;
+  --green: #48c98b;
+  --green-dark: #239b66;
+  --green-soft: #e9f9f1;
+  --orange: #e9852d;
+  --orange-soft: #fff3e7;
+  --red: #dd4b5c;
+  --red-soft: #ffedf0;
+  background: #fff !important;
+}
+
+#progressScreen .progress-hero {
+  background: var(--mf-ink) !important;
+  box-shadow: 0 8px 22px rgba(23, 35, 56, .15) !important;
+}
+
+#progressScreen .progress-hero-top b {
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, .18) !important;
+  background: rgba(255, 255, 255, .12) !important;
+}
+
+#progressScreen .profile-tab-btn.active {
+  color: #fff !important;
+  background: var(--mf-ink) !important;
+  box-shadow: none !important;
+}
+
+#progressScreen :is(.setting-icon, .secondary-btn, .danger-btn) {
+  color: var(--mf-ink) !important;
+  border-color: var(--mf-line) !important;
+  background: #eef2f7 !important;
+}
+
+/* Accent-aware keyboard focus. */
+#homeScreen :is(button, input, select, textarea):focus-visible,
+#progressScreen :is(button, input, select, textarea):focus-visible {
+  outline-color: rgba(23, 35, 56, .24) !important;
+}
+
+#hifdhScreen :is(button, input, select, textarea):focus-visible {
+  outline-color: rgba(84, 57, 175, .25) !important;
+}
+
+#journalScreen :is(button, input, select, textarea):focus-visible {
+  outline-color: rgba(36, 87, 197, .24) !important;
+}
+
+:is(.eyebrow, .home-quick-actions > h2, .section-title h2) {
+  letter-spacing: 0 !important;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(10, 90, 67, .22) !important;
+  outline-offset: 2px;
+}
+
+#homeScreen :is(button, input, select, textarea):focus-visible,
+#progressScreen :is(button, input, select, textarea):focus-visible {
+  outline-color: rgba(23, 35, 56, .24) !important;
+}
+
+#hifdhScreen :is(button, input, select, textarea):focus-visible {
+  outline-color: rgba(84, 57, 175, .25) !important;
+}
+
+#journalScreen :is(button, input, select, textarea):focus-visible {
+  outline-color: rgba(36, 87, 197, .24) !important;
+}
+
+/* Optional French translation: separate from KFGQPC Arabic rendering. */
+.translation-toggle {
+  min-width: 44px;
+  min-height: 38px;
+  padding: 8px 11px;
+  border: 1px solid rgba(10, 90, 67, .14);
+  border-radius: var(--mf-radius);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: var(--mf-primary);
+  background: var(--mf-primary-soft);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.translation-toggle > svg {
+  width: 17px;
+  height: 17px;
+}
+
+.translation-toggle.active {
+  color: #fff;
+  border-color: var(--mf-primary);
+  background: var(--mf-primary);
+}
+
+#reviewSession .review-page-head {
+  min-height: 44px;
+  padding: 0 4px 8px;
+}
+
+#reviewSession .review-translation-inline {
+  width: auto;
+  min-height: 36px;
+  gap: 6px;
+  padding: 7px 11px;
+  cursor: pointer;
+}
+
+#reviewSession .review-translation-inline > svg {
+  width: 15px;
+  height: 15px;
+}
+
+#reviewSession .review-translation-inline.active {
+  color: #fff !important;
+  border-color: var(--mf-primary) !important;
+  background: var(--mf-primary) !important;
+}
+
+#reviewSession .review-translation-inline:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+#reviewSession .review-page-reference {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  overflow: hidden;
+}
+
+#reviewSession .review-page-reference b,
+#reviewSession .review-page-reference em {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-style: normal;
+}
+
+#reviewSession .review-page-reference b {
+  color: var(--mf-ink);
+  font-size: 11px;
+}
+
+.verse-translation-panel {
+  width: 100%;
+  margin-top: 2px;
+  padding: 12px;
+  border-top: 1px solid rgba(10, 90, 67, .16);
+  border-radius: var(--mf-radius);
+  direction: ltr;
+  color: var(--mf-ink);
+  background: #f5faf7;
+  text-align: left;
+}
+
+.verse-translation-panel strong,
+.verse-translation-panel p,
+.verse-translation-panel small {
+  display: block;
+  letter-spacing: 0;
+}
+
+.verse-translation-panel strong {
+  margin-bottom: 6px;
+  color: var(--mf-primary);
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.verse-translation-panel p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.verse-translation-panel small {
+  margin-top: 7px;
+  color: var(--mf-muted);
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.hifdh-translation-tools {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 2;
+}
+
+#hifdhScreen .translation-toggle {
+  color: var(--mf-hifdh);
+  border-color: rgba(84, 57, 175, .16);
+  background: var(--mf-hifdh-soft);
+}
+
+#hifdhScreen .translation-toggle.active {
+  color: #fff;
+  border-color: var(--mf-hifdh);
+  background: var(--mf-hifdh);
+}
+
+#hifdhScreen .hifdh-translation-panel {
+  margin: 0 0 10px;
+  border-top-color: rgba(84, 57, 175, .18);
+  background: #f8f6ff;
+}
+
+#hifdhScreen .hifdh-translation-panel strong {
+  color: var(--mf-hifdh);
+}
+
+@media (max-width: 370px) {
+  .translation-toggle {
+    padding-inline: 9px;
+  }
+
+  #reviewSession .translation-toggle span {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

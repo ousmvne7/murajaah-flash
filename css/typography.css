@@ -1,0 +1,913 @@
+/* Audit typographique global - interface mobile hors texte coranique. */
+:is(#homeScreen, #libraryScreen, #addScreen, #progressScreen, #reviewScreen, #hifdhScreen) {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+:is(#libraryScreen, #addScreen, #progressScreen, #reviewScreen, #hifdhScreen)
+  :is(input, textarea, select) {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+:is(#homeScreen, #libraryScreen, #addScreen, #progressScreen, #reviewScreen, #hifdhScreen)
+  :is(.page-title, .library-heading, .greeting-copy, .home-mode-copy, .library-card-copy,
+      .review-quick-actions button > span, .review-task-copy, .hifdh-question-meta-copy,
+      .hifdh-task-head > div, .hifdh-picker-copy) {
+  min-width: 0;
+}
+
+/* Accueil */
+#homeScreen .greeting-copy h1 {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+#homeScreen .greeting-copy p {
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+
+#homeScreen .streak {
+  flex: none;
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+#homeScreen .focus-card .eyebrow {
+  font-size: 11.5px;
+  line-height: 1.3;
+}
+
+#homeScreen .session-main-line {
+  min-width: 0;
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+#homeScreen .session-main-line span {
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+}
+
+#homeScreen .time-pill,
+#homeScreen .session-progress-meta {
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+#homeScreen .session-progress-meta { gap: 10px; }
+
+#homeScreen .focus-card .primary-btn {
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+#homeScreen .home-mode-title h2 {
+  font-size: 19px;
+  line-height: 1.25;
+}
+
+#homeScreen .home-mode-copy strong {
+  display: block;
+  font-size: 17px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+#homeScreen .home-mode-copy small {
+  display: block;
+  margin-top: 5px;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+#homeScreen .home-quick-actions h2 {
+  font-size: 13.5px;
+  line-height: 1.3;
+}
+
+#homeScreen .home-quick-grid span {
+  font-size: 12px;
+  line-height: 1.32;
+  overflow-wrap: anywhere;
+}
+
+/* Mes passages */
+#libraryScreen .library-content {
+  padding-bottom: calc(118px + env(safe-area-inset-bottom));
+}
+
+#libraryScreen .library-heading h1 {
+  font-size: 28px;
+  line-height: 1.08;
+}
+
+#libraryScreen .library-heading p {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+#libraryScreen .library-search input {
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+#libraryScreen .library-stat strong {
+  font-size: 11.5px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+#libraryScreen .library-stat small {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+#libraryScreen .filter-chip {
+  min-height: 42px;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: normal;
+}
+
+#libraryScreen .library-filter-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow-x: visible;
+}
+
+#libraryScreen .library-list-head h2 {
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+#libraryScreen .library-list-head button {
+  flex: none;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+#libraryScreen .memory-card { min-height: 96px; }
+
+#libraryScreen .library-card-copy strong {
+  overflow: visible;
+  font-size: 15px;
+  line-height: 1.3;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#libraryScreen .library-card-copy span,
+#libraryScreen .library-card-copy small {
+  overflow: visible;
+  font-size: 12px;
+  line-height: 1.35;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#libraryScreen .library-card-status {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+#libraryScreen .library-help strong {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+#libraryScreen .library-help small {
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+#libraryScreen .library-help button {
+  min-height: 42px;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+#libraryScreen .empty h3 {
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+#libraryScreen .empty p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Ajouter un passage */
+#addScreen .page-title .eyebrow {
+  font-size: 11.5px;
+  line-height: 1.3;
+  letter-spacing: .14em;
+}
+
+#addScreen .page-title h1 {
+  font-size: 32px;
+  line-height: 1.08;
+}
+
+#addScreen .page-title p {
+  max-width: none;
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+#addScreen label {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+#addScreen .helper {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+#addScreen .auto-fill-copy strong,
+#addScreen .audio-card .field-heading strong {
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+#addScreen .auto-fill-copy span,
+#addScreen .audio-card .field-heading small,
+#addScreen .field-heading small {
+  font-size: 12.5px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+#addScreen .quran-picker-open {
+  min-height: 70px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "icon label arrow"
+    "icon summary arrow";
+  row-gap: 2px;
+  text-align: left;
+}
+
+#addScreen .picker-target-icon { grid-area: icon; }
+#addScreen .picker-arrow { grid-area: arrow; }
+
+#addScreen .quran-picker-open > span:not(.picker-target-icon):not(.picker-arrow) {
+  grid-area: label;
+  font-size: 13px;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+#addScreen .quran-picker-open b {
+  grid-area: summary;
+  max-width: none;
+  margin-left: 0;
+  overflow: visible;
+  color: var(--green-dark);
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: left;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#addScreen .auto-preview-label {
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+#addScreen .sequence-heading span:not(.heading-bubble) {
+  font-size: 12px;
+  line-height: 1.3;
+  letter-spacing: .1em;
+  overflow-wrap: anywhere;
+}
+
+#addScreen .difficulty-chip {
+  font-size: 13px;
+  line-height: 1.3;
+  white-space: normal;
+}
+
+#addScreen .inline-recorder { flex-wrap: wrap; }
+
+#addScreen .record-btn,
+#addScreen .audio-action.listen-btn,
+#addScreen .record-status {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+#addScreen .record-status {
+  flex-basis: 100%;
+  white-space: normal;
+}
+
+#addScreen .quran-picker-top span {
+  font-size: 11.5px;
+  line-height: 1.3;
+}
+
+#addScreen .quran-picker-option {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+/* Profil et progression */
+#progressScreen .page-title h1 {
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+#progressScreen .page-title p {
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+#progressScreen .profile-tab-btn {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+#progressScreen .progress-hero-top span {
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+#progressScreen .progress-hero-top b {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+#progressScreen .progress-hero strong {
+  font-size: 36px;
+  line-height: 1.05;
+}
+
+#progressScreen .progress-hero small {
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+#progressScreen .progress-mini span {
+  font-size: 11px;
+  line-height: 1.25;
+  letter-spacing: .03em;
+}
+
+#progressScreen .progress-panel-head h2 {
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+#progressScreen .progress-panel-head span {
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: normal;
+  text-align: right;
+}
+
+#progressScreen .week-bar span {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+#progressScreen .level-item {
+  font-size: 12.5px;
+  line-height: 1.3;
+}
+
+#progressScreen .level-item b {
+  font-size: 11.5px;
+  line-height: 1.25;
+}
+
+#progressScreen .setting-row strong {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+#progressScreen .setting-row > div > span {
+  font-size: 12.5px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#progressScreen :is(.secondary-btn, .danger-btn) {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+/* Entrée du mode Révision */
+#reviewIntro .review-intro-header h1 {
+  font-size: 28px;
+  line-height: 1.12;
+}
+
+#reviewIntro .review-intro-title p {
+  font-size: 13.5px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#reviewIntro .review-daily-top > span {
+  font-size: 11px;
+  line-height: 1.25;
+  letter-spacing: .12em;
+}
+
+#reviewIntro .review-daily-top > b {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+#reviewIntro .review-daily-count > span {
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#reviewIntro .review-daily-meta {
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+#reviewIntro .intro-start-btn {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+#reviewIntro .review-section-title h2 {
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+#reviewIntro .review-section-title button {
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+#reviewIntro .review-stat > strong,
+#reviewIntro .review-stat > small {
+  font-size: 11px;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#reviewIntro .review-quick-actions strong {
+  font-size: 16px;
+  line-height: 1.25;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#reviewIntro .review-quick-actions small {
+  max-width: none;
+  font-size: 12.5px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+#reviewIntro .review-progress-card > span:nth-child(2) strong {
+  font-size: 15px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+#reviewIntro .review-progress-card > span:nth-child(2) small {
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+#reviewIntro .review-quote-card p {
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+#reviewIntro .review-quote-card cite {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* Session Révision : uniquement l'interface, jamais le texte du Mushaf. */
+#reviewSession .review-prompt span {
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: normal;
+}
+
+#reviewSession .review-counter {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+#reviewSession .review-meta,
+#reviewSession .review-page-head,
+#reviewSession .review-mushaf-meta,
+#reviewSession .review-mushaf-meta span,
+#reviewSession .mushaf-line.active .review-meta {
+  font-size: 11px;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}
+
+#reviewSession .elan-audio-panel strong {
+  font-size: 12.5px;
+  line-height: 1.25;
+}
+
+#reviewSession .elan-audio-panel span,
+#reviewSession.mushaf-active .elan-audio-panel span {
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+#reviewSession #elanAudioMeta {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+
+#reviewSession .review-task-copy strong {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+#reviewSession .review-task-copy small {
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+#reviewSession .rating-title {
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+#reviewSession .rating-btn {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+#reviewSession .rating-btn small {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+#reviewSummary > p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#reviewSummary .summary-stat span {
+  font-size: 11px;
+  line-height: 1.25;
+  letter-spacing: .03em;
+}
+
+#reviewSummary .summary-next-row span {
+  font-size: 12.5px;
+  line-height: 1.35;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+
+#reviewSummary .summary-next-row b {
+  font-size: 11.5px;
+  line-height: 1.3;
+}
+
+/* Préparation, test et résumé Hifdh. */
+#hifdhScreen .hifdh-header-subtitle {
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+#hifdhSetup :is(.hifdh-setup-heading, .hifdh-settings-title) h2 {
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+#hifdhSetup :is(.hifdh-setup-heading, .hifdh-settings-title) p {
+  font-size: 12.5px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+#hifdhSetup .hifdh-select-card strong {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+#hifdhSetup .hifdh-select-card small {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+#hifdhSetup .hifdh-counts button {
+  font-size: 12.5px;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+#hifdhSetup .hifdh-objective-card strong {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+#hifdhSetup .hifdh-objective-card p {
+  font-size: 12.5px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#hifdhSetup .hifdh-how-copy h2 {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+#hifdhSetup .hifdh-how-copy li {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+#hifdhSetup .hifdh-how-copy li b { font-size: 10.5px; }
+
+#hifdhSetup .hifdh-progress-tip strong {
+  font-size: 13.5px;
+  line-height: 1.3;
+}
+
+#hifdhSetup .hifdh-progress-tip p {
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+#hifdhSetup .hifdh-setup-launch {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+#hifdhScreen .hifdh-picker-search input {
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+#hifdhScreen .hifdh-picker-copy strong {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+#hifdhScreen .hifdh-picker-copy small {
+  overflow: visible;
+  font-size: 12px;
+  line-height: 1.35;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#hifdhScreen .hifdh-picker-pages,
+#hifdhScreen .hifdh-picker-footer {
+  font-size: 11.5px;
+  line-height: 1.3;
+}
+
+#hifdhScreen .hifdh-stage-tabs span,
+#hifdhScreen.test-running .hifdh-stage-tabs span {
+  font-size: 11px;
+  line-height: 1.15;
+  text-align: center;
+  white-space: normal;
+}
+
+#hifdhScreen .hifdh-progress-row,
+#hifdhScreen.test-running .hifdh-progress-row {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+#hifdhScreen .hifdh-question-meta-copy small,
+#hifdhScreen .hifdh-question-meta-copy em {
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+#hifdhScreen .hifdh-question-meta-copy strong {
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+#hifdhScreen .hifdh-stage-prompt {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+#hifdhScreen .hifdh-audio-btn #hifdhAudioMeta {
+  overflow: visible;
+  font-size: 11px;
+  line-height: 1.3;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#hifdhScreen .hifdh-live-strip small {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+#hifdhScreen .hifdh-live-stats span {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+#hifdhScreen .hifdh-task-head h2 {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+#hifdhScreen .hifdh-task-head p {
+  font-size: 12.5px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+#hifdhScreen .hifdh-rating-wrap .rating-title {
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+#hifdhScreen .hifdh-ratings button {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+#hifdhScreen .hifdh-ratings small {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+#hifdhSummary > .hifdh-panel > h2 {
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+#hifdhSummary > .hifdh-panel > p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#hifdhSummary .hifdh-summary-grid span {
+  font-size: 11px;
+  line-height: 1.25;
+  letter-spacing: .02em;
+}
+
+#hifdhSummary .hifdh-weak-item strong {
+  font-size: 14px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+#hifdhSummary .hifdh-weak-item small {
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+#hifdhSummary .hifdh-weak-item button {
+  min-height: 42px;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+/* Breakpoints étroits : réorganiser plutôt que réduire les textes. */
+@media (max-width: 390px) {
+  #homeScreen .greeting {
+    grid-template-columns: 50px minmax(0, 1fr) auto;
+    gap: 9px;
+  }
+
+  #homeScreen .greeting-copy h1 { font-size: 16px; }
+  #homeScreen .greeting-copy p { font-size: 12.5px; }
+  #homeScreen .streak { min-width: 0; padding-inline: 9px; font-size: 12px; }
+  #homeScreen .home-mode-card { grid-template-columns: 54px minmax(0, 1fr) 42px; }
+  #homeScreen .home-mode-copy strong { font-size: 15.5px; }
+  #homeScreen .home-mode-copy small { font-size: 12px; }
+  #homeScreen .home-quick-grid span { font-size: 11.5px; }
+
+  #libraryScreen .library-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #libraryScreen .library-stat { min-height: 116px; }
+  #libraryScreen .memory-card {
+    grid-template-columns: 42px minmax(0, 1fr) 44px;
+    align-items: start;
+  }
+  #libraryScreen .library-card-status {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: 3px;
+  }
+  #libraryScreen .library-card-delete {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+  #libraryScreen .library-help { grid-template-columns: 42px minmax(0, 1fr); }
+  #libraryScreen .library-help button {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  #addScreen .page-title h1 { font-size: 29px; }
+  #addScreen .passage-card-head { padding-right: 66px; }
+  #addScreen .passage-card-art { width: 102px; }
+
+  #progressScreen .progress-panel-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  #progressScreen .level-layout {
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 13px;
+  }
+  #progressScreen .level-donut {
+    width: 88px;
+    height: 88px;
+  }
+
+  #reviewIntro .review-intro-header h1 { font-size: 25px; }
+  #reviewIntro .review-intro-title p { font-size: 12.5px; }
+  #reviewIntro .review-daily-top > span { font-size: 10.5px; }
+  #reviewIntro .review-daily-count > span { font-size: 17px; }
+  #reviewIntro .review-quick-actions strong { font-size: 15px; }
+  #reviewIntro .review-quick-actions small { font-size: 12px; }
+  #reviewIntro .review-progress-card > span:nth-child(2) small { font-size: 11.5px; }
+
+  #hifdhSetup .hifdh-how-card { grid-template-columns: minmax(0, 1fr) 82px; }
+  #hifdhSetup .hifdh-how-art { width: 92px; }
+}
+
+@media (max-width: 340px) {
+  #homeScreen .session-progress-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  #libraryScreen .library-list-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  #addScreen .difficulty-chips { grid-template-columns: 1fr; }
+  #addScreen .difficulty-chip { min-height: 54px; }
+  #reviewIntro .review-daily-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  #hifdhSetup .hifdh-counts { grid-template-columns: 1fr; }
+  #hifdhSetup .hifdh-how-card { grid-template-columns: 1fr; }
+  #hifdhSetup .hifdh-how-art { display: none; }
+  #hifdhScreen .hifdh-picker-item {
+    min-height: 78px;
+    grid-template-columns: 38px minmax(0, 1fr) 28px;
+    grid-template-rows: auto auto;
+    align-items: center;
+  }
+  #hifdhScreen .hifdh-picker-book {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+  #hifdhScreen .hifdh-picker-copy {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  #hifdhScreen .hifdh-picker-pages {
+    grid-column: 2;
+    grid-row: 2;
+    white-space: normal;
+  }
+  #hifdhScreen .hifdh-picker-state {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+  #hifdhSummary .hifdh-summary-grid { grid-template-columns: repeat(2, 1fr); }
+}

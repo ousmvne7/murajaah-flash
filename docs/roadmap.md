@@ -1,49 +1,49 @@
 # Roadmap
 
-## Priorité 1 — Stabiliser l’expérience
+État révisé le 19 juillet 2026.
 
-- Vérifier le responsive sur petits écrans
-- Éviter les boutons trop grands
-- Stabiliser les longs versets
-- Nettoyer les textes
-- Harmoniser les états vides
+## Terminé récemment
 
-## Priorité 2 — Améliorer la révision
+- migration exclusive vers KFGQPC Hafs v18 ;
+- navigation basse Accueil, Révision, Test Hifdh et Bilan ;
+- Profil déplacé en haut à droite ;
+- Test Hifdh par hizb ;
+- Journal de révision libre dans Bilan ;
+- suppression individuelle des révisions avec confirmation ;
+- design system actif et audit typographique mobile ;
+- registre Lucide local et cohérent ;
+- couleurs fonctionnelles Acquis, Presque et À revoir restaurées ;
+- menu mobile opaque, fixe et lisible.
 
-- Fin de session plus claire
-- Meilleur résumé des résultats
-- Indication de la prochaine révision
-- Affiner la difficulté automatique avec plus de données utilisateur
-- Bouton “revoir maintenant” mieux intégré
-- Meilleure gestion des longs versets
+## Priorité 1 — Fiabilité
 
-## Priorité 3 — Améliorer l’ajout
+- tester les versets sensibles et les versets très longs ;
+- vérifier le responsive à 340, 390 et 430 px ;
+- tester les parcours complets sans erreur JavaScript ;
+- confirmer le fonctionnement du cache après chaque déploiement.
 
-- Choix sourate + verset plus fluide
-- Prévisualisation plus visuelle
-- Audio mieux intégré
-- Validation plus rassurante avant enregistrement
+## Priorité 2 — Données
 
-## Priorité 4 — Présentation du projet
+- finaliser l’import JSON après export ;
+- améliorer la sauvegarde et la restauration locales ;
+- préparer une stratégie de migration des données entre versions.
 
-- Ajouter des screenshots
-- Ajouter des GIF courts
-- Ajouter un logo propre
-- Améliorer le site vitrine
+## Priorité 3 — Expérience de révision
 
-## Priorité 5 — Version avancée
+- affiner les suggestions du Journal selon les hizb délaissés ;
+- améliorer l’historique détaillé par passage ;
+- continuer à simplifier les écrans sans retirer d’information utile.
 
-- Mode Mushaf visuel
-- Emplacement du verset sur la page
-- Audio de plusieurs récitateurs
-- Export / import des données
-- Sauvegarde cloud optionnelle
-- Authentification optionnelle
+## Priorité 4 — Validation produit
 
-## Priorité 6 — Version mobile
+- organiser des tests utilisateurs ;
+- tester l’installation PWA sur iPhone et Android ;
+- ajouter des captures fidèles de la version actuelle ;
+- préparer un guide court de retour utilisateur.
 
-- PWA installable propre
-- Icônes d’app
-- Splash screen final
-- Tests iPhone / Android
-- Packaging hybride possible
+## Hors périmètre immédiat
+
+- Tajwīd ;
+- changement de source ou de police du Mushaf ;
+- authentification obligatoire ;
+- backend ou synchronisation cloud avant validation du prototype local.

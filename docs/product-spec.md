@@ -6,6 +6,8 @@ Le README principal reste volontairement court pour présenter rapidement l’ap
 
 ---
 
+**État du document :** actualisé le 19 juillet 2026. En cas de conflit avec une ancienne section, l’état actuel décrit ci-dessous et les fichiers `design.md`, `ICON_SYSTEM.md` et `docs/architecture.md` font référence.
+
 **Murajaah Flash** est une application mobile au format PWA pensée pour une révision coranique très ciblée.
 
 L’objectif n’est pas de remplacer une application Quran complète.  
@@ -59,7 +61,7 @@ Il permet de vérifier que l’utilisateur ne sait pas seulement retrouver le ve
 - Sélection d’une sourate et d’un verset cible.
 - Remplissage automatique du verset avant, du verset cible et du verset après.
 - Révision en 3 étapes.
-- Audio personnel optionnel sur le verset avant.
+- Choix de la première révision : aujourd’hui ou demain.
 - Élan audio Minshawi en ligne sur le verset avant.
 - Vitesse d’écoute fixée à 1.25x pour garder l’élan.
 - Lancement automatique de l’audio pendant la révision.
@@ -68,21 +70,24 @@ Il permet de vérifier que l’utilisateur ne sait pas seulement retrouver le ve
 - Bibliothèque des passages enregistrés.
 - Recherche et filtres.
 - Statistiques du jour.
+- Test Hifdh par hizb avec 5, 10 ou 20 questions.
+- Traduction française Hamidullah affichable et masquable dans Révision ciblée et Test Hifdh.
+- Journal de révision libre par hizb.
+- Suppression individuelle des entrées du Bilan avec confirmation.
 - Données stockées localement dans le navigateur.
 - Fonctionnement sans compte.
+- Navigation basse Accueil, Révision, Test Hifdh et Bilan.
 
 ## Architecture de l’interface
 
-L’application est organisée autour de 4 menus principaux :
+L’application est organisée autour de quatre menus principaux :
 
 1. Accueil
-2. Passages
-3. Ajouter
-4. Réviser
+2. Révision ciblée
+3. Test Hifdh
+4. Bilan / Journal de révision
 
-Un écran supplémentaire est disponible via l’icône réglages :
-
-5. Progression / Réglages
+Les actions **Ajouter un passage** et **Mes passages** restent accessibles depuis l’Accueil et Révision. Le Profil est accessible en haut à droite et contient les réglages.
 
 ## 1. Accueil
 
@@ -254,6 +259,8 @@ Une carte contient :
 - un bouton modifier ;
 - un bouton supprimer.
 
+Le bouton `Trash2` supprime le passage après confirmation. Le passage disparaît alors de la bibliothèque, du planning de répétition et des statistiques calculées.
+
 ### Statuts possibles
 
 #### À revoir
@@ -360,30 +367,18 @@ Il doit ensuite cliquer sur **Utiliser ce passage**.
 
 Cette étape évite d’enregistrer un passage par erreur.
 
-### Élan audio personnel
+### Première révision
 
-L’utilisateur peut ajouter un audio personnel.
+Après avoir choisi le verset cible, l’utilisateur planifie l’entrée du passage dans son cycle :
 
-Cet audio correspond au verset avant.
+- **Aujourd’hui** : le passage rejoint immédiatement la session du jour ;
+- **Demain** : le passage reste enregistré mais n’est proposé qu’à partir du lendemain.
 
-Pendant la révision, il peut se lancer au début pour déclencher la récitation de mémoire.
-
-Le bloc audio contient :
-
-- un bouton enregistrer ;
-- un bouton écouter ;
-- un bouton supprimer ;
-- un état audio facultatif / prêt / en cours.
-
-### Pourquoi l’audio est placé sur le verset avant ?
-
-Parce que le verset avant sert de déclencheur.
-
-L’utilisateur écoute son propre élan de récitation, puis doit retrouver la suite sans regarder.
+Ce choix utilise un contrôle segmenté et reste masqué lors de la modification d’un passage existant afin de ne pas modifier involontairement son échéance.
 
 ### Élan audio Minshawi
 
-En plus de l’audio personnel, l’application peut proposer une récitation de référence du verset avant.
+Pendant la révision, l’application peut proposer une récitation de référence du verset avant.
 
 Cette fonction s’appelle **Élan audio**.
 
@@ -485,7 +480,7 @@ Le haut de l’écran contient :
 
 - le titre **Murajaah** ;
 - un bouton fermer ;
-- les trois étapes de révision ;
+- le bouton de traduction ;
 - une barre de progression ;
 - le compteur de carte.
 
@@ -517,15 +512,9 @@ Cette étape vérifie la fluidité après le passage cible.
 
 L’objectif n’est pas seulement de reconnaître le verset, mais de savoir continuer.
 
-### Bouton audio
+### Compatibilité des anciens audios
 
-Si un audio a été ajouté, un bouton apparaît pendant la révision.
-
-Il permet :
-
-- de rejouer l’audio ;
-- de reprendre l’élan ;
-- de travailler avec sa propre récitation.
+La page Ajouter un passage ne permet plus de créer un enregistrement personnel. Si un ancien passage contient déjà un audio local, son bouton de lecture reste disponible pendant la révision afin de ne pas perdre les données existantes.
 
 ### Bouton Élan audio
 
@@ -689,6 +678,28 @@ Supprime les données locales de l’application.
 
 Une confirmation est demandée avant suppression.
 
+## 6. Test Hifdh
+
+Le Test Hifdh évalue la capacité à poursuivre la récitation dans un hizb choisi. L’utilisateur sélectionne 5, 10 ou 20 questions, écoute le verset de départ, récite la suite, puis révèle le verset suivant.
+
+Le bouton de révélation utilise `CircleArrowRight`. La page est dominée par le violet, sa jauge d’avancement reste verte, et les réponses conservent leurs couleurs sémantiques : Acquis vert, Presque orange, À revoir rouge.
+
+Le bouton **Traduction**, associé à l’icône `Languages`, affiche la traduction française de Muhammad Hamidullah sous le verset courant. Après révélation de la suite, le panneau se met à jour avec le nouveau verset. Un second appui masque le panneau. Le texte et la police KFGQPC Hafs v18 ne sont jamais modifiés par cette option.
+
+## 7. Bilan / Journal de révision
+
+Le Bilan enregistre les révisions complètes réalisées librement en dehors de la révision ciblée.
+
+Chaque entrée contient :
+
+- un hizb ;
+- une date ;
+- une durée ;
+- un ressenti ;
+- une note optionnelle.
+
+Le Bilan affiche la dernière révision, la prochaine étape, l’historique récent et la fréquence par hizb. Une entrée peut être supprimée après confirmation ; toutes les statistiques sont alors recalculées.
+
 ## Splash screen
 
 Au lancement, l’application affiche un écran d’ouverture court.
@@ -709,19 +720,19 @@ Elle contient :
 
 ### Accueil
 
-Retour au dashboard.
+Retour au tableau de bord.
 
-### Passages
+### Révision
 
-Ouvre la bibliothèque.
+Ouvre la révision ciblée et ses outils.
 
-### Ajouter
+### Test Hifdh
 
-Ouvre l’écran d’ajout.
+Ouvre l’évaluation par hizb.
 
-### Réviser
+### Bilan
 
-Lance la session du jour.
+Ouvre le Journal de révision libre et ses statistiques.
 
 Pendant la révision, cette navigation disparaît pour limiter les distractions.
 
@@ -764,7 +775,7 @@ L’application utilise une base Quran locale.
 Le fichier principal est :
 
 ```text
-data/quran-uthmani.json
+data/hafsData_v18.json
 ```
 
 Il contient :
@@ -774,7 +785,7 @@ Il contient :
 - les noms de sourates ;
 - des alias de recherche.
 
-Le Tajwid coloré a été retiré pour garder une écriture plus sobre et plus stable visuellement.
+Le Tajwid coloré n’est pas utilisé pour l’instant : l’app reste sur KFGQPC Hafs v18 uniquement, avec `hafs.18.ttf` et `hafs.18.woff2`.
 
 ## Source audio
 
@@ -817,7 +828,7 @@ murajaah-flash/
 ├── js/
 │   └── app.js
 ├── data/
-│   └── quran-uthmani.json
+│   └── hafsData_v18.json
 ├── assets/
 │   └── bismillah.png
 └── README.md
@@ -905,81 +916,27 @@ Ce qui est déjà utilisable :
 - ajout automatique par verset cible ;
 - bibliothèque ;
 - révision en trois étapes ;
+- Test Hifdh par hizb ;
+- Bilan et Journal de révision libre ;
+- suppression individuelle des révisions ;
 - répétition espacée ;
-- audio personnel ;
+- planification de la première révision ;
 - stockage local ;
 - export ;
-- GitHub Pages.
+- PWA et GitHub Pages ;
+- design system et registre d’icônes Lucide.
 
 Ce qui doit encore être amélioré :
 
 - gestion parfaite des très longs versets ;
-- fin de session plus premium ;
 - meilleur historique par passage ;
 - système d’import après export ;
-- vraie installation PWA ;
+- validation de l’installation PWA sur plusieurs appareils ;
 - tests utilisateurs.
 
 ## Roadmap proposée
 
-### Priorité 1 — Révision Pro V3
-
-Stabiliser complètement le mode révision.
-
-Objectifs :
-
-- meilleur affichage des longs versets ;
-- bouton toujours accessible ;
-- étapes plus fluides ;
-- écran final plus clair ;
-- transitions plus propres.
-
-### Priorité 2 — Fin de session premium
-
-Créer un vrai résumé de session.
-
-Objectifs :
-
-- afficher les réussites ;
-- afficher les hésitations ;
-- montrer les prochaines dates ;
-- proposer un rappel immédiat ;
-- donner une sensation de progression.
-
-### Priorité 3 — Bibliothèque plus utile
-
-Améliorer “Mes passages”.
-
-Objectifs :
-
-- filtres plus lisibles ;
-- statut plus clair ;
-- action “réviser ce passage” ;
-- historique court ;
-- prochaines révisions visibles.
-
-### Priorité 4 — Sauvegarde
-
-Ajouter une meilleure gestion des données.
-
-Objectifs :
-
-- import JSON ;
-- export plus propre ;
-- sauvegarde manuelle ;
-- préparation éventuelle à un compte optionnel plus tard.
-
-### Priorité 5 — Version test
-
-Préparer une version testable par des proches.
-
-Objectifs :
-
-- README propre ;
-- site vitrine clair ;
-- lien GitHub Pages ;
-- guide de test ;
-- formulaire de retour.
+La roadmap active est maintenue dans [`docs/roadmap.md`](roadmap.md). Elle donne la priorité à la fiabilité du Mushaf, aux tests mobiles, à l’import des sauvegardes et à la validation utilisateur.
 
 ## Philosophie produit
 

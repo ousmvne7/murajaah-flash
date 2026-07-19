@@ -1,6 +1,6 @@
 # Murajaah Flash
 
-**Murajaah Flash** est une application PWA minimaliste pour renforcer uniquement les passages du Coran où la mémoire hésite.
+**Murajaah Flash** est une application PWA mobile pour renforcer les passages du Coran où la mémoire hésite et suivre les révisions libres du Hifdh.
 
 L’idée est simple : ne pas réviser tout ce que l’on maîtrise déjà, mais cibler les **passages glissants**, les transitions difficiles et les versets qui reviennent souvent en erreur.
 
@@ -18,7 +18,7 @@ Ensuite, l’utilisateur s’auto-évalue :
 - **Presque**
 - **À revoir**
 
-L’application programme ensuite la prochaine révision avec une répétition espacée simple.
+L’application programme ensuite la prochaine révision avec une répétition espacée simple. Le mode **Test Hifdh** évalue un hizb, tandis que le **Bilan** conserve le journal des révisions libres.
 
 ## Points forts
 
@@ -28,9 +28,14 @@ L’application programme ensuite la prochaine révision avec une répétition e
 - Audio d’élan sur le verset avant
 - Récitation Minshawi en ligne à 1.25x
 - Répétition espacée
+- Test Hifdh par hizb avec auto-évaluation
+- Traduction française Hamidullah affichable à la demande en Révision et Test Hifdh
+- Journal de révision libre et historique supprimable
+- Bilan de fréquence par hizb
 - Données locales
 - Sans compte
 - Format PWA
+- Interface cohérente basée sur Lucide Icons
 
 ## Méthode
 
@@ -77,7 +82,7 @@ En mode **Réciter**, l’application prépare automatiquement :
 - le verset cible ;
 - le verset après.
 
-Un audio personnel peut aussi être ajouté sur le verset avant.
+L’utilisateur choisit ensuite si la première révision doit commencer **aujourd’hui** ou **demain**.
 
 ### Réviser
 
@@ -87,13 +92,23 @@ Le mode **Réciter** se fait en trois étapes :
 2. retrouver le verset cible ;
 3. continuer avec le verset de liaison.
 
+Le bouton **Traduction** affiche ou masque sous le verset la traduction française de Muhammad Hamidullah. Le texte arabe KFGQPC Hafs v18 reste inchangé.
+
 ### Passages
 
-La bibliothèque permet de retrouver, filtrer et relancer les passages enregistrés.
+La bibliothèque permet de retrouver, filtrer, modifier et supprimer après confirmation les passages enregistrés.
 
-### Progression
+### Test Hifdh
 
-L’application affiche une vue simple de la régularité, des passages revus et des passages encore fragiles.
+Le Test Hifdh propose des questions dans un hizb sélectionné. L’utilisateur peut afficher la traduction française à la demande, récite la suite, révèle le verset avec le bouton `CircleArrowRight`, puis choisit **Acquis**, **Presque** ou **À revoir**.
+
+### Bilan
+
+Le Bilan enregistre les révisions libres par hizb avec leur date, leur durée et leur ressenti. Chaque entrée peut être supprimée après confirmation et les statistiques sont recalculées automatiquement.
+
+### Profil
+
+Le Profil affiche une vue simple de la régularité, des passages revus et des passages encore fragiles. Il centralise aussi les réglages et la gestion des données locales.
 
 ## Installation locale
 
@@ -129,6 +144,9 @@ Le détail complet du projet est séparé dans le dossier [`docs`](docs/).
 - [`docs/architecture.md`](docs/architecture.md) — structure technique
 - [`docs/revision.md`](docs/revision.md) — méthode de révision
 - [`docs/roadmap.md`](docs/roadmap.md) — prochaines étapes
+- [`docs/changelog.md`](docs/changelog.md) — évolutions récentes
+- [`design.md`](design.md) — design system actif
+- [`ICON_SYSTEM.md`](ICON_SYSTEM.md) — registre officiel des icônes
 
 ## Sources des textes
 
@@ -136,20 +154,20 @@ Murajaah Flash utilise un texte arabe Uthmani local pour préparer les trois ver
 
 ### Texte arabe
 
-- Source : King Fahd Glorious Qur'an Printing Complex, via les ressources KFGQPC Hafs utilisées dans l’app.
-- Fichier local : `data/quran-uthmani.json`
-- Police : `hafs.18.ttf`
+- Source : King Fahd Glorious Qur'an Printing Complex, via les ressources KFGQPC Hafs v18 utilisées dans l’app.
+- Fichier local : `data/hafsData_v18.json`
+- Police : `hafs.18.ttf` et `hafs.18.woff2`
+- Tajwīd : non utilisé pour l’instant, afin de ne pas mélanger les sources ou les polices.
 
 ## Roadmap courte
 
-- Ajouter des screenshots propres
-- Ajouter des GIF de démonstration
-- Améliorer la fin de session
-- Stabiliser l’expérience sur petits écrans
-- Tester l’installation PWA sur plusieurs appareils
+- Finaliser les tests sur appareils iOS et Android
+- Renforcer les tests des longs versets et des petits écrans
+- Ajouter l’import des sauvegardes JSON
+- Préparer une phase de test utilisateur
 
 ## Statut
 
-Murajaah Flash est un prototype fonctionnel en amélioration continue.
+Murajaah Flash est un prototype avancé et fonctionnel en amélioration continue.
 
 Le projet vise une expérience simple, rapide et utile pour la révision coranique ciblée.

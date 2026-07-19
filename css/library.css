@@ -138,7 +138,7 @@
   position: relative;
   min-height: 88px;
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto 18px;
+  grid-template-columns: 44px minmax(0, 1fr) auto 44px;
   align-items: center;
   gap: 10px;
   padding: 12px 12px;
@@ -158,9 +158,23 @@
 #libraryScreen .library-card-status.mastered { color: var(--library-green); background: #eaf8f1; }
 #libraryScreen .library-card-status.reinforce { color: #e97e14; background: #fff2e5; }
 #libraryScreen .library-card-status.due { color: var(--library-purple); background: #f0ebff; }
-#libraryScreen .library-card-arrow { width: 18px; height: 18px; color: #858ea1; }
 #libraryScreen .library-card-main { position: absolute; inset: 0; z-index: 1; border: 0; background: transparent; }
-#libraryScreen .memory-card > :not(.library-card-main) { pointer-events: none; }
+#libraryScreen .library-card-delete {
+  position: relative;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: #dd4b5c;
+  border: 1px solid rgba(221, 75, 92, .16);
+  border-radius: 8px;
+  background: #ffedf0;
+}
+#libraryScreen .library-card-delete svg { width: 19px; height: 19px; }
+#libraryScreen .library-card-delete:active { transform: scale(.96); }
+#libraryScreen .memory-card > :not(.library-card-main):not(.library-card-delete) { pointer-events: none; }
 
 #libraryScreen .empty { border-radius: 20px; background: #fff; }
 #libraryScreen .empty-icon { width: 52px; height: 52px; display: grid; place-items: center; margin: 0 auto 10px; color: var(--library-green); background: #e9f8f1; border-radius: 17px; }
@@ -192,6 +206,6 @@
   #libraryScreen .library-stat strong { font-size: 8px; }
   #libraryScreen .library-help { grid-template-columns: 38px minmax(0, 1fr); }
   #libraryScreen .library-help button { grid-column: 2; justify-self: start; }
-  #libraryScreen .memory-card { grid-template-columns: 41px minmax(0, 1fr) auto 15px; gap: 8px; }
+  #libraryScreen .memory-card { grid-template-columns: 41px minmax(0, 1fr) 44px; gap: 8px; }
   #libraryScreen .library-card-status { padding-inline: 7px; }
 }

@@ -17,13 +17,15 @@ setTimeout(() => {
     const STORAGE_KEY = "murajaah_flash_v2_cards";
     const ACTIVITY_KEY = "murajaah_flash_v2_activity";
     const HIFDH_HISTORY_KEY = "murajaah_flash_v2_hifdh_tests";
+    const JOURNAL_KEY = "murajaah_flash_v1_free_reviews";
     const ELAN_RECITER_BASE = "https://everyayah.com/data/Minshawy_Murattal_128kbps";
     const ELAN_PLAYBACK_RATE = 1.25;
+    const FRENCH_TRANSLATION_PATH = "data/quran-fr-hamidullah.json";
     const TOTAL_MUSHAF_PAGES = 604;
     const TEXT_REPOSITORIES = {
       kfgqpc: {
         label: "KFGQPC Hafs",
-        path: "data/quran-uthmani.json"
+        path: "data/hafsData_v18.json"
       }
     };
     const DAY = 86400000;
@@ -38,6 +40,8 @@ setTimeout(() => {
       }));
     let activity = load(ACTIVITY_KEY, {});
     let hifdhHistory = load(HIFDH_HISTORY_KEY, []);
+    let journalEntries = load(JOURNAL_KEY, []);
+    let journalShowAll = false;
     let activeFilter = "all";
     let librarySort = "recent";
     let reviewPool = [];
@@ -57,6 +61,10 @@ setTimeout(() => {
     let previewPlayer = null;
     let quranData = null;
     let quranPagesData = null;
+    let frenchTranslations = null;
+    let frenchTranslationsPromise = null;
+    let reviewTranslationVisible = false;
+    let hifdhTranslationVisible = false;
     let pendingAutoFill = null;
     let quranPickerState = { surahId: "2", ayah: 2 };
     let hifdhSelectedHizb = 1;
@@ -64,6 +72,8 @@ setTimeout(() => {
     let hifdhTest = null;
     let hifdhRevealStage = 0;
     let hifdhPickerCloseTimer = null;
+    let screenHistory = [];
+    let overlayReturnScreen = "home";
 
     function load(key, fallback) {
       try {
@@ -77,6 +87,7 @@ setTimeout(() => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
         localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activity));
         localStorage.setItem(HIFDH_HISTORY_KEY, JSON.stringify(hifdhHistory));
+        localStorage.setItem(JOURNAL_KEY, JSON.stringify(journalEntries));
         return true;
       } catch (_) {
         toast("Stockage plein : supprime un ancien audio ou raccourcis l’enregistrement.");
@@ -138,14 +149,30 @@ setTimeout(() => {
       return count;
     }
 
-    function showScreen(name) {
+    function activeScreenName() {
+      const active = document.querySelector(".screen.active");
+      return active?.id?.replace(/Screen$/, "") || "home";
+    }
+
+    function showScreen(name, options = {}) {
       const target = document.getElementById(name + "Screen");
       if (!target) return;
+      const current = activeScreenName();
+      if (options.remember !== false && current !== name) {
+        if (screenHistory[screenHistory.length - 1] !== current) screenHistory.push(current);
+        if (screenHistory.length > 12) screenHistory.shift();
+      }
       document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
       target.classList.add("active");
       target.scrollTop = 0;
       document.querySelectorAll(".nav-btn").forEach(btn => {
-        const activeScreen = name === "library" ? "review" : name;
+        const activeScreen = name === "library"
+          ? "review"
+          : name === "add"
+            ? (current === "library" ? "review" : "home")
+            : name === "progress"
+              ? (current === "journal" ? "journal" : "home")
+              : name;
         btn.classList.toggle("active", btn.dataset.screen === activeScreen);
       });
       if (name === "home") renderDashboard();
@@ -154,6 +181,7 @@ setTimeout(() => {
         renderProgress();
         renderSettings();
       }
+      if (name === "journal") renderJournal();
       window.scrollTo(0, 0);
       requestAnimationFrame(() => {
         target.scrollTop = 0;
@@ -161,9 +189,73 @@ setTimeout(() => {
       });
     }
 
+    function setBottomNavActive(name) {
+      document.querySelectorAll(".nav-btn").forEach(button => {
+        button.classList.toggle("active", button.dataset.screen === name);
+      });
+    }
+
+    function closeReviewOverlayState() {
+      const audio = document.getElementById("reviewAudio");
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+      resetElanAudio();
+      document.getElementById("reviewScreen")?.classList.remove("active");
+      document.getElementById("reviewIntro")?.classList.remove("active");
+      document.getElementById("reviewSummary")?.classList.remove("active");
+      const session = document.getElementById("reviewSession");
+      if (session) session.style.display = "flex";
+    }
+
+    function closeHifdhOverlayState() {
+      stopHifdhAudio();
+      hifdhTest = null;
+      const picker = document.getElementById("hifdhHizbPicker");
+      if (picker) {
+        picker.hidden = true;
+        picker.classList.remove("open");
+      }
+      document.getElementById("hifdhScreen")?.classList.remove("picker-open", "test-running", "active");
+      const controls = document.getElementById("hifdhTestHeaderControls");
+      if (controls) controls.hidden = true;
+    }
+
+    function openMainSection(name) {
+      if (name === "review") {
+        closeHifdhOverlayState();
+        startReview();
+        return;
+      }
+      if (name === "hifdh") {
+        closeReviewOverlayState();
+        openHifdhTest();
+        return;
+      }
+      closeReviewOverlayState();
+      closeHifdhOverlayState();
+      document.getElementById("bottomNav").style.display = "grid";
+      overlayReturnScreen = "home";
+      if (name === "journal") journalShowAll = false;
+      showScreen(name, { remember: false });
+    }
+
+    function navigateBack(fallback = "home") {
+      const current = activeScreenName();
+      let previous = screenHistory.pop();
+      while (previous === current) previous = screenHistory.pop();
+      showScreen(previous || fallback, { remember: false });
+    }
+
     function openProfile(tab = "progress") {
       showScreen("progress");
       setProfileTab(tab);
+    }
+
+    function openJournal() {
+      journalShowAll = false;
+      showScreen("journal");
     }
 
     function setProfileTab(tab = "progress") {
@@ -191,9 +283,12 @@ setTimeout(() => {
         ? "— " + session.total + " révision" + (session.total > 1 ? "s" : "")
         : "Aucune révision prévue";
       document.getElementById("sessionReviewedLabel").textContent = session.reviewed + " / " + session.total + " révisés";
-      document.getElementById("reviewedToday").textContent = session.reviewed;
-      document.getElementById("fragileCount").textContent = fragile;
-      document.getElementById("totalCount").textContent = cards.length;
+      const reviewedToday = document.getElementById("reviewedToday");
+      const fragileCount = document.getElementById("fragileCount");
+      const totalCount = document.getElementById("totalCount");
+      if (reviewedToday) reviewedToday.textContent = session.reviewed;
+      if (fragileCount) fragileCount.textContent = fragile;
+      if (totalCount) totalCount.textContent = cards.length;
       document.getElementById("streakLabel").textContent = days + " jour" + (days > 1 ? "s" : "");
       const startBtn = document.getElementById("startReviewBtn");
       startBtn.disabled = cards.length > 0 && session.remaining === 0;
@@ -417,7 +512,9 @@ setTimeout(() => {
           <span class="library-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.25A2.25 2.25 0 0 1 5.75 3H10a2 2 0 0 1 2 2v15.5a2.75 2.75 0 0 0-2.75-2.75H3.5Z"/><path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"/></svg></span>
           <span class="library-card-copy"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(subtitle)}</span><small>${escapeHtml(addedDate)}</small></span>
           <span class="library-card-status ${category}">${statusLabel}</span>
-          <svg class="library-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+          <button class="library-card-delete" type="button" data-card-id="${escapeHtml(card.id)}" aria-label="Supprimer ${escapeHtml(title)}" onclick="event.stopPropagation(); askDelete(this.dataset.cardId)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg>
+          </button>
           <button class="library-card-main" type="button" aria-label="Modifier ${escapeHtml(title)}" onclick="editCard('${card.id}')"></button>
         </article>`;
       }).join("");
@@ -535,15 +632,35 @@ setTimeout(() => {
       recordingTimer = null;
     }
 
+    function recordButtonMarkup(state, hasAudio) {
+      const recording = state === "recording";
+      const icon = recording
+        ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>';
+      const label = recording ? "Arrêter" : hasAudio ? "Refaire" : "Enregistrer";
+      return `<span class="record-btn-icon">${icon}</span><span>${label}</span>`;
+    }
+
+    function setPreviewAudioButtonState(state = "play") {
+      const button = document.getElementById("previewAudioBtn");
+      if (!button) return;
+      const icon = state === "stop"
+        ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.4v13.2a1 1 0 0 0 1.55.83l9.2-6.6a1 1 0 0 0 0-1.66l-9.2-6.6A1 1 0 0 0 8 5.4Z"/></svg>';
+      button.innerHTML = `${icon}<span>${state === "stop" ? "Stop" : "Écouter"}</span>`;
+    }
+
     function updateRecorderUI(state) {
       const button = document.getElementById("recordBtn");
       const dot = document.getElementById("recordDot");
       const status = document.getElementById("recordStatus");
+      if (!button || !dot || !status) return;
       const hasAudio = Boolean(recordedAudio);
       button.classList.toggle("recording", state === "recording");
       dot.className = "record-dot" + (state === "recording" ? " live" : hasAudio ? " ready" : "");
-      button.textContent = state === "recording" ? "■ Arrêter" : hasAudio ? "🎙 Refaire" : "🎙 Enregistrer";
+      button.innerHTML = recordButtonMarkup(state, hasAudio);
       if (state !== "recording") status.textContent = hasAudio ? "Audio prêt · lecture automatique" : "Audio facultatif";
+      if (state !== "recording") setPreviewAudioButtonState("play");
       document.getElementById("previewAudioBtn").disabled = !hasAudio;
       document.getElementById("deleteAudioBtn").disabled = !hasAudio;
     }
@@ -554,21 +671,21 @@ setTimeout(() => {
       if (previewPlayer && !previewPlayer.paused) {
         previewPlayer.pause();
         previewPlayer.currentTime = 0;
-        button.textContent = "▶ Écouter";
+        setPreviewAudioButtonState("play");
         return;
       }
       previewPlayer?.pause();
       previewPlayer = new Audio(recordedAudio);
       previewPlayer.preload = "auto";
       previewPlayer.playsInline = true;
-      button.textContent = "■ Stop";
-      previewPlayer.onended = () => { button.textContent = "▶ Écouter"; };
+      setPreviewAudioButtonState("stop");
+      previewPlayer.onended = () => { setPreviewAudioButtonState("play"); };
       previewPlayer.onerror = () => {
-        button.textContent = "▶ Écouter";
+        setPreviewAudioButtonState("play");
         toast("Cet audio ne peut pas être lu. Réenregistre-le.");
       };
       previewPlayer.play().catch(() => {
-        button.textContent = "▶ Écouter";
+        setPreviewAudioButtonState("play");
         toast("Impossible de lire cet audio. Réenregistre-le.");
       });
     }
@@ -609,6 +726,28 @@ setTimeout(() => {
       return quranPagesData;
     }
 
+    async function loadFrenchTranslations() {
+      if (frenchTranslations) return frenchTranslations;
+      if (!frenchTranslationsPromise) {
+        frenchTranslationsPromise = fetch(FRENCH_TRANSLATION_PATH)
+          .then(response => {
+            if (!response.ok) throw new Error("French translation unavailable");
+            return response.json();
+          })
+          .then(rows => {
+            frenchTranslations = new Map(
+              rows.map(row => [`${Number(row.surah)}:${Number(row.ayah)}`, String(row.text || "").trim()])
+            );
+            return frenchTranslations;
+          })
+          .catch(error => {
+            frenchTranslationsPromise = null;
+            throw error;
+          });
+      }
+      return frenchTranslationsPromise;
+    }
+
     function resolveSurah(data, value) {
       const key = normalizeQuranKey(value);
       const id = data.aliases[key] || (/^\d+$/.test(key) ? key : "");
@@ -620,6 +759,27 @@ setTimeout(() => {
       if (!data) return "";
       const key = normalizeQuranKey(value);
       return data.aliases[key] || (/^\d+$/.test(key) ? key : "");
+    }
+
+    function frenchTranslationFor(surahValue, ayahValue) {
+      const rawSurah = String(surahValue || "").trim();
+      const surahId = /^\d+$/.test(rawSurah) ? String(Number(rawSurah)) : resolveSurahId(rawSurah);
+      const ayah = Number(ayahValue);
+      if (!frenchTranslations || !surahId || !Number.isInteger(ayah) || ayah < 1) return "";
+      return frenchTranslations.get(`${Number(surahId)}:${ayah}`) || "";
+    }
+
+    function createTranslationPanel(text) {
+      const panel = document.createElement("div");
+      panel.className = "verse-translation-panel";
+      const title = document.createElement("strong");
+      title.textContent = "Traduction";
+      const copy = document.createElement("p");
+      copy.textContent = text;
+      const source = document.createElement("small");
+      source.textContent = "Muhammad Hamidullah";
+      panel.append(title, copy, source);
+      return panel;
     }
 
     function quranPageFor(surahValue, ayahValue) {
@@ -878,11 +1038,20 @@ setTimeout(() => {
       });
     }
 
+    function selectFirstReviewDelay(value = 0) {
+      const delay = Number(value) === 1 ? 1 : 0;
+      const input = document.getElementById("firstReviewDelay");
+      if (input) input.value = String(delay);
+      document.querySelectorAll("[data-first-review-delay]").forEach(button => {
+        const active = Number(button.dataset.firstReviewDelay) === delay;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-checked", String(active));
+      });
+    }
+
     function selectReviewMode() {
       const input = document.getElementById("reviewMode");
       if (input) input.value = "recitation";
-      const audioSection = document.getElementById("userAudioSection");
-      if (audioSection) audioSection.hidden = false;
       const title = document.getElementById("passageCopyTitle");
       const text = document.getElementById("passageCopyText");
       if (title) title.textContent = "Choisis ton passage";
@@ -908,9 +1077,9 @@ setTimeout(() => {
         afterVerse,
         difficulty: document.getElementById("difficulty").value,
         note: document.getElementById("note").value.trim(),
-        audioData: recordedAudio || "",
+        audioData: recordedAudio || existing?.audioData || "",
         createdAt: existing?.createdAt || Date.now(),
-        nextReview: existing?.nextReview || Date.now(),
+        nextReview: existing?.nextReview || startOfToday() + (Number(document.getElementById("firstReviewDelay")?.value) || 0) * DAY,
         strength: existing?.strength || 0,
         interval: existing?.interval || 0,
         reviews: existing?.reviews || 0
@@ -970,6 +1139,7 @@ setTimeout(() => {
       renderAutoPreview(previewItems);
       document.getElementById("formTitle").textContent = "Modifie ton passage";
       document.getElementById("saveBtn").textContent = "Enregistrer les modifications";
+      document.getElementById("firstReviewCard").hidden = true;
       showScreen("add");
     }
 
@@ -984,6 +1154,8 @@ setTimeout(() => {
       clearAutoPreview();
       selectReviewMode("recitation");
       selectDifficulty("transition");
+      selectFirstReviewDelay(0);
+      document.getElementById("firstReviewCard").hidden = false;
       document.getElementById("formTitle").textContent = "Ajoute un passage";
       document.getElementById("saveBtn").textContent = "Enregistrer";
     }
@@ -1042,6 +1214,7 @@ setTimeout(() => {
     }
 
     async function startReview() {
+      overlayReturnScreen = activeScreenName();
       try {
         await loadQuranData();
         await loadQuranPagesData();
@@ -1055,18 +1228,21 @@ setTimeout(() => {
       document.getElementById("reviewSession").style.display = "none";
       document.getElementById("reviewSummary").classList.remove("active");
       document.getElementById("reviewScreen").classList.add("active");
-      document.getElementById("bottomNav").style.display = "none";
+      document.getElementById("bottomNav").style.display = "grid";
+      setBottomNavActive("review");
     }
 
     function beginReviewSession() {
       if (!reviewQueue.length) return startReview();
       reviewIndex = 0;
+      reviewTranslationVisible = false;
       sessionResults = { no: 0, almost: 0, yes: 0 };
       sessionRetryIds = [];
       sessionSchedule = [];
       document.getElementById("reviewIntro").classList.remove("active");
       document.getElementById("reviewSession").style.display = "flex";
       document.getElementById("reviewSummary").classList.remove("active");
+      document.getElementById("bottomNav").style.display = "none";
       renderReviewCard();
     }
 
@@ -1141,6 +1317,12 @@ setTimeout(() => {
       `;
     }
 
+    function setReviewStep(step) {
+      ["stepBefore", "stepTarget", "stepAfter"].forEach((id, index) => {
+        document.getElementById(id)?.classList.toggle("active", index === step);
+      });
+    }
+
     function advanceReviewStage() {
       const card = reviewQueue[reviewIndex];
       if (!card) return;
@@ -1198,15 +1380,18 @@ setTimeout(() => {
 
       list.classList.toggle("single", stage === 0);
 
+      const baseAyah = /^\d+$/.test(String(card.ayah || "")) ? Number.parseInt(card.ayah, 10) : null;
+      const translationAvailable = Boolean(baseAyah && resolveSurahId(card.surah));
       const pageHead = document.createElement("div");
       pageHead.className = "review-page-head";
       pageHead.innerHTML = `
-        <span>${escapeHtml(card.surah || "Passage personnel")}</span>
-        <span>${escapeHtml(card.ayah ? verseReference(card, 0).replace((card.surah || "Passage personnel") + " — ", "") : "Murajaah ciblée")}</span>
+        <span class="review-page-reference">
+          <b>${escapeHtml(card.surah || "Passage personnel")}</b>
+          <em>${escapeHtml(card.ayah ? verseReference(card, 0).replace((card.surah || "Passage personnel") + " — ", "") : "Murajaah ciblée")}</em>
+        </span>
       `;
       list.appendChild(pageHead);
 
-      const baseAyah = /^\d+$/.test(String(card.ayah || "")) ? Number.parseInt(card.ayah, 10) : null;
       const verses = [
         { label: "Verset avant", text: card.beforeVerse, ref: verseReference(card, -1), ayah: baseAyah ? baseAyah - 1 : "" },
         { label: "Verset cible", text: card.blockageVerse, ref: verseReference(card, 0), ayah: baseAyah || "" },
@@ -1239,14 +1424,27 @@ setTimeout(() => {
         placeholder.className = "mask-lines";
         placeholder.innerHTML = "<span></span><span></span><span></span>";
 
-        const meta = document.createElement("div");
-        meta.className = "review-meta";
-        meta.textContent = index < stage ? "" : verse.label;
+        let translationButton = null;
+        if (index === stage) {
+          translationButton = document.createElement("button");
+          translationButton.type = "button";
+          translationButton.className = "review-meta translation-toggle review-translation-inline";
+          translationButton.id = "reviewTranslationToggle";
+          translationButton.setAttribute("aria-pressed", "false");
+          translationButton.setAttribute("aria-label", "Afficher ou masquer la traduction");
+          translationButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"></svg><span>Traduction</span>';
+          translationButton.addEventListener("click", toggleReviewTranslation);
+        }
 
         if (index <= stage) {
-          item.append(meta, arabic);
+          if (translationButton) item.appendChild(translationButton);
+          item.appendChild(arabic);
+          if (index === stage && reviewTranslationVisible) {
+            const translation = frenchTranslationFor(card.surah, verse.ayah);
+            if (translation) item.appendChild(createTranslationPanel(translation));
+          }
         } else {
-          item.append(placeholder, meta);
+          item.appendChild(placeholder);
         }
         list.appendChild(item);
 
@@ -1255,12 +1453,35 @@ setTimeout(() => {
         }
       });
 
+      updateReviewTranslationControl(translationAvailable);
+
     }
 
-    function setReviewStep(step) {
-      ["stepBefore", "stepTarget", "stepAfter"].forEach((id, index) => {
-        document.getElementById(id)?.classList.toggle("active", index === step);
-      });
+    function updateReviewTranslationControl(available = true) {
+      const button = document.getElementById("reviewTranslationToggle");
+      if (!button) return;
+      button.disabled = !available;
+      button.classList.toggle("active", available && reviewTranslationVisible);
+      button.setAttribute("aria-pressed", String(available && reviewTranslationVisible));
+      button.setAttribute("aria-label", available ? "Afficher ou masquer la traduction" : "Traduction indisponible");
+    }
+
+    async function toggleReviewTranslation() {
+      const button = document.getElementById("reviewTranslationToggle");
+      if (button?.disabled) return;
+      const nextVisible = !reviewTranslationVisible;
+      if (nextVisible) {
+        try {
+          await loadFrenchTranslations();
+        } catch (error) {
+          console.error("[Murajaah Flash] Traduction française indisponible.", error);
+          toast("Impossible de charger la traduction.");
+          return;
+        }
+      }
+      reviewTranslationVisible = nextVisible;
+      const card = reviewQueue[reviewIndex];
+      if (card) renderReviewVerses(card, reviewStage);
     }
 
     function audioControlMarkup(state = "play") {
@@ -1452,17 +1673,12 @@ setTimeout(() => {
       renderReviewCard();
     }
 
-    function exitReview() {
-      const audio = document.getElementById("reviewAudio");
-      audio.pause();
-      audio.currentTime = 0;
-      resetElanAudio();
-      document.getElementById("reviewScreen").classList.remove("active");
-      document.getElementById("reviewIntro").classList.remove("active");
-      document.getElementById("reviewSummary").classList.remove("active");
-      document.getElementById("reviewSession").style.display = "flex";
+    function exitReview(destination = "") {
+      closeReviewOverlayState();
       document.getElementById("bottomNav").style.display = "grid";
-      showScreen("home");
+      const target = destination || overlayReturnScreen || "home";
+      overlayReturnScreen = "home";
+      showScreen(target, { remember: false });
     }
 
     function hifdhPageRangeForHizb(hizb) {
@@ -1478,6 +1694,7 @@ setTimeout(() => {
     }
 
     function openHifdhTest() {
+      overlayReturnScreen = activeScreenName();
       hifdhTest = null;
       const picker = document.getElementById("hifdhHizbPicker");
       if (picker) {
@@ -1488,7 +1705,8 @@ setTimeout(() => {
       document.getElementById("reviewIntro")?.classList.remove("active");
       document.getElementById("reviewSession").style.display = "flex";
       document.getElementById("reviewSummary")?.classList.remove("active");
-      document.getElementById("bottomNav").style.display = "none";
+      document.getElementById("bottomNav").style.display = "grid";
+      setBottomNavActive("hifdh");
       document.getElementById("hifdhScreen")?.classList.add("active");
       document.getElementById("hifdhScreen")?.classList.remove("test-running");
       document.getElementById("hifdhHeaderTitle").textContent = "Test Hifdh";
@@ -1501,19 +1719,11 @@ setTimeout(() => {
     }
 
     function closeHifdhTest() {
-      stopHifdhAudio();
-      hifdhTest = null;
-      const picker = document.getElementById("hifdhHizbPicker");
-      if (picker) {
-        picker.hidden = true;
-        picker.classList.remove("open");
-      }
-      document.getElementById("hifdhScreen")?.classList.remove("picker-open");
-      document.getElementById("hifdhScreen")?.classList.remove("test-running");
-      document.getElementById("hifdhScreen")?.classList.remove("active");
-      document.getElementById("hifdhTestHeaderControls").hidden = true;
+      closeHifdhOverlayState();
       document.getElementById("bottomNav").style.display = "grid";
-      showScreen("home");
+      const target = overlayReturnScreen || "home";
+      overlayReturnScreen = "home";
+      showScreen(target, { remember: false });
     }
 
     function renderHifdhSetup() {
@@ -1671,12 +1881,14 @@ setTimeout(() => {
           results: [],
           startedAt: Date.now()
         };
+        hifdhTranslationVisible = false;
         document.getElementById("hifdhHeaderTitle").textContent = "Test hifdh";
         document.getElementById("hifdhTestHeaderControls").hidden = false;
         document.getElementById("hifdhSetup").hidden = true;
         document.getElementById("hifdhSummary").hidden = true;
         document.getElementById("hifdhQuestion").hidden = false;
         document.getElementById("hifdhScreen")?.classList.add("test-running");
+        document.getElementById("bottomNav").style.display = "none";
         renderHifdhQuestion();
       } catch (error) {
         console.error("[Murajaah Flash] Test Hifdh indisponible.", error);
@@ -1717,15 +1929,12 @@ setTimeout(() => {
       startVerse.hidden = false;
       setArabicVerseContent(startVerse, question.startText, question.surah, question.ayah);
       document.getElementById("hifdhAudioPanel").hidden = false;
-      document.getElementById("hifdhTaskCard").hidden = false;
-      document.getElementById("hifdhTaskTitle").textContent = "Consigne";
-      document.getElementById("hifdhTaskText").textContent = "Récite le verset suivant de mémoire.";
-      document.getElementById("hifdhStagePrompt").textContent = "Récite de mémoire le verset suivant";
       document.getElementById("hifdhRevealBtn").hidden = false;
       document.getElementById("hifdhRevealLabel").textContent = "Vérifier la suite";
       document.getElementById("hifdhRatings").hidden = true;
       hifdhRevealStage = 0;
       setHifdhStage("start");
+      renderHifdhTranslation();
       updateHifdhLiveStats();
       const audio = document.getElementById("hifdhAudio");
       audio.src = hifdhAudioUrl(question.surahId, question.ayah);
@@ -1765,7 +1974,6 @@ setTimeout(() => {
       if (!question) return;
       const verse = document.getElementById("hifdhStartVerse");
       const audioPanel = document.getElementById("hifdhAudioPanel");
-      const task = document.getElementById("hifdhTaskCard");
       const button = document.getElementById("hifdhRevealBtn");
       const ratings = document.getElementById("hifdhRatings");
 
@@ -1774,11 +1982,42 @@ setTimeout(() => {
       stopHifdhAudio();
       audioPanel.hidden = true;
       setArabicVerseContent(verse, question.nextOne, question.surah, question.ayah + 1);
-      document.getElementById("hifdhStagePrompt").textContent = "Verset suivant";
-      task.hidden = true;
+      renderHifdhTranslation();
       button.hidden = true;
       ratings.hidden = false;
       setHifdhStage("answer");
+    }
+
+    function renderHifdhTranslation() {
+      const button = document.getElementById("hifdhTranslationToggle");
+      const panel = document.getElementById("hifdhTranslationPanel");
+      const copy = document.getElementById("hifdhTranslationText");
+      if (!button || !panel || !copy) return;
+      button.classList.toggle("active", hifdhTranslationVisible);
+      button.setAttribute("aria-pressed", String(hifdhTranslationVisible));
+      panel.hidden = !hifdhTranslationVisible;
+      if (!hifdhTranslationVisible) {
+        copy.textContent = "";
+        return;
+      }
+      const question = currentHifdhQuestion();
+      const ayah = Number(question?.ayah || 0) + (hifdhRevealStage === 0 ? 0 : 1);
+      copy.textContent = frenchTranslationFor(question?.surahId || question?.surah, ayah) || "Traduction indisponible pour ce verset.";
+    }
+
+    async function toggleHifdhTranslation() {
+      const nextVisible = !hifdhTranslationVisible;
+      if (nextVisible) {
+        try {
+          await loadFrenchTranslations();
+        } catch (error) {
+          console.error("[Murajaah Flash] Traduction française indisponible.", error);
+          toast("Impossible de charger la traduction.");
+          return;
+        }
+      }
+      hifdhTranslationVisible = nextVisible;
+      renderHifdhTranslation();
     }
 
     function setHifdhStage(stage) {
@@ -1905,12 +2144,254 @@ setTimeout(() => {
       document.getElementById("confidenceRing").style.setProperty("--confidence", value + "%");
     }
 
+    function journalEntryTime(entry) {
+      const time = entry.time || "12:00";
+      const value = new Date(`${entry.date}T${time}:00`).getTime();
+      return Number.isFinite(value) ? value : Number(entry.createdAt || 0);
+    }
+
+    function sortedJournalEntries() {
+      return [...journalEntries].sort((a, b) => journalEntryTime(b) - journalEntryTime(a));
+    }
+
+    function journalStartOfWeek() {
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+      return start;
+    }
+
+    function journalFeelingLabel(feeling) {
+      return ({ fluid: "Fluide", medium: "Moyen", difficult: "Difficile" })[feeling] || "Moyen";
+    }
+
+    function journalRelativeDate(dateValue) {
+      if (!dateValue) return "Jamais revu";
+      const target = new Date(`${dateValue}T00:00:00`);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const difference = Math.round((today - target) / DAY);
+      if (difference <= 0) return "Aujourd’hui";
+      if (difference === 1) return "Hier";
+      return `Il y a ${difference} jours`;
+    }
+
+    function nextJournalHizb() {
+      const last = sortedJournalEntries()[0];
+      return last ? (Number(last.hizb) % 60) + 1 : 1;
+    }
+
+    function renderJournal() {
+      const list = document.getElementById("journalWeekList");
+      if (!list) return;
+
+      const ordered = sortedJournalEntries();
+      const last = ordered[0];
+      const nextHizb = nextJournalHizb();
+      const weekStart = journalStartOfWeek();
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 7);
+      const weekEntries = ordered.filter(entry => {
+        const date = new Date(`${entry.date}T12:00:00`);
+        return date >= weekStart && date < weekEnd;
+      });
+
+      document.getElementById("journalLastHizb").textContent = last ? `Hizb ${last.hizb}` : "Aucune";
+      document.getElementById("journalLastMeta").textContent = last
+        ? `${journalRelativeDate(last.date)} · ${last.duration} min · ${journalFeelingLabel(last.feeling)}`
+        : "Commence ton journal aujourd’hui";
+      document.getElementById("journalNextHizb").textContent = `Hizb ${nextHizb}`;
+      document.getElementById("journalNextMeta").textContent = last ? "Continuer dans l’ordre" : "Commencer dans l’ordre";
+
+      const historyTitle = document.getElementById("journalWeekTitle");
+      const historyToggle = document.getElementById("journalHistoryToggle");
+      historyTitle.textContent = journalShowAll ? "Toutes les révisions" : "Cette semaine";
+      historyToggle.hidden = ordered.length <= 3;
+      historyToggle.firstChild.textContent = journalShowAll ? "Réduire " : "Voir tout ";
+
+      const visibleEntries = journalShowAll ? ordered : weekEntries.slice(0, 3);
+      if (!visibleEntries.length) {
+        list.innerHTML = `
+          <div class="journal-empty">
+            <strong>Aucune révision enregistrée</strong>
+            <p>Ajoute ton premier Hizb pour commencer le suivi de ta régularité.</p>
+            <button type="button" onclick="openJournalForm()">Ajouter une révision</button>
+          </div>`;
+      } else {
+        list.innerHTML = visibleEntries.map(entry => {
+          const date = new Date(`${entry.date}T12:00:00`);
+          const weekday = new Intl.DateTimeFormat("fr-FR", { weekday: "short" }).format(date).replace(".", "");
+          const timeMeta = entry.time ? `${escapeHtml(entry.time)} · ` : "";
+          const note = entry.note ? `<span class="journal-entry-note">${escapeHtml(entry.note)}</span>` : "";
+          return `
+            <div class="journal-entry-row">
+              <button class="journal-entry" type="button" onclick="editJournalRevision('${escapeHtml(entry.id)}')">
+                <span class="journal-date-badge">${escapeHtml(weekday)}<b>${date.getDate()}</b></span>
+                <span class="journal-entry-copy"><strong>Hizb ${entry.hizb}</strong><small>${timeMeta}${entry.duration} min</small>${note}</span>
+                <span class="journal-feeling-pill ${escapeHtml(entry.feeling)}">${journalFeelingLabel(entry.feeling)}</span>
+              </button>
+              <button class="journal-entry-delete" type="button" data-journal-delete="${escapeHtml(entry.id)}" aria-label="Supprimer la révision du Hizb ${entry.hizb}" onclick="deleteJournalRevisionById(this.dataset.journalDelete)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 3h6l1 4H8l1-4ZM7 7l1 14h8l1-14M10 11v6M14 11v6"/></svg>
+              </button>
+            </div>`;
+        }).join("");
+      }
+
+      renderJournalFrequency(nextHizb);
+      const trackedDays = new Set(weekEntries.map(entry => entry.date)).size;
+      const totalMinutes = weekEntries.reduce((sum, entry) => sum + Number(entry.duration || 0), 0);
+      document.getElementById("journalDaysCount").textContent = trackedDays;
+      document.getElementById("journalReviewsCount").textContent = weekEntries.length;
+      document.getElementById("journalMinutesCount").textContent = formatJournalDuration(totalMinutes);
+      document.querySelector("#journalDaysCount + small").textContent = trackedDays > 1 ? "jours suivis" : "jour suivi";
+      document.querySelector("#journalReviewsCount + small").textContent = weekEntries.length > 1 ? "révisions" : "révision";
+    }
+
+    function renderJournalFrequency(nextHizb = nextJournalHizb()) {
+      const grid = document.getElementById("journalFrequencyGrid");
+      if (!grid) return;
+      const start = Math.max(1, Math.min(57, nextHizb - 2));
+      const hizbs = Array.from({ length: 4 }, (_, index) => start + index);
+      grid.innerHTML = hizbs.map(hizb => {
+        const revisions = journalEntries.filter(entry => Number(entry.hizb) === hizb);
+        const latest = [...revisions].sort((a, b) => journalEntryTime(b) - journalEntryTime(a))[0];
+        const relative = latest ? journalRelativeDate(latest.date) : "Jamais revu";
+        return `
+          <button class="journal-frequency-card${hizb === nextHizb ? " current" : ""}" type="button" onclick="openJournalFormForHizb(${hizb})">
+            <strong>Hizb ${hizb}</strong>
+            <span class="${latest ? "" : "never"}">${relative}</span>
+            <small>${revisions.length} révision${revisions.length > 1 ? "s" : ""}</small>
+          </button>`;
+      }).join("");
+    }
+
+    function formatJournalDuration(minutes) {
+      const value = Number(minutes || 0);
+      if (value < 60) return `${value} min`;
+      const hours = Math.floor(value / 60);
+      const rest = value % 60;
+      return rest ? `${hours} h ${String(rest).padStart(2, "0")}` : `${hours} h`;
+    }
+
+    function toggleJournalHistory() {
+      journalShowAll = !journalShowAll;
+      renderJournal();
+    }
+
+    function ensureJournalHizbOptions() {
+      const select = document.getElementById("journalHizb");
+      if (!select || select.options.length) return;
+      select.innerHTML = Array.from({ length: 60 }, (_, index) => `<option value="${index + 1}">Hizb ${index + 1}</option>`).join("");
+    }
+
+    function currentClockTime() {
+      const now = new Date();
+      return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    }
+
+    function openJournalForm(hizb = nextJournalHizb()) {
+      ensureJournalHizbOptions();
+      document.getElementById("journalForm").reset();
+      document.getElementById("journalEntryId").value = "";
+      document.getElementById("journalHizb").value = String(hizb);
+      document.getElementById("journalDate").value = todayKey();
+      document.getElementById("journalDuration").value = "20";
+      document.getElementById("journalFormTitle").textContent = "Ajouter une révision";
+      document.getElementById("journalDeleteBtn").hidden = true;
+      selectJournalFeeling("fluid");
+      document.getElementById("journalSheet").hidden = false;
+      document.body.style.overflow = "hidden";
+    }
+
+    function openJournalFormForNext() {
+      openJournalForm(nextJournalHizb());
+    }
+
+    function openJournalFormForHizb(hizb) {
+      openJournalForm(Number(hizb));
+    }
+
+    function editJournalRevision(id) {
+      const entry = journalEntries.find(item => item.id === id);
+      if (!entry) return;
+      openJournalForm(Number(entry.hizb));
+      document.getElementById("journalEntryId").value = entry.id;
+      document.getElementById("journalDate").value = entry.date;
+      document.getElementById("journalDuration").value = entry.duration;
+      document.getElementById("journalNote").value = entry.note || "";
+      document.getElementById("journalFormTitle").textContent = `Modifier le Hizb ${entry.hizb}`;
+      document.getElementById("journalDeleteBtn").hidden = false;
+      selectJournalFeeling(entry.feeling || "medium");
+    }
+
+    function closeJournalForm() {
+      document.getElementById("journalSheet").hidden = true;
+      document.body.style.overflow = "";
+    }
+
+    function selectJournalFeeling(feeling) {
+      document.getElementById("journalFeeling").value = feeling;
+      document.querySelectorAll("[data-journal-feeling]").forEach(button => {
+        button.classList.toggle("active", button.dataset.journalFeeling === feeling);
+      });
+    }
+
+    function saveJournalRevision(event) {
+      event.preventDefault();
+      const id = document.getElementById("journalEntryId").value;
+      const previous = journalEntries.find(entry => entry.id === id);
+      const entry = {
+        id: id || Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        hizb: Number(document.getElementById("journalHizb").value),
+        date: document.getElementById("journalDate").value,
+        time: previous?.time || currentClockTime(),
+        duration: Number(document.getElementById("journalDuration").value),
+        feeling: document.getElementById("journalFeeling").value,
+        note: document.getElementById("journalNote").value.trim(),
+        createdAt: previous?.createdAt || Date.now(),
+        updatedAt: Date.now()
+      };
+      if (!entry.date || !entry.hizb || entry.duration < 1) return toast("Complète le Hizb, la date et la durée.");
+
+      if (id) journalEntries = journalEntries.map(item => item.id === id ? entry : item);
+      else journalEntries.push(entry);
+      journalEntries = sortedJournalEntries().slice(0, 500);
+      persist();
+      closeJournalForm();
+      renderJournal();
+      toast(id ? "Révision mise à jour." : "Révision ajoutée au journal.");
+    }
+
+    function deleteJournalRevision() {
+      const id = document.getElementById("journalEntryId").value;
+      deleteJournalRevisionById(id);
+    }
+
+    function deleteJournalRevisionById(id) {
+      const entry = journalEntries.find(item => item.id === id);
+      if (!entry) return;
+      openModal(`Supprimer la révision du Hizb ${entry.hizb} ?`, "Elle disparaîtra du journal et des statistiques du Bilan.", () => {
+        journalEntries = journalEntries.filter(entry => entry.id !== id);
+        persist();
+        closeModal();
+        if (!document.getElementById("journalSheet").hidden) closeJournalForm();
+        renderJournal();
+        toast("Révision supprimée du journal.");
+      });
+    }
+
     function askDelete(id) {
-      openModal("Supprimer ce passage ?", "Il sera retiré de ta bibliothèque et de tes prochaines révisions.", () => {
+      const card = cards.find(item => item.id === id);
+      if (!card) return;
+      const label = card.surah ? `${card.surah} · V${card.ayah || "—"}` : "ce passage";
+      openModal(`Supprimer ${label} ?`, "Ce passage sera retiré définitivement de ta bibliothèque et de tes prochaines révisions.", () => {
         cards = cards.filter(card => card.id !== id);
         persist();
         closeModal();
         renderLibrary();
+        renderHome();
+        renderReviewIntro();
+        renderProgress();
         toast("Passage supprimé.");
       });
     }
@@ -1919,6 +2400,7 @@ setTimeout(() => {
       openModal("Tout effacer ?", "Toutes tes cartes, révisions et statistiques locales seront supprimées.", () => {
         cards = [];
         activity = {};
+        journalEntries = [];
         persist();
         closeModal();
         renderProgress();
@@ -1939,8 +2421,8 @@ setTimeout(() => {
     }
 
     function exportData() {
-      if (!cards.length) return toast("Aucune carte à exporter.");
-      const data = JSON.stringify({ version: 2, exportedAt: new Date().toISOString(), cards, activity }, null, 2);
+      if (!cards.length && !journalEntries.length) return toast("Aucune donnée à exporter.");
+      const data = JSON.stringify({ version: 3, exportedAt: new Date().toISOString(), cards, activity, journalEntries }, null, 2);
       const blob = new Blob([data], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -2237,6 +2719,7 @@ setTimeout(() => {
     verifyQuranFontLoaded();
     renderDashboard();
     renderLibrary();
+    renderJournal();
     Promise.all([loadQuranData(), loadQuranPagesData()]).then(() => {
       renderDashboard();
       renderLibrary();

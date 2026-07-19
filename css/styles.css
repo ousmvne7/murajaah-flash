@@ -4237,10 +4237,10 @@
     .review-last-session > svg { color: var(--navy-2); }
     .review-header {
       background:
-        radial-gradient(circle at 98% 0%, rgba(98,80,165,.30), transparent 35%),
-        linear-gradient(145deg, #239b66 0%, #32ae76 58%, #48c98b 100%);
+        radial-gradient(circle at 98% 0%, rgba(89,211,143,.22), transparent 35%),
+        linear-gradient(145deg, #073d2f 0%, #0a5a43 58%, #13724f 100%);
       border-bottom-color: rgba(255,255,255,.18);
-      box-shadow: 0 10px 26px rgba(35,155,102,.18);
+      box-shadow: 0 10px 26px rgba(10,90,67,.20);
     }
     .review-prompt {
       background: rgba(255,255,255,.16);
@@ -4254,7 +4254,7 @@
       box-shadow: 0 7px 16px rgba(68,53,125,.20);
     }
     .review-progress .progress-track { background: rgba(255,255,255,.24); }
-    .review-progress .progress-fill { background: var(--navy-2); }
+    .review-progress .progress-fill { background: #72dda5; }
     .review-counter { color: rgba(255,255,255,.86); }
     .review-main {
       background:
@@ -4306,8 +4306,8 @@
     }
     .review-screen .elan-actions button {
       color: #fff;
-      background: linear-gradient(145deg, #239b66, #48c98b);
-      box-shadow: 0 6px 13px rgba(35,155,102,.18);
+      background: linear-gradient(145deg, #0a5a43, #13724f);
+      box-shadow: 0 6px 13px rgba(10,90,67,.20);
     }
     .review-screen .elan-actions span {
       color: var(--navy-2);
@@ -4319,8 +4319,8 @@
       box-shadow: 0 8px 18px rgba(35,155,102,.065);
     }
     .review-task-icon {
-      color: var(--navy-2);
-      background: var(--sky);
+      color: #0a5a43;
+      background: #e3f3ec;
     }
     .review-task-sound {
       color: var(--green-dark);
@@ -4330,9 +4330,9 @@
     .review-task-copy small { color: var(--muted); }
     .review-screen .reveal-btn {
       color: #fff;
-      background: linear-gradient(135deg, #239b66 0%, #48c98b 100%);
-      border-color: rgba(35,155,102,.26);
-      box-shadow: 0 11px 23px rgba(35,155,102,.20);
+      background: linear-gradient(135deg, #0a5a43 0%, #13724f 100%);
+      border-color: rgba(10,90,67,.26);
+      box-shadow: 0 11px 23px rgba(10,90,67,.20);
     }
     .review-screen .rating-title {
       color: var(--ink);

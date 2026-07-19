@@ -1,0 +1,552 @@
+/* Audit visuel global - composants d'interface uniquement, hors texte coranique. */
+
+:is(#homeScreen, #libraryScreen, #addScreen, #progressScreen, #journalScreen, #reviewScreen, #hifdhScreen) {
+  --ui-border: rgba(22, 42, 78, .10);
+  --ui-shadow: 0 10px 28px rgba(22, 42, 78, .08);
+}
+
+:is(#homeScreen, #libraryScreen, #addScreen, #progressScreen, #journalScreen, #reviewScreen, #hifdhScreen)
+  :is(button, article, section, header, div, span) {
+  box-sizing: border-box;
+}
+
+:is(#homeScreen, #libraryScreen, #addScreen, #progressScreen, #journalScreen, #reviewScreen, #hifdhScreen)
+  button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+:is(#homeScreen, #libraryScreen, #addScreen, #progressScreen, #journalScreen, #reviewScreen, #hifdhScreen)
+  button:focus-visible {
+  outline: 3px solid rgba(80, 58, 180, .24);
+  outline-offset: 2px;
+}
+
+:is(#homeScreen, #libraryScreen, #addScreen, #progressScreen, #journalScreen, #reviewScreen, #hifdhScreen)
+  svg {
+  display: block;
+  flex: none;
+  shape-rendering: geometricPrecision;
+}
+
+:is(#homeScreen, #libraryScreen, #addScreen, #progressScreen, #journalScreen, #reviewScreen, #hifdhScreen)
+  button svg {
+  pointer-events: none;
+}
+
+:is(.focus-card, .home-mode-card, .home-quick-actions, .greeting,
+    .library-search, .library-stats, .library-help, .memory-card,
+    .auto-fill-card, .sequence-card, .audio-card, .notes-card,
+    .progress-hero, .progress-summary-grid, .progress-panel, .settings-list,
+    .journal-overview, .journal-add-cta, .journal-history, .journal-frequency-grid, .journal-week-summary,
+    .review-daily-card, .review-quick-actions, .review-progress-card, .flashcard,
+    .hifdh-panel, .hifdh-how-card, .hifdh-progress-tip, .hifdh-question-meta, .hifdh-task-card) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+:is(.home-mode-card, .library-stat, .memory-card, .progress-mini, .setting-row,
+    .journal-overview-block, .journal-frequency-card, .summary-stat, .hifdh-count-btn) {
+  overflow: clip;
+}
+
+/* Images matricielles : conserver leur définition native et un cadrage stable. */
+#homeScreen .home-hero {
+  image-rendering: auto;
+  background-repeat: no-repeat;
+}
+
+/* Accueil : proportions canoniques de la maquette validée. */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+#homeScreen .home-hero {
+  min-height: 238px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .08) 0%, rgba(255, 255, 255, .42) 58%, #fff 100%),
+    url("../assets/home-hero-bg.png") center 12px / 445px auto no-repeat;
+}
+
+#homeScreen .home-hero::before {
+  opacity: .26;
+}
+
+#homeScreen .topbar {
+  min-height: 118px;
+  padding: calc(30px + env(safe-area-inset-top)) 21px 12px;
+}
+
+#homeScreen .home-logo-lockup {
+  max-width: 190px;
+  padding-top: 8px;
+}
+
+#homeScreen .brand {
+  font-size: 18px;
+  line-height: .9;
+}
+
+#homeScreen .brand small {
+  margin-top: 8px;
+  font-size: 8px;
+  letter-spacing: .45em;
+}
+
+#homeScreen .home-profile-btn {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  border-radius: 14px;
+}
+
+#homeScreen .home-profile-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+#homeScreen .greeting {
+  left: 22px;
+  right: 22px;
+  bottom: 10px;
+  min-height: 68px;
+  padding: 10px 13px;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  gap: 12px;
+  border-radius: 20px;
+}
+
+#homeScreen .greeting-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+}
+
+#homeScreen .greeting-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+#homeScreen .greeting h1 {
+  font-size: 13px;
+  line-height: 1.15;
+}
+
+#homeScreen .greeting p {
+  margin-top: 4px;
+  font-size: 9.5px;
+  line-height: 1.2;
+}
+
+#homeScreen .streak {
+  min-width: 60px;
+  padding: 5px 8px;
+  gap: 5px;
+  font-size: 10px;
+}
+
+#homeScreen .streak svg {
+  width: 14px;
+  height: 14px;
+}
+
+.splash-bismillah {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+/* Boutons retour et en-têtes secondaires. */
+.page-back-btn,
+.journal-back-btn,
+.review-session-back,
+.summary-back-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(18, 50, 84, .10);
+  border-radius: 14px;
+  color: #17345f;
+  background: #fff;
+  box-shadow: 0 7px 18px rgba(18, 50, 84, .08);
+}
+
+.page-back-btn svg,
+.journal-back-btn svg,
+.review-session-back svg,
+.summary-back-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+#addScreen .subpage-topbar,
+#progressScreen .subpage-topbar {
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 10px;
+  padding: calc(14px + env(safe-area-inset-top)) 16px 14px;
+  background: #fff;
+}
+
+#addScreen .subpage-topbar .brand,
+#progressScreen .subpage-topbar .brand {
+  justify-self: center;
+  text-align: center;
+}
+
+.topbar-spacer,
+.review-header-spacer,
+.hifdh-header-spacer {
+  width: 44px;
+  height: 44px;
+  display: block;
+}
+
+#libraryScreen .library-header-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+#libraryScreen .library-add-btn {
+  font-size: 0;
+}
+
+#libraryScreen .library-add-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+#libraryScreen .library-list-head button svg {
+  width: 18px;
+  height: 18px;
+}
+
+#journalScreen .journal-topline {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 52px;
+  align-items: center;
+  gap: 10px;
+}
+
+#journalScreen .journal-topline .brand {
+  justify-self: center;
+  text-align: center;
+}
+
+#journalScreen .journal-back-btn {
+  color: var(--journal-dark, #183f98);
+}
+
+#reviewIntro .review-intro-head-icon:first-child,
+#hifdhScreen .hifdh-back {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+#reviewIntro .review-intro-head-spacer {
+  width: 44px;
+  height: 44px;
+  display: block;
+}
+
+#reviewIntro .review-intro-body,
+#hifdhScreen:not(.test-running) #hifdhSetup {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom));
+}
+
+#reviewSession .review-header {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 8px;
+}
+
+#reviewSession .review-session-back {
+  order: initial;
+  color: #fff;
+  background: rgba(255, 255, 255, .14);
+  border-color: rgba(255, 255, 255, .18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10);
+}
+
+#reviewSession .review-title {
+  order: initial;
+  padding: 0;
+  text-align: center;
+}
+
+#reviewSession .review-header-spacer {
+  order: initial;
+}
+
+#reviewSession .review-prompt,
+#reviewSession .review-progress {
+  grid-column: 1 / -1;
+  order: initial;
+  width: 100%;
+}
+
+#reviewSummary {
+  position: relative;
+}
+
+#reviewSummary .summary-back-btn {
+  position: absolute;
+  z-index: 2;
+  top: calc(14px + env(safe-area-inset-top));
+  left: 16px;
+}
+
+#hifdhScreen .hifdh-header-spacer {
+  justify-self: end;
+}
+
+#hifdhScreen #hifdhSetup .hifdh-start-btn span svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Icônes utilitaires uniformisées. */
+#homeScreen .streak {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+#homeScreen .streak::before {
+  content: none;
+}
+
+#homeScreen .streak svg {
+  width: 16px;
+  height: 16px;
+}
+
+#progressScreen .setting-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: #4d3caf;
+  background: #f1efff;
+  border: 1px solid rgba(77, 60, 175, .10);
+}
+
+#progressScreen .setting-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+#addScreen #deleteAudioBtn svg,
+#addScreen .quran-picker-top button svg {
+  width: 20px;
+  height: 20px;
+}
+
+#addScreen .picker-arrow svg,
+#addScreen .chip-icon svg,
+#addScreen .record-btn-icon svg,
+#addScreen .listen-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+#addScreen .record-btn-icon {
+  display: grid;
+  place-items: center;
+}
+
+#reviewIntro .review-daily-top > b::before {
+  content: none;
+}
+
+#hifdhSetup .hifdh-benefits li::before {
+  content: "";
+  top: 2px;
+  left: 6px;
+  width: 6px;
+  height: 10px;
+  border: solid #259c61;
+  border-width: 0 2px 2px 0;
+  border-radius: 0;
+  background: transparent;
+  transform: rotate(45deg);
+}
+
+/* Blocs et sections : rythme, alignement et zones tactiles stables. */
+#homeScreen .home-mode-card,
+#libraryScreen .memory-card,
+#progressScreen .setting-row,
+#journalScreen .journal-add-cta,
+#reviewIntro .review-quick-actions > button,
+#hifdhScreen .hifdh-select-card {
+  min-height: 72px;
+}
+
+#homeScreen .home-mode-icon,
+#libraryScreen .library-stat-icon,
+#libraryScreen .library-help-icon,
+#addScreen .passage-card-icon,
+#progressScreen .setting-icon,
+#reviewIntro .review-quick-icon,
+#hifdhScreen .hifdh-setup-heading > span {
+  flex: none;
+}
+
+#homeScreen .home-quick-grid button,
+#reviewIntro .review-quick-actions > button,
+#journalScreen .journal-overview button,
+#hifdhScreen .hifdh-count-btn {
+  min-width: 0;
+}
+
+#addScreen .quran-picker-top button,
+#addScreen #deleteAudioBtn,
+.journal-form-head button,
+.hifdh-picker-close {
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+}
+
+/* Navigation mobile opaque et fixée au bas de l'application. */
+.bottom-nav {
+  position: absolute;
+  z-index: 90;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  min-height: 84px;
+  padding: 7px 10px calc(7px + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  border: 1px solid rgba(35, 43, 76, .09);
+  border-bottom: 0;
+  border-radius: 22px 22px 0 0;
+  background: #fff;
+  box-shadow: 0 -10px 30px rgba(24, 36, 72, .11);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  opacity: 1;
+}
+
+.bottom-nav .nav-btn {
+  min-width: 0;
+  min-height: 64px;
+  padding: 6px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 0;
+  border-radius: 16px;
+  color: #66728d;
+  background: #fff;
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: normal;
+  text-align: center;
+}
+
+.bottom-nav .nav-btn svg {
+  width: 25px;
+  height: 25px;
+  stroke-width: 1.9;
+}
+
+.bottom-nav .nav-btn.active {
+  color: #fff;
+  background: #0b3158;
+  box-shadow: 0 8px 18px rgba(11, 49, 88, .20);
+}
+
+.bottom-nav .nav-btn[data-screen="review"].active {
+  background: #0a5a43;
+  box-shadow: 0 8px 18px rgba(10, 90, 67, .22);
+}
+
+.bottom-nav .nav-btn[data-screen="hifdh"].active {
+  background: #5439af;
+  box-shadow: 0 8px 18px rgba(84, 57, 175, .22);
+}
+
+.bottom-nav .nav-btn[data-screen="journal"].active {
+  background: #4330a3;
+  box-shadow: 0 8px 18px rgba(67, 48, 163, .22);
+}
+
+.screen {
+  padding-bottom: calc(104px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 360px) {
+  #homeScreen .home-hero {
+    min-height: 228px;
+    background-size: 410px auto;
+  }
+
+  #homeScreen .topbar {
+    min-height: 110px;
+    padding-top: calc(23px + env(safe-area-inset-top));
+  }
+
+  #homeScreen .brand {
+    font-size: 17px;
+  }
+
+  #homeScreen .greeting {
+    left: 16px;
+    right: 16px;
+  }
+
+  .bottom-nav {
+    padding-inline: 6px;
+    gap: 2px;
+  }
+
+  .bottom-nav .nav-btn {
+    min-height: 62px;
+    font-size: 10.5px;
+  }
+
+  .bottom-nav .nav-btn svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  #addScreen .subpage-topbar,
+  #progressScreen .subpage-topbar,
+  #journalScreen .journal-topline,
+  #reviewSession .review-header {
+    gap: 7px;
+  }
+}

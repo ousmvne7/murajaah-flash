@@ -1,109 +1,105 @@
 # Architecture
 
-Murajaah Flash est une application web statique pensée comme une PWA.
+Murajaah Flash est une application web statique sans framework, installable comme PWA.
 
 ## Structure actuelle
 
 ```text
 murajaah-flash/
   index.html
-  site.html
+  manifest.webmanifest
+  service-worker.js
+  design.md
+  ICON_SYSTEM.md
   css/
     styles.css
+    home.css
+    library.css
+    hifdh-setup.css
+    review-intro.css
+    journal.css
+    typography.css
+    visual-audit.css
+    design-system.css
   js/
     app.js
+    icon-system.js
+    pwa.js
   data/
-    quran-uthmani.json
+    hafsData_v18.json
     quran-pages.json
   assets/
+    fonts/
+    icons/
   docs/
 ```
 
 ## Frontend
 
-L’application fonctionne sans framework.
+- **HTML** : structure de tous les écrans dans `index.html`.
+- **CSS** : styles historiques séparés par domaine, puis règles communes dans `design-system.css`.
+- **JavaScript vanilla** : navigation, stockage, révision, Test Hifdh, Bilan et PWA.
+- **Lucide local** : registre dans `ICON_SYSTEM.md`, sprite hors ligne dans `assets/icons/lucide.svg`.
+- **Traduction locale** : `data/quran-fr-hamidullah.json`, chargée à la demande et mise en cache par la PWA.
 
-- **HTML** : structure des écrans
-- **CSS** : direction artistique, responsive, composants
-- **JavaScript vanilla** : navigation, logique métier, stockage local, révision
+## Navigation principale
 
-## Écrans principaux
+La barre inférieure contient quatre destinations stables :
 
-- Accueil
-- Passages
-- Ajouter
-- Réviser
-- Progression / Réglages
+1. Accueil
+2. Révision
+3. Test Hifdh
+4. Bilan
 
-## Données
+Le Profil est accessible en haut à droite de l’Accueil. Les pages secondaires disposent d’un bouton retour en haut à gauche. Les réglages restent exclusivement dans le Profil.
 
-Les passages sont stockés localement dans le navigateur.
+## Données locales
 
-Chaque passage contient notamment :
+Les données utilisateur sont stockées dans le navigateur. Elles comprennent notamment :
 
-- sourate ;
-- numéro du verset cible ;
-- verset avant ;
-- verset cible ;
-- verset après ;
-- type d’hésitation ;
-- note courte ;
-- audio éventuel ;
-- prochaine date de révision ;
-- niveau de solidité.
+- les passages ciblés et leur planification ;
+- l’historique d’auto-évaluation ;
+- les audios personnels éventuels ;
+- l’activité et la progression ;
+- les entrées du Journal de révision libre.
 
-## TextRepository
+La suppression d’une entrée du Bilan demande confirmation et déclenche le recalcul des statistiques.
 
-Murajaah Flash utilise uniquement le texte arabe Uthmani nécessaire à la révision de récitation.
+## Texte coranique protégé
 
 ```text
 TextRepository
-└── KFGQPC Hafs
-    └── data/quran-uthmani.json
+└── KFGQPC Hafs v18
+    ├── data/hafsData_v18.json
+    ├── assets/fonts/hafs.18.ttf
+    └── assets/fonts/hafs.18.woff2
 ```
 
-Objectif :
+La traduction française est une source parallèle d’interface. Elle n’entre jamais dans le pipeline de nettoyage ou de rendu du texte arabe.
 
-- garder le moteur Quran simple et fiable ;
-- garder les autres usages dans des projets séparés ;
-- éviter toute dépendance réseau pendant l’utilisation.
+Le projet utilise exclusivement cette combinaison pour le Mushaf. `uthmanic_hafs_v22.ttf` ne doit pas être mélangée avec v18. Le Tajwīd reste hors périmètre tant qu’une migration séparée n’a pas été validée.
 
-## Stockage
-
-Le projet utilise un stockage local côté navigateur.
-
-Objectif :
-
-- pas de compte ;
-- pas de serveur ;
-- données privées sur l’appareil ;
-- usage simple pour un prototype testable.
+Les refontes visuelles ne doivent jamais modifier les données, les polices, le nettoyage Unicode ou les fonctions de rendu arabe.
 
 ## Audio
 
-Deux types d’audio existent :
+La récitation Minshawi en ligne est utilisée comme élan sur le verset avant. La création de nouveaux enregistrements personnels a été retirée de la page Ajouter un passage. Les anciens audios déjà présents dans les données locales restent lisibles pour préserver la compatibilité.
 
-1. **Audio personnel** : enregistré par l’utilisateur.
-2. **Élan audio Minshawi** : lu en ligne pour le verset avant.
-
-L’audio Minshawi donne uniquement l’élan.  
-Il ne donne pas la réponse.
+Les ressources d’interface et les données principales sont mises en cache par le service worker. Les audios distants nécessitent une connexion lorsqu’ils ne sont pas déjà disponibles.
 
 ## Limites actuelles
 
-- Données locales uniquement
-- Pas de synchronisation multi-appareils
-- Pas d’authentification
-- Pas encore de backend
-- Images Mushaf non intégrées
+- stockage local uniquement ;
+- aucune synchronisation multi-appareils ;
+- aucune authentification ;
+- aucun backend ;
+- import de sauvegarde encore à finaliser ;
+- validation réelle iOS et Android à poursuivre.
 
-## Orientation future
+## Règles de maintenance
 
-Si le projet devient une vraie app mobile, les prochaines briques possibles sont :
-
-- backend ;
-- authentification optionnelle ;
-- synchronisation cloud ;
-- sauvegarde des passages ;
-- vraie PWA installable ;
-- packaging mobile hybride.
+- mettre à jour les versions de cache après toute modification d’asset ;
+- documenter toute nouvelle icône dans `ICON_SYSTEM.md` ;
+- conserver les couleurs Acquis, Presque et À revoir comme couleurs fonctionnelles ;
+- tester au minimum à 340, 390 et 430 px ;
+- synchroniser et comparer les fichiers avant validation finale.
