@@ -4310,8 +4310,8 @@
       box-shadow: 0 6px 13px rgba(10,90,67,.20);
     }
     .review-screen .elan-actions span {
-      color: var(--navy-2);
-      background: var(--sky);
+      color: var(--green-dark);
+      background: var(--green-soft);
     }
     .review-instruction {
       background: #fff;

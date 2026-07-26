@@ -23,6 +23,20 @@
   --mf-shadow-nav: 0 -4px 18px rgba(23, 35, 56, .08);
 }
 
+/* Défilement conservé, barres natives masquées sur toute l’application. */
+html,
+body,
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 body,
 button,
 input,
@@ -180,6 +194,11 @@ body {
 #hifdhScreen .hifdh-start-btn span {
   background: rgba(255, 255, 255, .18) !important;
   box-shadow: none !important;
+}
+
+#hifdhScreen #hifdhSetup .hifdh-setup-launch > span {
+  color: var(--mf-hifdh) !important;
+  background: #fff !important;
 }
 
 .bottom-nav {
@@ -926,8 +945,17 @@ textarea:focus-visible {
 }
 
 .bottom-nav {
+  position: fixed !important;
+  z-index: 100 !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 0 !important;
+  width: min(100%, 430px) !important;
+  transform: translateX(-50%);
   padding: 8px !important;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
   border: 1px solid rgba(23, 35, 56, .10) !important;
+  border-bottom: 0 !important;
   border-radius: 18px 18px 0 0 !important;
   background: #fff !important;
   box-shadow: var(--mf-shadow-nav) !important;
@@ -993,4 +1021,1001 @@ textarea:focus-visible {
 
 #addScreen .first-review-options button {
   border-radius: var(--mf-radius-sm) !important;
+}
+
+/* Murajaah ciblée reprend la hiérarchie du header Test Hifdh. */
+#reviewIntro .review-intro-header {
+  position: relative;
+  display: block;
+  min-height: 221px;
+  padding: calc(20px + env(safe-area-inset-top)) 20px 30px;
+  overflow: hidden;
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 88% 10%, rgba(31, 147, 105, .72), transparent 43%),
+    radial-gradient(circle at 10% 76%, rgba(2, 53, 40, .72), transparent 44%),
+    linear-gradient(135deg, #063f31 0%, #0a5a43 55%, #16805f 100%) !important;
+  box-shadow: inset 0 -1px 0 rgba(184, 239, 216, .38) !important;
+}
+
+#reviewIntro .review-intro-head-icon {
+  position: absolute;
+  z-index: 2;
+  top: calc(20px + env(safe-area-inset-top));
+  left: 20px;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border: 1px solid rgba(255, 255, 255, .13);
+  border-radius: 15px !important;
+  color: #fff;
+  background: rgba(255, 255, 255, .12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12);
+}
+
+#reviewIntro .review-intro-header-mark {
+  position: absolute;
+  top: calc(42px + env(safe-area-inset-top));
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  color: #c9f3df;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 5px 12px rgba(2, 53, 40, .24));
+}
+
+#reviewIntro .review-intro-header-mark::before,
+#reviewIntro .review-intro-header-mark::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(211, 248, 230, .72);
+}
+
+#reviewIntro .review-intro-header-mark::before { left: -15px; }
+#reviewIntro .review-intro-header-mark::after { right: -15px; }
+
+#reviewIntro .review-intro-header-mark svg {
+  width: 44px;
+  height: 44px;
+  stroke-width: 1.8;
+}
+
+#reviewIntro .review-intro-title {
+  position: static;
+  padding: 0;
+}
+
+#reviewIntro .review-intro-header h1 {
+  position: absolute;
+  top: calc(91px + env(safe-area-inset-top));
+  left: 62px;
+  right: 62px;
+  margin: 0;
+  color: #fff;
+  font-size: 37px;
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+#reviewIntro .review-intro-title p {
+  position: absolute;
+  top: calc(143px + env(safe-area-inset-top));
+  left: 54px;
+  right: 54px;
+  margin: 0;
+  color: rgba(255, 255, 255, .91);
+  font-size: 15px;
+  line-height: 1.42;
+  font-weight: 550;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+#reviewIntro .review-intro-body {
+  margin-top: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 360px), (max-height: 720px) {
+  #reviewIntro .review-intro-header {
+    min-height: 202px;
+  }
+
+  #reviewIntro .review-intro-header-mark {
+    top: calc(38px + env(safe-area-inset-top));
+  }
+
+  #reviewIntro .review-intro-header h1 {
+    top: calc(80px + env(safe-area-inset-top));
+    font-size: 32px;
+  }
+
+  #reviewIntro .review-intro-title p {
+    top: calc(127px + env(safe-area-inset-top));
+    font-size: 13px;
+  }
+}
+
+/* Contexte simple du verset, partagé par les deux parcours. */
+#hifdhScreen .hifdh-question-context,
+#reviewSession .review-question-context {
+  min-height: 62px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid rgba(68, 53, 125, .08);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(68, 53, 125, .055);
+}
+
+#reviewSession .review-question-context {
+  flex: 0 0 auto;
+  margin-bottom: 10px;
+}
+
+:is(#hifdhScreen, #reviewSession) .question-reference-main {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+:is(#hifdhScreen, #reviewSession) .question-reference-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 11px;
+  color: #16805f;
+  background: #eef8f4;
+}
+
+:is(#hifdhScreen, #reviewSession) .question-reference-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:is(#hifdhScreen, #reviewSession) .question-reference-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+:is(#hifdhScreen, #reviewSession) .question-reference-copy small {
+  color: #748096;
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 750;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+:is(#hifdhScreen, #reviewSession) .question-reference-copy strong {
+  color: #172338;
+  font-size: 12.5px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+:is(#hifdhScreen, #reviewSession) .question-reference-translation {
+  width: auto;
+  min-height: 38px;
+  flex: none;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 11px;
+  font-size: 10.5px;
+  font-weight: 750;
+}
+
+#hifdhScreen .question-reference-translation {
+  color: #5b3dce;
+  border-color: rgba(91, 61, 206, .14);
+  background: #f4f1ff;
+}
+
+#reviewSession .question-reference-translation {
+  color: #0a5a43;
+  border-color: rgba(10, 90, 67, .14);
+  background: #eef8f4;
+}
+
+:is(#hifdhScreen, #reviewSession) .audio-reciter {
+  min-width: 0;
+  display: flex !important;
+  flex: 1;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 7px;
+  text-align: left;
+}
+
+:is(#hifdhScreen, #reviewSession) .audio-wave-icon {
+  width: 19px;
+  height: 19px;
+  flex: none;
+  fill: none;
+  stroke: #16805f;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+}
+
+:is(#hifdhScreen, #reviewSession) .audio-reciter > span {
+  min-width: 0;
+  margin: 0 !important;
+  color: #536278 !important;
+  font-size: 10.5px !important;
+  line-height: 1.3;
+  font-weight: 700;
+  white-space: normal;
+}
+
+:is(#hifdhScreen, #reviewSession) .elan-actions > span {
+  color: #16805f !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 360px) {
+  #hifdhScreen .hifdh-question-context,
+  #reviewSession .review-question-context {
+    padding-inline: 8px;
+    gap: 7px;
+  }
+
+  :is(#hifdhScreen, #reviewSession) .question-reference-main {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 7px;
+  }
+
+  :is(#hifdhScreen, #reviewSession) .question-reference-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  :is(#hifdhScreen, #reviewSession) .question-reference-translation {
+    padding-inline: 8px;
+    font-size: 9.5px;
+  }
+}
+
+/* Ajouter un passage : parcours en trois étapes, sans surcharge décorative. */
+#addScreen {
+  background: #fff !important;
+}
+
+#addScreen .add-page-header {
+  min-height: 76px;
+  padding: calc(17px + env(safe-area-inset-top)) 18px 15px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 0 !important;
+  background: #fff;
+  backdrop-filter: none;
+}
+
+#addScreen .add-page-header h1 {
+  margin: 0;
+  color: #0a5a43;
+  font-size: 23px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+#addScreen .add-page-header .icon-btn {
+  width: 42px;
+  height: 42px;
+  color: #0a5a43 !important;
+  border: 0;
+  border-radius: 12px !important;
+  background: transparent !important;
+  box-shadow: none;
+}
+
+#addScreen .content {
+  padding: 0 14px calc(116px + env(safe-area-inset-bottom));
+}
+
+#addScreen .page-title {
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+#addScreen .page-title p {
+  margin: 0;
+  color: #657086;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+#addScreen #cardForm {
+  display: grid;
+  gap: 12px;
+}
+
+#addScreen .add-step-number {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: #fff !important;
+  background: #0a5a43;
+  font-size: 13px !important;
+  line-height: 1;
+  font-weight: 850;
+  letter-spacing: 0 !important;
+}
+
+#addScreen .premium-passage-card {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(23, 35, 56, .08) !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 24px rgba(23, 35, 56, .055) !important;
+}
+
+#addScreen .passage-card-head {
+  min-height: 76px;
+  padding: 15px 16px;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 40px;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid rgba(23, 35, 56, .07);
+  background: #fff;
+}
+
+#addScreen .passage-card-head .add-step-number {
+  order: 1;
+}
+
+#addScreen .auto-fill-copy {
+  order: 2;
+  gap: 4px;
+}
+
+#addScreen .auto-fill-copy strong {
+  color: #172338;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+#addScreen .auto-fill-copy span {
+  color: #69758b;
+  font-size: 11px;
+  line-height: 1.4;
+  font-weight: 550;
+}
+
+#addScreen .passage-card-icon {
+  order: 3;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px !important;
+  color: #0a5a43;
+  background: #eef7f3;
+}
+
+#addScreen .quran-picker-open {
+  width: calc(100% - 28px) !important;
+  min-height: 66px !important;
+  margin: 14px !important;
+  padding: 10px 13px !important;
+  border: 1px solid rgba(23, 35, 56, .09) !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+#addScreen .picker-target-icon {
+  border-radius: 11px;
+  color: #0a5a43;
+  background: #eef7f3;
+}
+
+#addScreen .quran-picker-open > span:not(.picker-target-icon):not(.picker-arrow) {
+  color: #69758b;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+#addScreen .quran-picker-open b {
+  color: #172338;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+#addScreen .auto-preview {
+  padding: 0 14px 14px;
+}
+
+#addScreen .auto-preview-item {
+  border-color: rgba(10, 90, 67, .12);
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+#addScreen .first-review-card {
+  margin: 0;
+  padding: 15px 16px;
+  grid-template-columns: 30px minmax(0, 1fr) 40px;
+  gap: 12px;
+  border: 1px solid rgba(23, 35, 56, .08);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(23, 35, 56, .055);
+}
+
+#addScreen .first-review-card .add-step-number {
+  grid-column: 1;
+}
+
+#addScreen .first-review-copy {
+  grid-column: 2;
+}
+
+#addScreen .first-review-copy strong {
+  color: #172338;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+#addScreen .first-review-copy small {
+  color: #69758b;
+  font-size: 11px;
+}
+
+#addScreen .first-review-icon {
+  grid-column: 3;
+  grid-row: 1;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+#addScreen .first-review-options {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  padding: 4px;
+  border-radius: 13px;
+  background: #f1f5f3;
+}
+
+#addScreen .first-review-options button {
+  min-height: 42px;
+  border-radius: 10px;
+}
+
+#addScreen .first-review-options button.active {
+  color: #fff;
+  background: #0a5a43;
+  box-shadow: none;
+}
+
+#addScreen .sequence-heading {
+  min-height: 58px;
+  margin: 0 0 -12px;
+  padding: 14px 16px 15px;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 40px;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid rgba(23, 35, 56, .08);
+  border-bottom: 0;
+  border-radius: 20px 20px 0 0;
+  background: #fff;
+}
+
+#addScreen .sequence-heading::after {
+  display: none;
+}
+
+#addScreen .sequence-heading .add-step-number {
+  grid-column: 1;
+}
+
+#addScreen .sequence-heading span.sequence-heading-copy {
+  grid-column: 2;
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#addScreen .sequence-heading .sequence-heading-copy .sequence-heading-label {
+  color: #172338;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#addScreen .sequence-heading .sequence-heading-copy .sequence-heading-help {
+  color: #748096;
+  font-size: 9.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#addScreen .heading-bubble {
+  grid-column: 3;
+  grid-row: 1;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: #0a5a43;
+  background: #eef7f3;
+  box-shadow: none;
+}
+
+#addScreen .detail-card {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid rgba(23, 35, 56, .08) !important;
+  border-top: 0 !important;
+  border-radius: 0 0 20px 20px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 24px rgba(23, 35, 56, .055) !important;
+}
+
+#addScreen .detail-card label {
+  color: #172338;
+  font-size: 12px;
+}
+
+#addScreen .difficulty-chips {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+#addScreen .difficulty-chip {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 20px;
+  align-items: center;
+  min-width: 0;
+  min-height: 66px;
+  padding: 10px 12px;
+  gap: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(10, 90, 67, .10) !important;
+  border-radius: 14px !important;
+  color: #32485b !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  text-align: left;
+  transform: none !important;
+}
+
+#addScreen .difficulty-chip:hover,
+#addScreen .difficulty-chip:focus-visible,
+#addScreen .difficulty-chip:active {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+#addScreen .difficulty-chip.active {
+  border-color: rgba(10, 90, 67, .52) !important;
+  color: #074c39 !important;
+  background: #eef8f4 !important;
+}
+
+#addScreen .difficulty-chip .chip-icon,
+#addScreen .difficulty-chip[data-difficulty="similar"] .chip-icon,
+#addScreen .difficulty-chip[data-difficulty="forgotten"] .chip-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: #0a5a43;
+  background: #edf7f3;
+}
+
+#addScreen .difficulty-chip[data-difficulty="similar"] .chip-icon {
+  color: #a85a24;
+  background: #fff4ea;
+}
+
+#addScreen .difficulty-chip[data-difficulty="forgotten"] .chip-icon {
+  color: #3772a9;
+  background: #edf6fd;
+}
+
+#addScreen .difficulty-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+#addScreen .difficulty-copy strong {
+  color: #172338;
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+#addScreen .difficulty-copy small {
+  color: #6f7b90;
+  font-size: 9.5px;
+  font-weight: 550;
+  line-height: 1.35;
+}
+
+#addScreen .difficulty-chip.active .difficulty-copy strong {
+  color: #07513d;
+}
+
+#addScreen .difficulty-radio {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #d5dce2;
+  border-radius: 50%;
+  background: #fff;
+}
+
+#addScreen .difficulty-chip.active .difficulty-radio {
+  border: 5px solid #0a5a43;
+}
+
+#addScreen .detail-card .field + .field {
+  margin-top: 16px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(23, 35, 56, .07);
+}
+
+#addScreen .detail-card input {
+  min-height: 50px;
+  border-color: rgba(23, 35, 56, .10);
+  border-radius: 13px !important;
+  background: #fff;
+  box-shadow: none;
+}
+
+#addScreen .form-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-top: 2px;
+}
+
+#addScreen .form-actions .primary-btn {
+  min-height: 54px;
+  border-radius: 14px !important;
+  background: #0a5a43 !important;
+  box-shadow: 0 8px 20px rgba(10, 90, 67, .16) !important;
+  font-size: 14px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+/* Audit typographique ciblé : Ajouter un passage. */
+#addScreen .add-page-header h1 {
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+#addScreen .page-title p {
+  max-width: 290px;
+  margin-inline: auto;
+  color: #69758b;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+#addScreen .auto-fill-copy strong,
+#addScreen .sequence-heading .sequence-heading-copy .sequence-heading-label {
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+#addScreen .auto-fill-copy span,
+#addScreen .sequence-heading .sequence-heading-copy .sequence-heading-help {
+  color: #748096;
+  font-size: 11px;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+#addScreen .quran-picker-open > span:not(.picker-target-icon):not(.picker-arrow) {
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+#addScreen .quran-picker-open b {
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+#addScreen .difficulty-copy strong {
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+#addScreen .difficulty-copy small {
+  font-size: 10.5px;
+  line-height: 1.4;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+#addScreen .detail-card label {
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 750;
+}
+
+#addScreen .detail-card label span {
+  color: #7a8598;
+  font-weight: 500;
+}
+
+#addScreen .detail-card input {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+@media (max-width: 360px) {
+  #addScreen .content {
+    padding-inline: 11px;
+  }
+
+  #addScreen .add-page-header h1 {
+    font-size: 20px;
+  }
+
+  #addScreen .passage-card-head,
+  #addScreen .first-review-card,
+  #addScreen .sequence-heading {
+    padding-inline: 13px;
+    gap: 10px;
+  }
+
+  #addScreen .difficulty-chips {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Bas de la page Murajaah : deux actions claires et une citation apaisée. */
+#reviewIntro .review-quick-actions {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  overflow: visible;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#reviewIntro .review-quick-actions > button {
+  min-height: 92px;
+  padding: 14px 17px;
+  grid-template-columns: 56px minmax(0, 1fr) 38px;
+  gap: 14px;
+  border: 1px solid rgba(10, 90, 67, .10);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(23, 35, 56, .055);
+}
+
+#reviewIntro .review-quick-actions > button + button {
+  border-top: 1px solid rgba(10, 90, 67, .10);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #reviewIntro .review-quick-actions > button:hover {
+    transform: none;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(23, 35, 56, .055);
+  }
+}
+
+#reviewIntro .review-quick-icon {
+  width: 56px;
+  height: 56px;
+  color: #0a5a43;
+  border-radius: 15px !important;
+  background: #eef7f3 !important;
+  box-shadow: none !important;
+}
+
+#reviewIntro .review-quick-icon svg,
+#reviewIntro .review-quick-icon.plus svg {
+  width: 31px;
+  height: 31px;
+}
+
+#reviewIntro .review-quick-actions strong {
+  color: #172338;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+#reviewIntro .review-quick-actions small {
+  max-width: none;
+  margin-top: 5px;
+  color: #657086;
+  font-size: 11px;
+  line-height: 1.45;
+  font-weight: 550;
+}
+
+#reviewIntro .review-quick-arrow {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(10, 90, 67, .10);
+  border-radius: 50%;
+  color: #0a5a43;
+  background: #fff;
+  box-shadow: 0 5px 14px rgba(23, 35, 56, .05);
+}
+
+#reviewIntro .review-quick-arrow svg {
+  width: 19px;
+  height: 19px;
+  stroke-width: 2.2;
+}
+
+#reviewIntro .review-quote-card {
+  position: relative;
+  min-height: 215px;
+  margin: 2px 0 0;
+  padding: 33px 22px 22px;
+  overflow: hidden;
+  border: 1px solid rgba(10, 90, 67, .08);
+  border-radius: 22px;
+  color: #172338;
+  text-align: center;
+  background:
+    radial-gradient(circle at 15% 24%, rgba(10, 90, 67, .07), transparent 27%),
+    radial-gradient(circle at 86% 73%, rgba(10, 90, 67, .06), transparent 29%),
+    linear-gradient(145deg, #fbfdfc, #f5faf7);
+  box-shadow: 0 10px 26px rgba(23, 35, 56, .055);
+}
+
+#reviewIntro .review-quote-card::before,
+#reviewIntro .review-quote-card::after {
+  content: "✦";
+  position: absolute;
+  color: rgba(26, 143, 100, .18);
+  font-size: 22px;
+}
+
+#reviewIntro .review-quote-card::before {
+  top: 48px;
+  left: 26px;
+}
+
+#reviewIntro .review-quote-card::after {
+  right: 26px;
+  bottom: 55px;
+}
+
+#reviewIntro .review-quote-mark {
+  position: static;
+  display: block;
+  height: 27px;
+  color: #0a5a43;
+  font-size: 39px;
+  line-height: .75;
+}
+
+#reviewIntro .review-quote-arabic {
+  margin: 9px 0 0 !important;
+  color: #172338;
+  font-family: "Geeza Pro", "Noto Naskh Arabic", serif;
+  font-size: 22px !important;
+  line-height: 1.7 !important;
+  font-weight: 500 !important;
+}
+
+#reviewIntro .review-quote-divider {
+  width: 48px;
+  height: 1px;
+  display: block;
+  margin: 8px auto 12px;
+  background: rgba(10, 90, 67, .55);
+}
+
+#reviewIntro .review-quote-card p:not(.review-quote-arabic) {
+  margin: 0;
+  color: #26344b;
+  font-size: 11px;
+  line-height: 1.55;
+  font-weight: 600;
+}
+
+#reviewIntro .review-quote-card cite {
+  display: block;
+  margin-top: 8px;
+  color: #16805f;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 750;
+}
+
+@media (max-width: 360px), (max-height: 720px) {
+  #reviewIntro .review-quick-actions {
+    padding-inline: 0;
+  }
+
+  #reviewIntro .review-quick-actions > button {
+    min-height: 84px;
+    grid-template-columns: 50px minmax(0, 1fr) 34px;
+    gap: 11px;
+  }
+
+  #reviewIntro .review-quick-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  #reviewIntro .review-quick-actions strong {
+    font-size: 13px;
+  }
+
+  #reviewIntro .review-quick-actions small {
+    font-size: 9.5px;
+  }
+
+  #reviewIntro .review-quote-card {
+    min-height: 196px;
+    padding-inline: 16px;
+  }
+
+  #reviewIntro .review-quote-arabic {
+    font-size: 19px !important;
+  }
 }

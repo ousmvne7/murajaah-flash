@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "murajaah-flash";
-const CACHE_VERSION = "v39-soft-surface-audit";
+const CACHE_VERSION = "v73-audio-speed-clean";
 const APP_CACHE = `${CACHE_PREFIX}-app-${CACHE_VERSION}`;
 const MUSHAF_CACHE = `${CACHE_PREFIX}-mushaf-${CACHE_VERSION}`;
 
@@ -7,20 +7,20 @@ const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./css/styles.css",
-  "./css/home.css?v=18",
+  "./css/styles.css?v=audio-status1",
+  "./css/home.css?v=20",
   "./css/journal.css?v=4",
   "./assets/home-hero-bg.png",
-  "./css/library.css?v=3",
-  "./css/hifdh-setup.css",
+  "./css/library.css?v=4",
+  "./css/hifdh-setup.css?v=setup5",
   "./css/review-intro.css?v=5",
   "./css/typography.css?v=3",
   "./css/visual-audit.css?v=6",
-  "./css/design-system.css?v=12",
+  "./css/design-system.css?v=29",
   "./js/pwa.js",
-  "./js/icon-system.js?v=15",
-  "./js/app.js?v=translation6",
-  "./assets/icons/lucide.svg?v=8",
+  "./js/icon-system.js?v=24",
+  "./js/app.js?v=audio-wave1",
+  "./assets/icons/lucide.svg?v=9",
   "./assets/icons/LUCIDE_LICENSE.txt",
   "./assets/icon.svg",
   "./assets/favicon-32.png",
@@ -32,6 +32,7 @@ const APP_SHELL = [
   "./assets/fonts/hafs.18.ttf",
   "./data/hafsData_v18.json",
   "./data/quran-pages.json",
+  "./data/hizb-boundaries.json",
   "./data/quran-fr-hamidullah.json"
 ];
 

@@ -61,6 +61,8 @@ setTimeout(() => {
     let previewPlayer = null;
     let quranData = null;
     let quranPagesData = null;
+    let hifdhBoundariesData = null;
+    let hifdhBoundariesPromise = null;
     let frenchTranslations = null;
     let frenchTranslationsPromise = null;
     let reviewTranslationVisible = false;
@@ -154,6 +156,12 @@ setTimeout(() => {
       return active?.id?.replace(/Screen$/, "") || "home";
     }
 
+    function activeNavigationSection() {
+      if (document.getElementById("reviewScreen")?.classList.contains("active")) return "review";
+      if (document.getElementById("hifdhScreen")?.classList.contains("active")) return "hifdh";
+      return activeScreenName();
+    }
+
     function showScreen(name, options = {}) {
       const target = document.getElementById(name + "Screen");
       if (!target) return;
@@ -223,14 +231,15 @@ setTimeout(() => {
     }
 
     function openMainSection(name) {
+      const previousSection = activeNavigationSection();
       if (name === "review") {
         closeHifdhOverlayState();
-        startReview();
+        startReview(previousSection === "review" ? activeScreenName() : previousSection);
         return;
       }
       if (name === "hifdh") {
         closeReviewOverlayState();
-        openHifdhTest();
+        openHifdhTest(previousSection === "hifdh" ? activeScreenName() : previousSection);
         return;
       }
       closeReviewOverlayState();
@@ -273,9 +282,6 @@ setTimeout(() => {
     function renderDashboard() {
       const session = dashboardSessionStats();
       const fragile = cards.filter(card => !card.archived && ["very-fragile", "fragile"].includes(autoDifficulty(card).level)).length;
-      const days = streak();
-      const date = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
-      document.getElementById("todayLabel").textContent = date;
       document.getElementById("dueCount").textContent = session.remaining;
       document.getElementById("timeEstimate").textContent = "≈ " + session.estimate + " min";
       document.getElementById("dailyProgress").style.width = session.progress + "%";
@@ -289,7 +295,6 @@ setTimeout(() => {
       if (reviewedToday) reviewedToday.textContent = session.reviewed;
       if (fragileCount) fragileCount.textContent = fragile;
       if (totalCount) totalCount.textContent = cards.length;
-      document.getElementById("streakLabel").textContent = days + " jour" + (days > 1 ? "s" : "");
       const startBtn = document.getElementById("startReviewBtn");
       startBtn.disabled = cards.length > 0 && session.remaining === 0;
       document.getElementById("startReviewLabel").textContent = session.remaining ? "Commencer la révision" : cards.length ? "Tout est à jour ✓" : "Ajoute ton premier passage";
@@ -502,9 +507,8 @@ setTimeout(() => {
         const category = categoryFor(card);
         const statusLabel = category === "mastered" ? "Maîtrisé" : category === "due" ? "À revoir" : "À renforcer";
         const reference = verseReference(card, 0);
-        const title = card.surah ? `${card.surah} · V${card.ayah || "—"}` : reference;
-        const pageMatch = reference.match(/Page\s+(\d+)/i);
-        const subtitle = pageMatch ? `Page ${pageMatch[1]} · Verset cible` : "Passage ciblé";
+        const title = card.surah || reference;
+        const subtitle = card.ayah ? `Verset cible · V${card.ayah}` : "Verset cible";
         const addedDate = card.createdAt
           ? `Ajouté le ${new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", year: "numeric" }).format(new Date(card.createdAt))}`
           : nextReviewLabel(card);
@@ -724,6 +728,29 @@ setTimeout(() => {
       if (!response.ok) throw new Error("Quran pages unavailable");
       quranPagesData = await response.json();
       return quranPagesData;
+    }
+
+    async function loadHifdhBoundaries() {
+      if (hifdhBoundariesData) return hifdhBoundariesData;
+      if (!hifdhBoundariesPromise) {
+        hifdhBoundariesPromise = fetch("data/hizb-boundaries.json")
+          .then(response => {
+            if (!response.ok) throw new Error("Hizb boundaries unavailable");
+            return response.json();
+          })
+          .then(data => {
+            if (!Array.isArray(data?.hizbs) || data.hizbs.length !== 60) {
+              throw new Error("Invalid Hizb boundaries");
+            }
+            hifdhBoundariesData = data;
+            return data;
+          })
+          .catch(error => {
+            hifdhBoundariesPromise = null;
+            throw error;
+          });
+      }
+      return hifdhBoundariesPromise;
     }
 
     async function loadFrenchTranslations() {
@@ -1055,7 +1082,7 @@ setTimeout(() => {
       const title = document.getElementById("passageCopyTitle");
       const text = document.getElementById("passageCopyText");
       if (title) title.textContent = "Choisis ton passage";
-      if (text) text.textContent = "Sélectionne la sourate et le verset cible. L’app prépare automatiquement le verset avant et le verset après.";
+      if (text) text.textContent = "Sélectionne la sourate puis le verset cible.";
     }
 
     function saveCard(event) {
@@ -1137,9 +1164,8 @@ setTimeout(() => {
         { label: "Verset après", ref: verseReference(card, 1), text: pendingAutoFill.afterVerse, surah: card.surah, ayah: editAyah ? editAyah + 1 : "" }
       ];
       renderAutoPreview(previewItems);
-      document.getElementById("formTitle").textContent = "Modifie ton passage";
+      document.getElementById("formTitle").textContent = "Modifier le passage";
       document.getElementById("saveBtn").textContent = "Enregistrer les modifications";
-      document.getElementById("firstReviewCard").hidden = true;
       showScreen("add");
     }
 
@@ -1155,9 +1181,8 @@ setTimeout(() => {
       selectReviewMode("recitation");
       selectDifficulty("transition");
       selectFirstReviewDelay(0);
-      document.getElementById("firstReviewCard").hidden = false;
-      document.getElementById("formTitle").textContent = "Ajoute un passage";
-      document.getElementById("saveBtn").textContent = "Enregistrer";
+      document.getElementById("formTitle").textContent = "Ajouter un passage";
+      document.getElementById("saveBtn").textContent = "Ajouter ce passage";
     }
 
     function updateReviewIntroCounts() {
@@ -1213,8 +1238,8 @@ setTimeout(() => {
         .sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
     }
 
-    async function startReview() {
-      overlayReturnScreen = activeScreenName();
+    async function startReview(returnScreen = "") {
+      overlayReturnScreen = returnScreen || activeScreenName();
       reviewPool = dueCards().sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
       reviewSessionMode = "recitation";
       updateReviewIntroCounts();
@@ -1288,36 +1313,8 @@ setTimeout(() => {
       }
       document.getElementById("ratingWrap").classList.remove("visible");
       document.querySelector(".rating-title").textContent = "As-tu enchaîné les deux versets sans hésiter ?";
-      setReviewInstruction("Récite de mémoire le passage qui vient après.", true);
       document.getElementById("revealBtn").style.display = "flex";
       document.getElementById("revealBtnLabel").textContent = "Voir le verset cible";
-    }
-
-    function setReviewInstruction(text, visible = true) {
-      const instruction = document.getElementById("reviewInstruction");
-      if (!instruction) return;
-      instruction.style.display = visible ? "grid" : "none";
-      if (!visible) return;
-      instruction.innerHTML = `
-        <span class="review-task-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9.5 4.5A3 3 0 0 0 5 7.1a3.3 3.3 0 0 0 .5 6.4A3 3 0 0 0 9.5 18V4.5Z"/>
-            <path d="M14.5 4.5A3 3 0 0 1 19 7.1a3.3 3.3 0 0 1-.5 6.4A3 3 0 0 1 14.5 18V4.5Z"/>
-            <path d="M9.5 8H8M9.5 13H8M14.5 8H16M14.5 13H16M12 3v18"/>
-          </svg>
-        </span>
-        <span class="review-task-copy">
-          <strong>Consigne</strong>
-          <small>${escapeHtml(text)}</small>
-        </span>
-        <span class="review-task-sound" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M4.4 9.3v5.4h3.1l4.7 3.7V5.6L7.5 9.3H4.4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-            <path d="M16.1 8.8c.9.9 1.4 2 1.4 3.2s-.5 2.3-1.4 3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M19 6.5c1.5 1.5 2.4 3.4 2.4 5.5S20.5 16 19 17.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </span>
-      `;
     }
 
     function setReviewStep(step) {
@@ -1336,14 +1333,12 @@ setTimeout(() => {
         reviewStage = 1;
         setReviewStep(1);
         renderReviewVerses(card, 1);
-        setReviewInstruction("Continue ensuite la récitation sans couper l’élan.", true);
         document.getElementById("revealBtnLabel").textContent = "Voir le verset de liaison";
         return;
       }
       reviewStage = 2;
       setReviewStep(2);
       renderReviewVerses(card, 2);
-      setReviewInstruction("", false);
       document.getElementById("revealBtn").style.display = "none";
       document.getElementById("ratingWrap").classList.add("visible");
     }
@@ -1364,8 +1359,9 @@ setTimeout(() => {
       elan.className = "elan-audio-panel";
       elan.id = "elanAudioPanel";
       elan.innerHTML = `
-        <div>
-          <span id="elanAudioMeta">Préparation de l’élan audio…</span>
+        <div class="audio-reciter">
+          <svg class="audio-wave-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons/lucide.svg#lucide-audio-waveform"></use></svg>
+          <span id="elanAudioMeta">Minshawi (Murattal)</span>
         </div>
         <div class="elan-actions">
           <button type="button" id="elanAudioBtn" onclick="playElanAudio()" disabled>${audioControlMarkup("loading")}</button>
@@ -1385,21 +1381,15 @@ setTimeout(() => {
 
       const baseAyah = /^\d+$/.test(String(card.ayah || "")) ? Number.parseInt(card.ayah, 10) : null;
       const translationAvailable = Boolean(baseAyah && resolveSurahId(card.surah));
-      const pageHead = document.createElement("div");
-      pageHead.className = "review-page-head";
-      pageHead.innerHTML = `
-        <span class="review-page-reference">
-          <b>${escapeHtml(card.surah || "Passage personnel")}</b>
-          <em>${escapeHtml(card.ayah ? verseReference(card, 0).replace((card.surah || "Passage personnel") + " — ", "") : "Murajaah ciblée")}</em>
-        </span>
-      `;
-      list.appendChild(pageHead);
-
       const verses = [
         { label: "Verset avant", text: card.beforeVerse, ref: verseReference(card, -1), ayah: baseAyah ? baseAyah - 1 : "" },
         { label: "Verset cible", text: card.blockageVerse, ref: verseReference(card, 0), ayah: baseAyah || "" },
         { label: "Verset de liaison", text: card.afterVerse || "Verset suivant non renseigné", ref: verseReference(card, 1), ayah: baseAyah ? baseAyah + 1 : "" }
       ];
+      const activeVerse = verses[stage];
+      document.getElementById("reviewQuestionSurah").textContent = card.surah || "Passage personnel";
+      const activePage = activeVerse?.ayah ? quranPageFor(card.surah, activeVerse.ayah) || "—" : "—";
+      document.getElementById("reviewQuestionReference").textContent = `Page ${activePage} – V${activeVerse?.ayah || "—"}`;
 
       const activeLength = String(verses[stage]?.text || "").length;
       const visibleLength = verses.slice(0, stage + 1).reduce((sum, verse) => sum + String(verse.text || "").length, 0);
@@ -1427,20 +1417,7 @@ setTimeout(() => {
         placeholder.className = "mask-lines";
         placeholder.innerHTML = "<span></span><span></span><span></span>";
 
-        let translationButton = null;
-        if (index === stage) {
-          translationButton = document.createElement("button");
-          translationButton.type = "button";
-          translationButton.className = "review-meta translation-toggle review-translation-inline";
-          translationButton.id = "reviewTranslationToggle";
-          translationButton.setAttribute("aria-pressed", "false");
-          translationButton.setAttribute("aria-label", "Afficher ou masquer la traduction");
-          translationButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"></svg><span>Traduction</span>';
-          translationButton.addEventListener("click", toggleReviewTranslation);
-        }
-
         if (index <= stage) {
-          if (translationButton) item.appendChild(translationButton);
           item.appendChild(arabic);
           if (index === stage && reviewTranslationVisible) {
             const translation = frenchTranslationFor(card.surah, verse.ayah);
@@ -1542,35 +1519,38 @@ setTimeout(() => {
       panel.hidden = false;
       button.disabled = true;
       setAudioControlState(button, "loading");
-      meta.textContent = "Préparation de l’élan audio…";
+      meta.textContent = "Minshawi (Murattal)";
 
       try {
         const info = await getElanAudioInfo(card);
         if (reviewStage !== 0 || reviewQueue[reviewIndex]?.id !== card.id) return resetElanAudio();
         if (!info) {
           setAudioControlState(button, "error");
-          meta.textContent = "Audio disponible seulement pour un passage Quran reconnu.";
           return;
         }
 
         audio.src = info.url;
         audio.playbackRate = ELAN_PLAYBACK_RATE;
         audio.load();
-        meta.textContent = `${info.label} · Minshawi`;
+        meta.textContent = "Minshawi (Murattal)";
         button.disabled = false;
         setAudioControlState(button, "play");
-        audio.onplay = () => { setAudioControlState(button, "pause"); };
-        audio.onpause = () => { setAudioControlState(button, "play"); };
-        audio.onended = () => { setAudioControlState(button, "replay"); };
+        audio.onplay = () => {
+          setAudioControlState(button, "pause");
+        };
+        audio.onpause = () => {
+          setAudioControlState(button, "play");
+        };
+        audio.onended = () => {
+          setAudioControlState(button, "replay");
+        };
         audio.onerror = () => {
           setAudioControlState(button, "error");
           button.disabled = false;
-          meta.textContent = "Audio indisponible pour ce verset.";
         };
         playElanAudio(true);
       } catch (_) {
         setAudioControlState(button, "error");
-        meta.textContent = "Ouvre l’app via localhost ou GitHub Pages pour charger l’audio.";
       }
     }
 
@@ -1681,23 +1661,44 @@ setTimeout(() => {
       document.getElementById("bottomNav").style.display = "grid";
       const target = destination || overlayReturnScreen || "home";
       overlayReturnScreen = "home";
+      if (target === "hifdh") {
+        openHifdhTest("home");
+        return;
+      }
       showScreen(target, { remember: false });
     }
 
-    function hifdhPageRangeForHizb(hizb) {
+    function hifdhBoundaryForHizb(hizb) {
       const safeHizb = Math.min(60, Math.max(1, Number.parseInt(hizb, 10) || 1));
-      const start = Math.floor((safeHizb - 1) * TOTAL_MUSHAF_PAGES / 60) + 1;
-      const end = Math.floor(safeHizb * TOTAL_MUSHAF_PAGES / 60);
-      return { start, end };
+      return hifdhBoundariesData?.hizbs?.[safeHizb - 1] || null;
+    }
+
+    function hifdhPageRangeForHizb(hizb) {
+      const boundary = hifdhBoundaryForHizb(hizb);
+      if (!boundary) return null;
+      return {
+        start: boundary.start.page,
+        end: boundary.end.page,
+        startVerse: boundary.start,
+        endVerse: boundary.end
+      };
     }
 
     function hifdhRangeLabel(hizb) {
       const range = hifdhPageRangeForHizb(hizb);
+      if (!range) return "Bornes indisponibles";
       return `Pages ${range.start} - ${range.end}`;
     }
 
-    function openHifdhTest() {
-      overlayReturnScreen = activeScreenName();
+    async function openHifdhTest(returnScreen = "") {
+      try {
+        await loadHifdhBoundaries();
+      } catch (error) {
+        console.error("[Murajaah Flash] Bornes des hizb indisponibles.", error);
+        toast("Impossible de charger les limites exactes des hizb.");
+        return;
+      }
+      overlayReturnScreen = returnScreen || activeScreenName();
       hifdhTest = null;
       const picker = document.getElementById("hifdhHizbPicker");
       if (picker) {
@@ -1726,6 +1727,10 @@ setTimeout(() => {
       document.getElementById("bottomNav").style.display = "grid";
       const target = overlayReturnScreen || "home";
       overlayReturnScreen = "home";
+      if (target === "review") {
+        startReview("home");
+        return;
+      }
       showScreen(target, { remember: false });
     }
 
@@ -1756,8 +1761,14 @@ setTimeout(() => {
       }
       document.getElementById("hifdhSelectedHizb").textContent = `Hizb ${hifdhSelectedHizb}`;
       document.getElementById("hifdhSelectedRange").textContent = hifdhRangeLabel(hifdhSelectedHizb);
-      const estimate = document.querySelector("#hifdhEstimate span");
-      if (estimate) estimate.textContent = `Environ ${Math.max(2, Math.ceil(hifdhQuestionCount * 0.5))} min`;
+      const summaryHizb = document.getElementById("hifdhSummaryHizb");
+      const summaryRange = document.getElementById("hifdhSummaryRange");
+      const summaryCount = document.getElementById("hifdhSummaryCount");
+      const estimate = document.getElementById("hifdhEstimate");
+      if (summaryHizb) summaryHizb.textContent = `Hizb ${hifdhSelectedHizb}`;
+      if (summaryRange) summaryRange.textContent = hifdhRangeLabel(hifdhSelectedHizb);
+      if (summaryCount) summaryCount.textContent = `${hifdhQuestionCount} questions`;
+      if (estimate) estimate.textContent = `~${hifdhQuestionCount} min`;
       document.querySelectorAll("#hifdhHizbList [data-hizb]").forEach(button => {
         const selected = Number(button.dataset.hizb) === hifdhSelectedHizb;
         button.classList.toggle("active", selected);
@@ -1830,12 +1841,23 @@ setTimeout(() => {
     async function hifdhCandidatesForHizb(hizb) {
       const data = await loadQuranData();
       await loadQuranPagesData();
+      await loadHifdhBoundaries();
       const range = hifdhPageRangeForHizb(hizb);
+      if (!range) return [];
+      const isWithinBoundary = (surah, ayah) => {
+        const afterStart = surah > range.startVerse.surah
+          || (surah === range.startVerse.surah && ayah >= range.startVerse.ayah);
+        const beforeEnd = surah < range.endVerse.surah
+          || (surah === range.endVerse.surah && ayah <= range.endVerse.ayah);
+        return afterStart && beforeEnd;
+      };
       const candidates = [];
       Object.values(data.chapters).forEach(chapter => {
         for (let ayah = 1; ayah <= chapter.versesCount - 2; ayah++) {
+          if (!isWithinBoundary(Number(chapter.id), ayah)
+            || !isWithinBoundary(Number(chapter.id), ayah + 2)) continue;
           const page = Number(quranPageFor(chapter.name, ayah));
-          if (!page || page < range.start || page > range.end) continue;
+          if (!page) continue;
           const startText = verseTextFromChapter(chapter, ayah);
           const nextOne = verseTextFromChapter(chapter, ayah + 1);
           const nextTwo = verseTextFromChapter(chapter, ayah + 2);
@@ -1925,9 +1947,8 @@ setTimeout(() => {
       document.getElementById("hifdhProgressLabel").textContent = `Question ${current} / ${hifdhTest.total}`;
       document.getElementById("hifdhProgressFill").style.width = `${percent}%`;
       document.getElementById("hifdhProgressPercent").textContent = `${percent}%`;
-      document.getElementById("hifdhQuestionHizb").textContent = `Hizb ${hifdhTest.hizb}`;
-      document.getElementById("hifdhQuestionRange").textContent = hifdhRangeLabel(hifdhTest.hizb);
-      document.getElementById("hifdhAudioMeta").textContent = `${question.startRef} · Minshawi`;
+      updateHifdhQuestionContext();
+      document.getElementById("hifdhAudioMeta").textContent = "Minshawi (Murattal)";
       const startVerse = document.getElementById("hifdhStartVerse");
       startVerse.hidden = false;
       setArabicVerseContent(startVerse, question.startText, question.surah, question.ayah);
@@ -1985,6 +2006,7 @@ setTimeout(() => {
       stopHifdhAudio();
       audioPanel.hidden = true;
       setArabicVerseContent(verse, question.nextOne, question.surah, question.ayah + 1);
+      updateHifdhQuestionContext();
       renderHifdhTranslation();
       button.hidden = true;
       ratings.hidden = false;
@@ -2006,6 +2028,15 @@ setTimeout(() => {
       const question = currentHifdhQuestion();
       const ayah = Number(question?.ayah || 0) + (hifdhRevealStage === 0 ? 0 : 1);
       copy.textContent = frenchTranslationFor(question?.surahId || question?.surah, ayah) || "Traduction indisponible pour ce verset.";
+    }
+
+    function updateHifdhQuestionContext() {
+      const question = currentHifdhQuestion();
+      if (!question) return;
+      const ayah = Number(question.ayah) + (hifdhRevealStage === 0 ? 0 : 1);
+      const page = quranPageFor(question.surahId || question.surah, ayah) || question.page || "—";
+      document.getElementById("hifdhQuestionSurah").textContent = question.surah;
+      document.getElementById("hifdhQuestionReference").textContent = `Page ${page} – V${ayah}`;
     }
 
     async function toggleHifdhTranslation() {

@@ -14,15 +14,15 @@
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/home.css?v=18">
+  <link rel="stylesheet" href="css/styles.css?v=audio-status1">
+  <link rel="stylesheet" href="css/home.css?v=20">
   <link rel="stylesheet" href="css/journal.css?v=4">
-  <link rel="stylesheet" href="css/library.css?v=3">
-  <link rel="stylesheet" href="css/hifdh-setup.css">
+  <link rel="stylesheet" href="css/library.css?v=4">
+  <link rel="stylesheet" href="css/hifdh-setup.css?v=setup5">
   <link rel="stylesheet" href="css/review-intro.css?v=5">
   <link rel="stylesheet" href="css/typography.css?v=3">
   <link rel="stylesheet" href="css/visual-audit.css?v=6">
-  <link rel="stylesheet" href="css/design-system.css?v=12">
+  <link rel="stylesheet" href="css/design-system.css?v=29">
 </head>
 <body>
   <main class="app">
@@ -48,22 +48,6 @@
               <path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"></path>
             </svg>
           </span>
-        </div>
-        <div class="greeting">
-          <span class="greeting-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20.2 15.3A8.3 8.3 0 0 1 8.7 3.8 8.4 8.4 0 1 0 20.2 15.3Z"></path>
-              <path d="M16.8 4.2v3.1M15.25 5.75h3.1"></path>
-            </svg>
-          </span>
-          <div class="greeting-copy">
-            <h1>Assalamu alaykoum</h1>
-            <p id="todayLabel">Aujourd’hui</p>
-          </div>
-          <div class="streak">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 2.5c.7 3.1-.5 4.7-2 6.3-1.3 1.4-2.5 2.8-2.5 5A4.2 4.2 0 0 0 12.2 18a4.4 4.4 0 0 0 4.4-4.5c0-1.8-.8-3.4-2.2-5.2.1 2.1-.8 3.2-2 4.1.4-3.2-1.3-5.6.1-9.9Z"/><path d="M9.2 17.3c.3 2 1.4 3.2 3 4.2 1.7-1.1 2.7-2.4 2.8-4.3"/></svg>
-            <span id="streakLabel">0 jour</span>
-          </div>
         </div>
       </div>
 
@@ -141,22 +125,24 @@
         </button>
         <div class="library-heading">
           <h1>Mes passages</h1>
-          <p id="librarySubtitle">Consulte, recherche et révise par sourate.</p>
         </div>
-        <button class="library-header-btn" type="button" aria-label="Afficher les filtres" onclick="document.querySelector('.library-filter-row')?.scrollIntoView({ behavior: 'smooth', block: 'center' })">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16l-6.2 7.1V19l-3.6 1v-7.9Z"/></svg>
-        </button>
+        <span class="library-header-spacer" aria-hidden="true"></span>
       </header>
       <div class="library-content">
-        <div class="library-search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-          <input id="searchInput" type="search" placeholder="Rechercher un passage, une sourate…" oninput="renderLibrary()">
-          <span class="library-search-settings" aria-hidden="true">
+        <p class="library-intro" id="librarySubtitle">Consulte et révise tes passages<br>en toute simplicité.</p>
+
+        <div class="library-search-row">
+          <div class="library-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <input id="searchInput" type="search" placeholder="Rechercher un passage…" oninput="renderLibrary()">
+          </div>
+          <button class="library-search-settings" type="button" aria-label="Afficher les filtres" onclick="document.querySelector('.library-filter-row')?.classList.toggle('open')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M7 14v6"/></svg>
-          </span>
+          </button>
         </div>
 
         <div class="library-stats" aria-label="Résumé de tes passages">
+          <div class="library-stats-title"><span><svg viewBox="0 0 24 24"></svg></span><strong>Aperçu général</strong></div>
           <article class="library-stat library-stat-total"><span class="library-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.25A2.25 2.25 0 0 1 5.75 3H10a2 2 0 0 1 2 2v15.5a2.75 2.75 0 0 0-2.75-2.75H3.5Z"/><path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"/></svg></span><b id="libraryTotalCount">0</b><strong>Total</strong><small>Passages</small></article>
           <article class="library-stat library-stat-mastered"><span class="library-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg></span><b id="libraryMasteredCount">0</b><strong>Maîtrisés</strong><small id="libraryMasteredPercent">0%</small></article>
           <article class="library-stat library-stat-reinforce"><span class="library-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 7v4h-4M5 17v-4h4"/><path d="M7.1 8.2A6 6 0 0 1 17 7l2 4M5 13l2 4a6 6 0 0 0 9.9-1.2"/></svg></span><b id="libraryReinforceCount">0</b><strong>À renforcer</strong><small id="libraryReinforcePercent">0%</small></article>
@@ -182,18 +168,18 @@
           <button type="button" onclick="startReview()">Voir les révisions</button>
         </aside>
 
-        <button class="library-add-btn" type="button" aria-label="Ajouter un passage" onclick="showScreen('add')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="library-add-btn" type="button" onclick="showScreen('add')"><svg viewBox="0 0 24 24"></svg><span>Ajouter un passage</span></button>
       </div>
     </section>
 
     <section class="screen" id="addScreen">
-      <header class="topbar subpage-topbar">
+      <header class="topbar subpage-topbar add-page-header">
         <button class="icon-btn page-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="resetForm(); navigateBack('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
-        <div class="brand">MURAJAAH<small>FLASH</small></div>
+        <h1 id="formTitle">Ajouter un passage</h1>
         <span class="topbar-spacer" aria-hidden="true"></span>
       </header>
       <div class="content">
-        <div class="page-title"><p class="eyebrow">Nouveau passage</p><h1 id="formTitle">Ajoute un passage</h1><p>Choisis le verset cible, vérifie la séquence et planifie sa première révision.</p></div>
+        <div class="page-title"><p>Sélectionne le verset cible et organise<br>ta révision simplement.</p></div>
         <form id="cardForm" onsubmit="saveCard(event)">
           <input type="hidden" id="editId">
           <input type="hidden" id="surah">
@@ -205,6 +191,7 @@
 
           <div class="auto-fill-card premium-passage-card">
             <div class="passage-card-head">
+              <span class="add-step-number" aria-hidden="true">1</span>
               <span class="passage-card-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M6.5 4.5h7.2a2.8 2.8 0 0 1 2.8 2.8v12.2H8.2a3.7 3.7 0 0 1-3.7-3.7V6.5a2 2 0 0 1 2-2Z"/>
@@ -214,7 +201,7 @@
               </span>
               <div class="auto-fill-copy">
                 <strong id="passageCopyTitle">Choisis ton passage</strong>
-                <span id="passageCopyText">Sélectionne la sourate et le verset cible. L’app prépare automatiquement le verset avant et le verset après.</span>
+                <span id="passageCopyText">Sélectionne la sourate puis le verset cible.</span>
               </div>
               <div class="passage-card-art" aria-hidden="true">
                 <svg viewBox="0 0 180 140" fill="none">
@@ -259,36 +246,37 @@
             </div>
           </div>
 
-          <section class="first-review-card" id="firstReviewCard" aria-labelledby="firstReviewTitle">
-            <span class="first-review-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
-            </span>
-            <span class="first-review-copy">
-              <strong id="firstReviewTitle">Première révision</strong>
-              <small>Quand veux-tu commencer ce passage ?</small>
-            </span>
-            <input type="hidden" id="firstReviewDelay" value="0">
-            <span class="first-review-options" role="radiogroup" aria-label="Date de la première révision">
-              <button type="button" class="active" data-first-review-delay="0" role="radio" aria-checked="true" onclick="selectFirstReviewDelay(0)">Aujourd’hui</button>
-              <button type="button" data-first-review-delay="1" role="radio" aria-checked="false" onclick="selectFirstReviewDelay(1)">Demain</button>
-            </span>
-          </section>
+          <input type="hidden" id="firstReviewDelay" value="0">
 
           <div class="sequence-heading refined-heading">
+            <span class="add-step-number" aria-hidden="true">2</span>
             <span class="heading-bubble" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7.5" r="3.5"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg>
             </span>
-            <span>Repère personnel</span>
+            <span class="sequence-heading-copy">
+              <span class="sequence-heading-label">Repère personnel</span>
+              <span class="sequence-heading-help">Dis-nous ce qui décrit le mieux ton blocage sur ce passage.</span>
+            </span>
           </div>
           <div class="form-card detail-card">
             <div class="field">
-              <label>Type d’hésitation</label>
               <input type="hidden" id="difficulty" value="transition">
               <div class="difficulty-chips" role="radiogroup" aria-label="Type d’hésitation">
-                <button type="button" class="difficulty-chip active" data-difficulty="transition" role="radio" aria-checked="true" onclick="selectDifficulty('transition')"><span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m10.2 13.8-1.4 1.4a3.4 3.4 0 0 1-4.8-4.8l2.4-2.4a3.4 3.4 0 0 1 4.8 0"/><path d="m13.8 10.2 1.4-1.4a3.4 3.4 0 0 1 4.8 4.8L17.6 16a3.4 3.4 0 0 1-4.8 0"/><path d="m8.8 15.2 6.4-6.4"/></svg></span>Enchaînement</button>
-                <button type="button" class="difficulty-chip" data-difficulty="beginning" role="radio" aria-checked="false" onclick="selectDifficulty('beginning')"><span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5"/><path d="M4 4v4.5h4.5"/></svg></span>Début</button>
-                <button type="button" class="difficulty-chip" data-difficulty="similar" role="radio" aria-checked="false" onclick="selectDifficulty('similar')"><span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="11" height="11" rx="2"/><rect x="9" y="9" width="11" height="11" rx="2"/></svg></span>Confusion</button>
-                <button type="button" class="difficulty-chip" data-difficulty="forgotten" role="radio" aria-checked="false" onclick="selectDifficulty('forgotten')"><span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V22l-6-3.5L6 22V4.5Z"/></svg></span>Oubli fréquent</button>
+                <button type="button" class="difficulty-chip active" data-difficulty="transition" role="radio" aria-checked="true" onclick="selectDifficulty('transition')">
+                  <span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m10.2 13.8-1.4 1.4a3.4 3.4 0 0 1-4.8-4.8l2.4-2.4a3.4 3.4 0 0 1 4.8 0"/><path d="m13.8 10.2 1.4-1.4a3.4 3.4 0 0 1 4.8 4.8L17.6 16a3.4 3.4 0 0 1-4.8 0"/><path d="m8.8 15.2 6.4-6.4"/></svg></span>
+                  <span class="difficulty-copy"><strong>Enchaînement</strong><small>Difficulté à relier correctement les mots entre eux.</small></span>
+                  <span class="difficulty-radio" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="difficulty-chip" data-difficulty="similar" role="radio" aria-checked="false" onclick="selectDifficulty('similar')">
+                  <span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="11" height="11" rx="2"/><rect x="9" y="9" width="11" height="11" rx="2"/></svg></span>
+                  <span class="difficulty-copy"><strong>Confusion</strong><small>Confusion avec un autre verset ou dans l’ordre des mots.</small></span>
+                  <span class="difficulty-radio" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="difficulty-chip" data-difficulty="forgotten" role="radio" aria-checked="false" onclick="selectDifficulty('forgotten')">
+                  <span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V22l-6-3.5L6 22V4.5Z"/></svg></span>
+                  <span class="difficulty-copy"><strong>Oubli fréquent</strong><small>Verset retenu, puis oublié rapidement.</small></span>
+                  <span class="difficulty-radio" aria-hidden="true"></span>
+                </button>
               </div>
             </div>
             <div class="field">
@@ -297,8 +285,7 @@
             </div>
           </div>
           <div class="form-actions">
-            <button type="button" class="secondary-btn" onclick="resetForm(); showScreen('home')">Annuler</button>
-            <button type="submit" class="primary-btn" id="saveBtn">Enregistrer</button>
+            <button type="submit" class="primary-btn" id="saveBtn">Ajouter ce passage</button>
           </div>
         </form>
       </div>
@@ -450,7 +437,7 @@
           <path d="M3.5 5.25A2.25 2.25 0 0 1 5.75 3H10a2 2 0 0 1 2 2v15.5a2.75 2.75 0 0 0-2.75-2.75H3.5Z"/>
           <path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"/>
         </svg>
-        Révision
+        Murajaah
       </button>
       <button class="nav-btn" data-screen="hifdh" onclick="openMainSection('hifdh')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -471,12 +458,15 @@
     <section class="review-screen" id="reviewScreen">
       <div class="review-intro" id="reviewIntro">
         <header class="review-intro-header">
-          <button class="review-intro-head-icon" type="button" aria-label="Revenir à l’accueil" onclick="exitReview()">
+          <button class="review-intro-head-icon" type="button" aria-label="Revenir à la page précédente" onclick="exitReview()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
           </button>
+          <span class="review-intro-header-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"></svg>
+          </span>
           <div class="review-intro-title">
-            <h1>Mode Révision</h1>
-            <p>Révise tes passages avec la méthode de répétition espacée</p>
+            <h1>Murajaah ciblée</h1>
+            <p>Révise tes passages avec<br>la méthode de répétition espacée.</p>
           </div>
           <span class="review-intro-head-spacer" aria-hidden="true"></span>
         </header>
@@ -496,46 +486,30 @@
             </button>
           </article>
 
-          <div class="review-intro-metrics" hidden><span id="introReviewedToday">0</span><span id="introFragileCount">0</span><span id="introTotalCount">0</span></div>
+          <div class="review-intro-metrics" hidden>
+            <span id="introReviewedToday">0</span><span id="introFragileCount">0</span><span id="introTotalCount">0</span>
+            <span id="introConfidenceValue">0%</span><span id="introConfidenceRing"></span><span id="introProgressTitle"></span>
+          </div>
 
           <section class="review-quick-actions" aria-label="Accès rapides">
             <button type="button" onclick="exitReview(); showScreen('library')">
               <span class="review-quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.6v14"/><path d="M3 17.5V5.7A2.7 2.7 0 0 1 5.7 3H9a3 3 0 0 1 3 3v14.6a3.9 3.9 0 0 0-3.4-2H3Z"/><path d="M21 17.5V5.7A2.7 2.7 0 0 0 18.3 3H15a3 3 0 0 0-3 3v14.6a3.9 3.9 0 0 1 3.4-2H21Z"/></svg></span>
-              <span><strong>Mes passages</strong><small>Consulte, recherche et révise par sourate.</small></span><b>›</b>
+              <span><strong>Mes passages</strong><small>Consulte et révise tes passages<br>en toute simplicité.</small></span>
+              <b class="review-quick-arrow"><svg viewBox="0 0 24 24"></svg></b>
             </button>
             <button type="button" onclick="exitReview(); showScreen('add')">
               <span class="review-quick-icon plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
-              <span><strong>Ajouter un passage</strong><small>Ajoute un nouveau passage en quelques secondes.</small></span><b>›</b>
+              <span><strong>Ajouter un passage</strong><small>Ajoute un nouveau passage<br>en quelques secondes.</small></span>
+              <b class="review-quick-arrow"><svg viewBox="0 0 24 24"></svg></b>
             </button>
           </section>
 
-          <div class="review-section-title progress"><h2>Ma progression</h2></div>
-          <button class="review-progress-card" type="button" onclick="exitReview(); openProfile('progress')">
-            <span class="review-progress-ring" id="introConfidenceRing"><b id="introConfidenceValue">0%</b></span>
-            <span><strong id="introProgressTitle">Continue comme ça !</strong><small>La régularité est la clé pour mémoriser durablement.</small></span>
-            <svg class="review-progress-visual" viewBox="0 0 96 72" fill="none" aria-hidden="true">
-              <rect x="5" y="5" width="86" height="62" rx="18" fill="#F0FAF5"/>
-              <path d="M21 53V43M39 53V35M57 53V26M75 53V17" stroke="url(#reviewProgressBars)" stroke-width="9" stroke-linecap="round"/>
-              <path d="m18 34 17-8 17-7 23-12" stroke="#168F5B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="m69 7 7-1-2 7" stroke="#168F5B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-              <defs><linearGradient id="reviewProgressBars" x1="21" y1="53" x2="75" y2="17" gradientUnits="userSpaceOnUse"><stop stop-color="#76D7A9"/><stop offset="1" stop-color="#168F5B"/></linearGradient></defs>
-            </svg>
-          </button>
-
           <blockquote class="review-quote-card">
             <span class="review-quote-mark" aria-hidden="true">“</span>
-            <p>« Les actes les plus aimés par Allah sont ceux qui sont faits avec assiduité, même s’ils sont peu nombreux. »</p>
-            <cite>— Hadith authentique</cite>
-            <span class="review-lantern" aria-hidden="true">
-              <svg viewBox="0 0 80 96" fill="none">
-                <circle cx="40" cy="49" r="33" fill="#E4F6ED"/>
-                <path d="M40 8v8M32 16h16l4 9H28l4-9Z" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M25 27h30l5 11-4 39H24l-4-39 5-11Z" fill="#F8FFFB" stroke="currentColor" stroke-width="2.8" stroke-linejoin="round"/>
-                <path d="M30 39h20l-2 27H32l-2-27Z" fill="#FFF1B8" stroke="currentColor" stroke-width="2.4"/>
-                <path d="M40 40v25M23 77h34M19 85h42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                <path d="M14 56c-5 2-8 5-10 9M66 53c5 1 8 4 11 8" stroke="#8FD4B2" stroke-width="2.2" stroke-linecap="round"/>
-              </svg>
-            </span>
+            <p class="review-quote-arabic" lang="ar" dir="rtl">خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ</p>
+            <span class="review-quote-divider" aria-hidden="true"></span>
+            <p>« Le meilleur d’entre vous est celui qui apprend<br>le Coran et l’enseigne. »</p>
+            <cite>— Hadith rapporté par Al-Bukhari</cite>
           </blockquote>
 
         </div>
@@ -558,6 +532,21 @@
         <div class="review-main">
           <audio id="reviewAudio" preload="auto" playsinline></audio>
           <audio id="elanAudio" preload="none" playsinline></audio>
+          <section class="review-question-context" aria-label="Référence du verset">
+            <div class="question-reference-main">
+              <span class="question-reference-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><use href="assets/icons/lucide.svg#lucide-book-open"></use></svg>
+              </span>
+              <span class="question-reference-copy">
+                <small id="reviewQuestionSurah">AL-BAQARA</small>
+                <strong id="reviewQuestionReference">Page 1 – V1</strong>
+              </span>
+            </div>
+            <button type="button" class="translation-toggle question-reference-translation" id="reviewTranslationToggle" aria-pressed="false" onclick="toggleReviewTranslation()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+              <span>Traduction</span>
+            </button>
+          </section>
           <article class="flashcard">
             <button class="review-audio" id="reviewAudioBtn" onclick="playReviewAudio()" aria-label="Écouter ma récitation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 7 7 5-7 5V7Z" fill="currentColor"/></svg></button>
             <div class="verse-surface" id="reviewVerseList">
@@ -569,7 +558,6 @@
           </article>
         </div>
         <div class="review-controls">
-          <div class="review-instruction" id="reviewInstruction"></div>
           <button class="primary-btn reveal-btn" id="revealBtn" onclick="advanceReviewStage()">
             <svg class="reveal-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="10"/>
@@ -620,7 +608,10 @@
           <h1 id="hifdhHeaderTitle">Test Hifdh</h1>
           <span class="hifdh-header-spacer" aria-hidden="true"></span>
         </div>
-        <p class="hifdh-header-subtitle">Teste un hizb entier et détecte tes points faibles.</p>
+        <span class="hifdh-header-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"></svg>
+        </span>
+        <p class="hifdh-header-subtitle">Évalue ton Hifdh<br>en quelques minutes.</p>
         <div class="hifdh-review-header-controls" id="hifdhTestHeaderControls" hidden>
           <div class="hifdh-stage-tabs" aria-label="Étapes du test">
             <span class="active" data-hifdh-stage="start">
@@ -641,12 +632,9 @@
       </header>
 
       <div class="hifdh-body" id="hifdhSetup">
-        <section class="hifdh-panel hifdh-setup-primary">
+        <section class="hifdh-panel hifdh-setup-primary hifdh-step-card">
           <div class="hifdh-setup-heading">
-            <span aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.25A2.25 2.25 0 0 1 5.75 3H10a2 2 0 0 1 2 2v15.5a2.75 2.75 0 0 0-2.75-2.75H3.5Z"/><path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"/></svg>
-            </span>
-            <div><h2>Sélectionner un hizb</h2><p>Choisis la partie que tu souhaites évaluer.</p></div>
+            <h2>Choisis ton hizb</h2>
           </div>
           <button type="button" class="hifdh-select-card" onclick="toggleHifdhHizbPicker()">
             <span class="hifdh-select-icon" aria-hidden="true">
@@ -678,92 +666,64 @@
               </footer>
             </section>
           </div>
+        </section>
 
+        <section class="hifdh-panel hifdh-step-card hifdh-question-step">
           <div class="hifdh-settings-title">
-            <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6h12M4 6h.01M8 12h12M4 12h.01M8 18h12M4 18h.01"/></svg></span>
-            <div><h2>Nombre de questions</h2><p>Adapte la durée du test à ton objectif.</p></div>
+            <h2>Nombre de questions</h2>
           </div>
           <div class="hifdh-counts" role="radiogroup" aria-label="Nombre de questions">
             <button type="button" data-hifdh-count="5" onclick="selectHifdhQuestionCount(5)">5 questions</button>
             <button type="button" data-hifdh-count="10" class="active" onclick="selectHifdhQuestionCount(10)">10 questions</button>
             <button type="button" data-hifdh-count="20" onclick="selectHifdhQuestionCount(20)">20 questions</button>
           </div>
-
-          <article class="hifdh-objective-card">
-            <span aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3M22 12h-3M12 22v-3M2 12h3"/></svg>
-            </span>
-            <div><strong>Ton objectif</strong><p>Enchaîner les passages avec fluidité et repérer précisément tes hésitations.</p></div>
-          </article>
-
-          <button type="button" class="hifdh-start-btn hifdh-setup-launch" onclick="startHifdhTest()">
-            <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.4v13.2a1 1 0 0 0 1.55.83l9.2-6.6a1 1 0 0 0 0-1.66l-9.2-6.6A1 1 0 0 0 8 5.4Z"/></svg></span>
-            Commencer le test
-          </button>
-
-          <section class="hifdh-how-card">
-            <div class="hifdh-how-copy">
-              <h2>Comment ça fonctionne ?</h2>
-              <ol>
-                <li><b>1</b><span>Écoute le verset de départ</span></li>
-                <li><b>2</b><span>Récite les 2 versets qui suivent</span></li>
-                <li><b>3</b><span>Révèle la réponse et évalue-toi</span></li>
-                <li><b>4</b><span>Analyse tes résultats à la fin</span></li>
-              </ol>
-            </div>
-            <svg class="hifdh-how-art" viewBox="0 0 150 138" fill="none" aria-hidden="true">
-              <g filter="url(#hifdhHowShadow)">
-                <path d="M40 12h70a12 12 0 0 1 12 12v90a12 12 0 0 1-12 12H40a12 12 0 0 1-12-12V24a12 12 0 0 1 12-12Z" fill="#C9C0F6"/>
-                <path d="M43 20h64a8 8 0 0 1 8 8v82a8 8 0 0 1-8 8H43a8 8 0 0 1-8-8V28a8 8 0 0 1 8-8Z" fill="white"/>
-                <rect x="58" y="5" width="34" height="18" rx="8" fill="#8370DE"/>
-                <path d="m49 47 4 4 8-9M49 70l4 4 8-9M49 93l4 4 8-9" stroke="#48C98B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M69 47h30M69 70h30M69 93h24" stroke="#E2DEF8" stroke-width="5" stroke-linecap="round"/>
-              </g>
-              <circle cx="116" cy="108" r="25" fill="url(#hifdhMicGradient)"/>
-              <rect x="111" y="94" width="10" height="19" rx="5" stroke="white" stroke-width="3"/>
-              <path d="M106 106a10 10 0 0 0 20 0M116 116v7M110 123h12" stroke="white" stroke-width="3" stroke-linecap="round"/>
-              <defs>
-                <linearGradient id="hifdhMicGradient" x1="94" y1="89" x2="137" y2="130" gradientUnits="userSpaceOnUse"><stop stop-color="#725FD1"/><stop offset="1" stop-color="#44357D"/></linearGradient>
-                <filter id="hifdhHowShadow" x="16" y="0" width="118" height="138" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#44357D" flood-opacity=".14"/></filter>
-              </defs>
-            </svg>
-          </section>
-
-          <section class="hifdh-progress-tip">
-            <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9M10 19V5M16 19v-7M22 19V2"/><path d="m3 8 6-4 6 5 7-7"/></svg></span>
-            <div><strong>Progresse efficacement</strong><p>Tes hésitations pourront être ajoutées directement à tes passages.</p></div>
-          </section>
         </section>
+
+        <section class="hifdh-setup-summary" aria-label="Résumé du test">
+          <div>
+            <span class="hifdh-summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+            <strong id="hifdhSummaryHizb">Hizb 1</strong>
+            <small id="hifdhSummaryRange">Pages 1 - 10</small>
+          </div>
+          <div>
+            <span class="hifdh-summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+            <strong id="hifdhSummaryCount">10 questions</strong>
+            <small>Sélectionné</small>
+          </div>
+          <div>
+            <span class="hifdh-summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+            <strong id="hifdhEstimate">~10 min</strong>
+            <small>Durée estimée</small>
+          </div>
+        </section>
+
+        <button type="button" class="hifdh-start-btn hifdh-setup-launch" onclick="startHifdhTest()">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.4v13.2a1 1 0 0 0 1.55.83l9.2-6.6a1 1 0 0 0 0-1.66l-9.2-6.6A1 1 0 0 0 8 5.4Z"/></svg></span>
+          Commencer le test
+        </button>
+
       </div>
 
       <div class="hifdh-body hifdh-test-body" id="hifdhQuestion" hidden>
         <div class="hifdh-question-scroll">
-          <section class="hifdh-question-meta" aria-label="Hizb sélectionné">
-            <span class="hifdh-question-meta-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 6.6v14"/>
-                <path d="M3 17.5V5.7A2.7 2.7 0 0 1 5.7 3H9a3 3 0 0 1 3 3v14.6a3.9 3.9 0 0 0-3.4-2H3Z"/>
-                <path d="M21 17.5V5.7A2.7 2.7 0 0 0 18.3 3H15a3 3 0 0 0-3 3v14.6a3.9 3.9 0 0 1 3.4-2H21Z"/>
-              </svg>
-            </span>
-            <span class="hifdh-question-meta-copy">
-              <small>Hizb sélectionné</small>
-              <strong id="hifdhQuestionHizb">Hizb 1</strong>
-              <em id="hifdhQuestionRange">Pages 1 - 10</em>
-            </span>
-            <svg class="hifdh-question-meta-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="m9 6 6 6-6 6"/>
-            </svg>
+          <section class="hifdh-question-context" aria-label="Référence du verset">
+            <div class="question-reference-main">
+              <span class="question-reference-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><use href="assets/icons/lucide.svg#lucide-book-open"></use></svg>
+              </span>
+              <span class="question-reference-copy">
+                <small id="hifdhQuestionSurah">AL-BAQARA</small>
+                <strong id="hifdhQuestionReference">Page 1 – V1</strong>
+              </span>
+            </div>
+            <button type="button" class="translation-toggle question-reference-translation" id="hifdhTranslationToggle" aria-pressed="false" onclick="toggleHifdhTranslation()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+              <span>Traduction</span>
+            </button>
           </section>
 
           <article class="hifdh-verse-card">
             <div class="verse-surface hifdh-verse-surface single">
-              <div class="hifdh-translation-tools">
-                <button type="button" class="translation-toggle" id="hifdhTranslationToggle" aria-pressed="false" onclick="toggleHifdhTranslation()">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
-                  <span>Traduction</span>
-                </button>
-              </div>
               <div class="review-verse-item mushaf-line active hifdh-start-line">
                 <div class="arabic" id="hifdhStartVerse" dir="rtl"></div>
               </div>
@@ -773,8 +733,9 @@
                 <small>Muhammad Hamidullah</small>
               </div>
               <div class="hifdh-audio-btn elan-audio-panel" id="hifdhAudioPanel">
-                <div>
-                  <span id="hifdhAudioMeta">Minshawi · lecture automatique</span>
+                <div class="audio-reciter">
+                  <svg class="audio-wave-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons/lucide.svg#lucide-audio-waveform"></use></svg>
+                  <span id="hifdhAudioMeta">Minshawi (Murattal)</span>
                 </div>
                 <div class="elan-actions">
                   <button type="button" id="hifdhAudioIcon" onclick="playHifdhAudio()" aria-label="Écouter le verset de départ"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 7 7 5-7 5V7Z" fill="currentColor"/></svg></button>
@@ -909,7 +870,7 @@
   </main>
 
   <script src="js/pwa.js"></script>
-  <script src="js/icon-system.js?v=15"></script>
-  <script src="js/app.js?v=translation6"></script>
+  <script src="js/icon-system.js?v=24"></script>
+  <script src="js/app.js?v=audio-wave1"></script>
 </body>
 </html>

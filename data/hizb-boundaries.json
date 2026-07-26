@@ -1,0 +1,908 @@
+{
+  "source": "Tanzil Quran Metadata 1.0 (hizb-quarter starts), mirrored by quran-meta 2.4.2",
+  "sourceUrl": "https://tanzil.net/docs/Quran_Metadata",
+  "generated": "2026-07-26",
+  "mushaf": "KFGQPC Hafs v18 / Madinah 604-page layout",
+  "hizbs": [
+    {
+      "hizb": 1,
+      "start": {
+        "surah": 1,
+        "surahName": "Al-Fātiḥah",
+        "ayah": 1,
+        "page": 1
+      },
+      "end": {
+        "surah": 2,
+        "surahName": "Al-Baqarah",
+        "ayah": 74,
+        "page": 11
+      }
+    },
+    {
+      "hizb": 2,
+      "start": {
+        "surah": 2,
+        "surahName": "Al-Baqarah",
+        "ayah": 75,
+        "page": 11
+      },
+      "end": {
+        "surah": 2,
+        "surahName": "Al-Baqarah",
+        "ayah": 141,
+        "page": 21
+      }
+    },
+    {
+      "hizb": 3,
+      "start": {
+        "surah": 2,
+        "surahName": "Al-Baqarah",
+        "ayah": 142,
+        "page": 22
+      },
+      "end": {
+        "surah": 2,
+        "surahName": "Al-Baqarah",
+        "ayah": 202,
+        "page": 31
+      }
+    },
+    {
+      "hizb": 4,
+      "start": {
+        "surah": 2,
+        "surahName": "Al-Baqarah",
+        "ayah": 203,
+        "page": 32
+      },
+      "end": {
+        "surah": 2,
+        "surahName": "Al-Baqarah",
+        "ayah": 252,
+        "page": 41
+      }
+    },
+    {
+      "hizb": 5,
+      "start": {
+        "surah": 2,
+        "surahName": "Al-Baqarah",
+        "ayah": 253,
+        "page": 42
+      },
+      "end": {
+        "surah": 3,
+        "surahName": "Āl-‘Imrān",
+        "ayah": 14,
+        "page": 51
+      }
+    },
+    {
+      "hizb": 6,
+      "start": {
+        "surah": 3,
+        "surahName": "Āl-‘Imrān",
+        "ayah": 15,
+        "page": 51
+      },
+      "end": {
+        "surah": 3,
+        "surahName": "Āl-‘Imrān",
+        "ayah": 92,
+        "page": 62
+      }
+    },
+    {
+      "hizb": 7,
+      "start": {
+        "surah": 3,
+        "surahName": "Āl-‘Imrān",
+        "ayah": 93,
+        "page": 62
+      },
+      "end": {
+        "surah": 3,
+        "surahName": "Āl-‘Imrān",
+        "ayah": 170,
+        "page": 72
+      }
+    },
+    {
+      "hizb": 8,
+      "start": {
+        "surah": 3,
+        "surahName": "Āl-‘Imrān",
+        "ayah": 171,
+        "page": 72
+      },
+      "end": {
+        "surah": 4,
+        "surahName": "An-Nisā’",
+        "ayah": 23,
+        "page": 81
+      }
+    },
+    {
+      "hizb": 9,
+      "start": {
+        "surah": 4,
+        "surahName": "An-Nisā’",
+        "ayah": 24,
+        "page": 82
+      },
+      "end": {
+        "surah": 4,
+        "surahName": "An-Nisā’",
+        "ayah": 87,
+        "page": 92
+      }
+    },
+    {
+      "hizb": 10,
+      "start": {
+        "surah": 4,
+        "surahName": "An-Nisā’",
+        "ayah": 88,
+        "page": 92
+      },
+      "end": {
+        "surah": 4,
+        "surahName": "An-Nisā’",
+        "ayah": 147,
+        "page": 101
+      }
+    },
+    {
+      "hizb": 11,
+      "start": {
+        "surah": 4,
+        "surahName": "An-Nisā’",
+        "ayah": 148,
+        "page": 102
+      },
+      "end": {
+        "surah": 5,
+        "surahName": "Al-Mā’idah",
+        "ayah": 26,
+        "page": 112
+      }
+    },
+    {
+      "hizb": 12,
+      "start": {
+        "surah": 5,
+        "surahName": "Al-Mā’idah",
+        "ayah": 27,
+        "page": 112
+      },
+      "end": {
+        "surah": 5,
+        "surahName": "Al-Mā’idah",
+        "ayah": 81,
+        "page": 121
+      }
+    },
+    {
+      "hizb": 13,
+      "start": {
+        "surah": 5,
+        "surahName": "Al-Mā’idah",
+        "ayah": 82,
+        "page": 121
+      },
+      "end": {
+        "surah": 6,
+        "surahName": "Al-An‘ām",
+        "ayah": 35,
+        "page": 131
+      }
+    },
+    {
+      "hizb": 14,
+      "start": {
+        "surah": 6,
+        "surahName": "Al-An‘ām",
+        "ayah": 36,
+        "page": 132
+      },
+      "end": {
+        "surah": 6,
+        "surahName": "Al-An‘ām",
+        "ayah": 110,
+        "page": 141
+      }
+    },
+    {
+      "hizb": 15,
+      "start": {
+        "surah": 6,
+        "surahName": "Al-An‘ām",
+        "ayah": 111,
+        "page": 142
+      },
+      "end": {
+        "surah": 6,
+        "surahName": "Al-An‘ām",
+        "ayah": 165,
+        "page": 150
+      }
+    },
+    {
+      "hizb": 16,
+      "start": {
+        "surah": 7,
+        "surahName": "Al-A‘rāf",
+        "ayah": 1,
+        "page": 151
+      },
+      "end": {
+        "surah": 7,
+        "surahName": "Al-A‘rāf",
+        "ayah": 87,
+        "page": 161
+      }
+    },
+    {
+      "hizb": 17,
+      "start": {
+        "surah": 7,
+        "surahName": "Al-A‘rāf",
+        "ayah": 88,
+        "page": 162
+      },
+      "end": {
+        "surah": 7,
+        "surahName": "Al-A‘rāf",
+        "ayah": 170,
+        "page": 172
+      }
+    },
+    {
+      "hizb": 18,
+      "start": {
+        "surah": 7,
+        "surahName": "Al-A‘rāf",
+        "ayah": 171,
+        "page": 173
+      },
+      "end": {
+        "surah": 8,
+        "surahName": "Al-Anfāl",
+        "ayah": 40,
+        "page": 181
+      }
+    },
+    {
+      "hizb": 19,
+      "start": {
+        "surah": 8,
+        "surahName": "Al-Anfāl",
+        "ayah": 41,
+        "page": 182
+      },
+      "end": {
+        "surah": 9,
+        "surahName": "At-Taubah",
+        "ayah": 33,
+        "page": 192
+      }
+    },
+    {
+      "hizb": 20,
+      "start": {
+        "surah": 9,
+        "surahName": "At-Taubah",
+        "ayah": 34,
+        "page": 192
+      },
+      "end": {
+        "surah": 9,
+        "surahName": "At-Taubah",
+        "ayah": 92,
+        "page": 201
+      }
+    },
+    {
+      "hizb": 21,
+      "start": {
+        "surah": 9,
+        "surahName": "At-Taubah",
+        "ayah": 93,
+        "page": 201
+      },
+      "end": {
+        "surah": 10,
+        "surahName": "Yūnus",
+        "ayah": 25,
+        "page": 211
+      }
+    },
+    {
+      "hizb": 22,
+      "start": {
+        "surah": 10,
+        "surahName": "Yūnus",
+        "ayah": 26,
+        "page": 212
+      },
+      "end": {
+        "surah": 11,
+        "surahName": "Hūd",
+        "ayah": 5,
+        "page": 221
+      }
+    },
+    {
+      "hizb": 23,
+      "start": {
+        "surah": 11,
+        "surahName": "Hūd",
+        "ayah": 6,
+        "page": 222
+      },
+      "end": {
+        "surah": 11,
+        "surahName": "Hūd",
+        "ayah": 83,
+        "page": 231
+      }
+    },
+    {
+      "hizb": 24,
+      "start": {
+        "surah": 11,
+        "surahName": "Hūd",
+        "ayah": 84,
+        "page": 231
+      },
+      "end": {
+        "surah": 12,
+        "surahName": "Yūsuf",
+        "ayah": 52,
+        "page": 241
+      }
+    },
+    {
+      "hizb": 25,
+      "start": {
+        "surah": 12,
+        "surahName": "Yūsuf",
+        "ayah": 53,
+        "page": 242
+      },
+      "end": {
+        "surah": 13,
+        "surahName": "Ar-Ra‘d",
+        "ayah": 18,
+        "page": 251
+      }
+    },
+    {
+      "hizb": 26,
+      "start": {
+        "surah": 13,
+        "surahName": "Ar-Ra‘d",
+        "ayah": 19,
+        "page": 252
+      },
+      "end": {
+        "surah": 14,
+        "surahName": "Ibrāhīm",
+        "ayah": 52,
+        "page": 261
+      }
+    },
+    {
+      "hizb": 27,
+      "start": {
+        "surah": 15,
+        "surahName": "Al-Ḥijr",
+        "ayah": 1,
+        "page": 262
+      },
+      "end": {
+        "surah": 16,
+        "surahName": "An-Naḥl",
+        "ayah": 50,
+        "page": 272
+      }
+    },
+    {
+      "hizb": 28,
+      "start": {
+        "surah": 16,
+        "surahName": "An-Naḥl",
+        "ayah": 51,
+        "page": 272
+      },
+      "end": {
+        "surah": 16,
+        "surahName": "An-Naḥl",
+        "ayah": 128,
+        "page": 281
+      }
+    },
+    {
+      "hizb": 29,
+      "start": {
+        "surah": 17,
+        "surahName": "Al-Isrā’",
+        "ayah": 1,
+        "page": 282
+      },
+      "end": {
+        "surah": 17,
+        "surahName": "Al-Isrā’",
+        "ayah": 98,
+        "page": 292
+      }
+    },
+    {
+      "hizb": 30,
+      "start": {
+        "surah": 17,
+        "surahName": "Al-Isrā’",
+        "ayah": 99,
+        "page": 292
+      },
+      "end": {
+        "surah": 18,
+        "surahName": "Al-Kahf",
+        "ayah": 74,
+        "page": 301
+      }
+    },
+    {
+      "hizb": 31,
+      "start": {
+        "surah": 18,
+        "surahName": "Al-Kahf",
+        "ayah": 75,
+        "page": 302
+      },
+      "end": {
+        "surah": 19,
+        "surahName": "Maryam",
+        "ayah": 98,
+        "page": 312
+      }
+    },
+    {
+      "hizb": 32,
+      "start": {
+        "surah": 20,
+        "surahName": "Ṭā-Hā",
+        "ayah": 1,
+        "page": 312
+      },
+      "end": {
+        "surah": 20,
+        "surahName": "Ṭā-Hā",
+        "ayah": 135,
+        "page": 321
+      }
+    },
+    {
+      "hizb": 33,
+      "start": {
+        "surah": 21,
+        "surahName": "Al-Anbiyā’",
+        "ayah": 1,
+        "page": 322
+      },
+      "end": {
+        "surah": 21,
+        "surahName": "Al-Anbiyā’",
+        "ayah": 112,
+        "page": 331
+      }
+    },
+    {
+      "hizb": 34,
+      "start": {
+        "surah": 22,
+        "surahName": "Al-Ḥajj",
+        "ayah": 1,
+        "page": 332
+      },
+      "end": {
+        "surah": 22,
+        "surahName": "Al-Ḥajj",
+        "ayah": 78,
+        "page": 341
+      }
+    },
+    {
+      "hizb": 35,
+      "start": {
+        "surah": 23,
+        "surahName": "Al-Mu’minūn",
+        "ayah": 1,
+        "page": 342
+      },
+      "end": {
+        "surah": 24,
+        "surahName": "An-Nūr",
+        "ayah": 20,
+        "page": 351
+      }
+    },
+    {
+      "hizb": 36,
+      "start": {
+        "surah": 24,
+        "surahName": "An-Nūr",
+        "ayah": 21,
+        "page": 352
+      },
+      "end": {
+        "surah": 25,
+        "surahName": "Al-Furqān",
+        "ayah": 20,
+        "page": 361
+      }
+    },
+    {
+      "hizb": 37,
+      "start": {
+        "surah": 25,
+        "surahName": "Al-Furqān",
+        "ayah": 21,
+        "page": 362
+      },
+      "end": {
+        "surah": 26,
+        "surahName": "Ash-Shu‘arā’",
+        "ayah": 110,
+        "page": 371
+      }
+    },
+    {
+      "hizb": 38,
+      "start": {
+        "surah": 26,
+        "surahName": "Ash-Shu‘arā’",
+        "ayah": 111,
+        "page": 371
+      },
+      "end": {
+        "surah": 27,
+        "surahName": "An-Naml",
+        "ayah": 55,
+        "page": 381
+      }
+    },
+    {
+      "hizb": 39,
+      "start": {
+        "surah": 27,
+        "surahName": "An-Naml",
+        "ayah": 56,
+        "page": 382
+      },
+      "end": {
+        "surah": 28,
+        "surahName": "Al-Qaṣaṣ",
+        "ayah": 50,
+        "page": 391
+      }
+    },
+    {
+      "hizb": 40,
+      "start": {
+        "surah": 28,
+        "surahName": "Al-Qaṣaṣ",
+        "ayah": 51,
+        "page": 392
+      },
+      "end": {
+        "surah": 29,
+        "surahName": "Al-‘Ankabūt",
+        "ayah": 45,
+        "page": 401
+      }
+    },
+    {
+      "hizb": 41,
+      "start": {
+        "surah": 29,
+        "surahName": "Al-‘Ankabūt",
+        "ayah": 46,
+        "page": 402
+      },
+      "end": {
+        "surah": 31,
+        "surahName": "Luqmān",
+        "ayah": 21,
+        "page": 413
+      }
+    },
+    {
+      "hizb": 42,
+      "start": {
+        "surah": 31,
+        "surahName": "Luqmān",
+        "ayah": 22,
+        "page": 413
+      },
+      "end": {
+        "surah": 33,
+        "surahName": "Al-Aḥzāb",
+        "ayah": 30,
+        "page": 421
+      }
+    },
+    {
+      "hizb": 43,
+      "start": {
+        "surah": 33,
+        "surahName": "Al-Aḥzāb",
+        "ayah": 31,
+        "page": 422
+      },
+      "end": {
+        "surah": 34,
+        "surahName": "Saba’",
+        "ayah": 23,
+        "page": 431
+      }
+    },
+    {
+      "hizb": 44,
+      "start": {
+        "surah": 34,
+        "surahName": "Saba’",
+        "ayah": 24,
+        "page": 431
+      },
+      "end": {
+        "surah": 36,
+        "surahName": "Yā-Sīn",
+        "ayah": 27,
+        "page": 441
+      }
+    },
+    {
+      "hizb": 45,
+      "start": {
+        "surah": 36,
+        "surahName": "Yā-Sīn",
+        "ayah": 28,
+        "page": 442
+      },
+      "end": {
+        "surah": 37,
+        "surahName": "Aṣ-Ṣāffāt",
+        "ayah": 144,
+        "page": 451
+      }
+    },
+    {
+      "hizb": 46,
+      "start": {
+        "surah": 37,
+        "surahName": "Aṣ-Ṣāffāt",
+        "ayah": 145,
+        "page": 451
+      },
+      "end": {
+        "surah": 39,
+        "surahName": "Az-Zumar",
+        "ayah": 31,
+        "page": 461
+      }
+    },
+    {
+      "hizb": 47,
+      "start": {
+        "surah": 39,
+        "surahName": "Az-Zumar",
+        "ayah": 32,
+        "page": 462
+      },
+      "end": {
+        "surah": 40,
+        "surahName": "Ghāfir",
+        "ayah": 40,
+        "page": 471
+      }
+    },
+    {
+      "hizb": 48,
+      "start": {
+        "surah": 40,
+        "surahName": "Ghāfir",
+        "ayah": 41,
+        "page": 472
+      },
+      "end": {
+        "surah": 41,
+        "surahName": "Fuṣṣilat",
+        "ayah": 46,
+        "page": 481
+      }
+    },
+    {
+      "hizb": 49,
+      "start": {
+        "surah": 41,
+        "surahName": "Fuṣṣilat",
+        "ayah": 47,
+        "page": 482
+      },
+      "end": {
+        "surah": 43,
+        "surahName": "Az-Zukhruf",
+        "ayah": 23,
+        "page": 491
+      }
+    },
+    {
+      "hizb": 50,
+      "start": {
+        "surah": 43,
+        "surahName": "Az-Zukhruf",
+        "ayah": 24,
+        "page": 491
+      },
+      "end": {
+        "surah": 45,
+        "surahName": "Al-Jāthiyah",
+        "ayah": 37,
+        "page": 502
+      }
+    },
+    {
+      "hizb": 51,
+      "start": {
+        "surah": 46,
+        "surahName": "Al-Aḥqāf",
+        "ayah": 1,
+        "page": 502
+      },
+      "end": {
+        "surah": 48,
+        "surahName": "Al-Fatḥ",
+        "ayah": 17,
+        "page": 513
+      }
+    },
+    {
+      "hizb": 52,
+      "start": {
+        "surah": 48,
+        "surahName": "Al-Fatḥ",
+        "ayah": 18,
+        "page": 513
+      },
+      "end": {
+        "surah": 51,
+        "surahName": "Adh-Dhāriyāt",
+        "ayah": 30,
+        "page": 521
+      }
+    },
+    {
+      "hizb": 53,
+      "start": {
+        "surah": 51,
+        "surahName": "Adh-Dhāriyāt",
+        "ayah": 31,
+        "page": 522
+      },
+      "end": {
+        "surah": 54,
+        "surahName": "Al-Qamar",
+        "ayah": 55,
+        "page": 531
+      }
+    },
+    {
+      "hizb": 54,
+      "start": {
+        "surah": 55,
+        "surahName": "Ar-Raḥmān",
+        "ayah": 1,
+        "page": 531
+      },
+      "end": {
+        "surah": 57,
+        "surahName": "Al-Ḥadīd",
+        "ayah": 29,
+        "page": 541
+      }
+    },
+    {
+      "hizb": 55,
+      "start": {
+        "surah": 58,
+        "surahName": "Al-Mujādilah",
+        "ayah": 1,
+        "page": 542
+      },
+      "end": {
+        "surah": 61,
+        "surahName": "Aṣ-Ṣaff",
+        "ayah": 14,
+        "page": 552
+      }
+    },
+    {
+      "hizb": 56,
+      "start": {
+        "surah": 62,
+        "surahName": "Al-Jumu‘ah",
+        "ayah": 1,
+        "page": 553
+      },
+      "end": {
+        "surah": 66,
+        "surahName": "At-Taḥrīm",
+        "ayah": 12,
+        "page": 561
+      }
+    },
+    {
+      "hizb": 57,
+      "start": {
+        "surah": 67,
+        "surahName": "Al-Mulk",
+        "ayah": 1,
+        "page": 562
+      },
+      "end": {
+        "surah": 71,
+        "surahName": "Nūḥ",
+        "ayah": 28,
+        "page": 571
+      }
+    },
+    {
+      "hizb": 58,
+      "start": {
+        "surah": 72,
+        "surahName": "Al-Jinn",
+        "ayah": 1,
+        "page": 572
+      },
+      "end": {
+        "surah": 77,
+        "surahName": "Al-Mursalāt",
+        "ayah": 50,
+        "page": 581
+      }
+    },
+    {
+      "hizb": 59,
+      "start": {
+        "surah": 78,
+        "surahName": "An-Naba’",
+        "ayah": 1,
+        "page": 582
+      },
+      "end": {
+        "surah": 86,
+        "surahName": "Aṭ-Ṭāriq",
+        "ayah": 17,
+        "page": 591
+      }
+    },
+    {
+      "hizb": 60,
+      "start": {
+        "surah": 87,
+        "surahName": "Al-A‘lā",
+        "ayah": 1,
+        "page": 591
+      },
+      "end": {
+        "surah": 114,
+        "surahName": "An-Nās",
+        "ayah": 6,
+        "page": 604
+      }
+    }
+  ]
+}

@@ -159,6 +159,13 @@ Murajaah Flash utilise un texte arabe Uthmani local pour préparer les trois ver
 - Police : `hafs.18.ttf` et `hafs.18.woff2`
 - Tajwīd : non utilisé pour l’instant, afin de ne pas mélanger les sources ou les polices.
 
+### Bornes des hizb
+
+- Les 60 hizb utilisent leurs vrais versets de début et de fin, et non un découpage fixe de dix pages.
+- Les pages sont résolues depuis la pagination locale KFGQPC Hafs v18.
+- Fichier local : `data/hizb-boundaries.json`
+- Métadonnées de partition : Tanzil Quran Metadata 1.0, miroir `quran-meta` 2.4.2.
+
 ## Roadmap courte
 
 - Finaliser les tests sur appareils iOS et Android
