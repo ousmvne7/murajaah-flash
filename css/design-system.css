@@ -876,3 +876,121 @@ textarea:focus-visible {
     transition-duration: .01ms !important;
   }
 }
+
+/* Visual audit: a quieter, softer mobile surface without changing app flows. */
+:root {
+  --mf-radius: 14px;
+  --mf-radius-sm: 10px;
+  --mf-shadow-card: 0 8px 24px rgba(23, 35, 56, .07);
+  --mf-shadow-nav: 0 -8px 24px rgba(23, 35, 56, .10);
+}
+
+:is(.focus-card, .greeting, .home-mode-card, .home-quick-actions,
+    .library-search, .library-stats, .library-card, .library-help,
+    .auto-fill-card, .sequence-card, .audio-card, .notes-card,
+    .progress-hero, .progress-summary-grid, .progress-panel, .settings-list,
+    .journal-overview, .journal-add-cta, .journal-history,
+    .journal-frequency-card, .journal-week-summary,
+    .review-daily-card, .review-quick-actions, .review-progress-card,
+    .flashcard, .mushaf-review-surface,
+    .hifdh-panel, .hifdh-how-card, .hifdh-progress-tip,
+    .hifdh-question-meta, .hifdh-verse-card, .hifdh-task-card,
+    .modal-card, .journal-form) {
+  border-radius: var(--mf-radius) !important;
+}
+
+:is(.home-mode-card, .home-quick-actions,
+    .library-search, .library-stats, .library-card, .library-help,
+    .auto-fill-card, .sequence-card, .audio-card, .notes-card,
+    .progress-summary-grid, .progress-panel, .settings-list,
+    .journal-overview, .journal-history, .journal-frequency-card,
+    .journal-week-summary, .review-quick-actions, .review-progress-card,
+    .hifdh-panel, .hifdh-how-card, .hifdh-progress-tip,
+    .hifdh-question-meta, .hifdh-verse-card, .hifdh-task-card) {
+  border-color: rgba(23, 35, 56, .10) !important;
+  box-shadow: var(--mf-shadow-card) !important;
+}
+
+:is(.primary-btn, .secondary-btn, .danger-btn,
+    .intro-start-btn, .hifdh-start-btn, .hifdh-reveal-btn,
+    .journal-save-btn, .journal-delete-btn, .quran-picker-confirm,
+    .rating-btn, .hifdh-ratings button) {
+  border-radius: 12px !important;
+}
+
+:is(.page-back-btn, .journal-back-btn, .review-session-back, .summary-back-btn,
+    .icon-btn, .library-header-btn, .journal-profile-btn, .hifdh-back,
+    .hifdh-picker-close, .quran-picker-top button, .journal-form-head > button,
+    .home-profile-btn) {
+  border-radius: var(--mf-radius-sm) !important;
+}
+
+.bottom-nav {
+  padding: 8px !important;
+  border: 1px solid rgba(23, 35, 56, .10) !important;
+  border-radius: 18px 18px 0 0 !important;
+  background: #fff !important;
+  box-shadow: var(--mf-shadow-nav) !important;
+  backdrop-filter: none !important;
+}
+
+.bottom-nav .nav-btn {
+  min-height: 58px;
+  border-radius: 12px !important;
+  color: var(--mf-muted) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.bottom-nav .nav-btn.active,
+.bottom-nav .nav-btn[data-screen="review"].active,
+.bottom-nav .nav-btn[data-screen="hifdh"].active,
+.bottom-nav .nav-btn[data-screen="journal"].active {
+  color: #fff !important;
+  box-shadow: 0 7px 16px rgba(23, 35, 56, .16) !important;
+}
+
+.bottom-nav .nav-btn[data-screen="home"].active,
+.bottom-nav .nav-btn[data-screen="review"].active {
+  background: var(--mf-primary) !important;
+}
+
+.bottom-nav .nav-btn[data-screen="hifdh"].active {
+  background: var(--mf-hifdh) !important;
+}
+
+.bottom-nav .nav-btn[data-screen="journal"].active {
+  background: var(--mf-journal) !important;
+}
+
+:is(.filter-chip, .difficulty-chip, .hifdh-counts button, .journal-feeling-field button) {
+  border-radius: var(--mf-radius-sm) !important;
+  border-color: var(--mf-line) !important;
+  box-shadow: none !important;
+}
+
+.translation-toggle,
+#reviewSession .review-translation-inline {
+  border-radius: var(--mf-radius-sm) !important;
+}
+
+/* Keep the add flow as one clear action surface, not a card inside a card. */
+#addScreen .premium-passage-card {
+  overflow: hidden !important;
+}
+
+#addScreen .quran-picker-open {
+  width: 100% !important;
+  min-height: 60px !important;
+  margin: 0 !important;
+  padding-inline: 16px !important;
+  border: 0 !important;
+  border-top: 1px solid var(--mf-line) !important;
+  border-radius: 0 0 var(--mf-radius) var(--mf-radius) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+#addScreen .first-review-options button {
+  border-radius: var(--mf-radius-sm) !important;
+}

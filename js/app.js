@@ -1215,12 +1215,6 @@ setTimeout(() => {
 
     async function startReview() {
       overlayReturnScreen = activeScreenName();
-      try {
-        await loadQuranData();
-        await loadQuranPagesData();
-      } catch (_) {
-        quranData = null;
-      }
       reviewPool = dueCards().sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
       reviewSessionMode = "recitation";
       updateReviewIntroCounts();
@@ -1230,6 +1224,15 @@ setTimeout(() => {
       document.getElementById("reviewScreen").classList.add("active");
       document.getElementById("bottomNav").style.display = "grid";
       setBottomNavActive("review");
+
+      try {
+        await loadQuranData();
+        await loadQuranPagesData();
+      } catch (_) {
+        quranData = null;
+      }
+      reviewPool = dueCards().sort((a, b) => (a.nextReview || 0) - (b.nextReview || 0));
+      updateReviewIntroCounts();
     }
 
     function beginReviewSession() {
