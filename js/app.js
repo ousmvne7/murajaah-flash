@@ -162,6 +162,15 @@ setTimeout(() => {
       return activeScreenName();
     }
 
+    function resetScrollPosition(...elements) {
+      const reset = () => {
+        elements.filter(Boolean).forEach(element => { element.scrollTop = 0; });
+        window.scrollTo(0, 0);
+      };
+      reset();
+      requestAnimationFrame(reset);
+    }
+
     function showScreen(name, options = {}) {
       const target = document.getElementById(name + "Screen");
       if (!target) return;
@@ -1249,6 +1258,7 @@ setTimeout(() => {
       document.getElementById("reviewScreen").classList.add("active");
       document.getElementById("bottomNav").style.display = "grid";
       setBottomNavActive("review");
+      resetScrollPosition(document.getElementById("reviewIntro"));
 
       try {
         await loadQuranData();
@@ -1271,6 +1281,10 @@ setTimeout(() => {
       document.getElementById("reviewSession").style.display = "flex";
       document.getElementById("reviewSummary").classList.remove("active");
       document.getElementById("bottomNav").style.display = "none";
+      resetScrollPosition(
+        document.getElementById("reviewSession"),
+        document.querySelector("#reviewSession .review-main")
+      );
       renderReviewCard();
     }
 
@@ -1282,6 +1296,7 @@ setTimeout(() => {
       reviewStage = 0;
       setReviewStep(0);
       renderReviewVerses(card, 0);
+      resetScrollPosition(document.querySelector("#reviewSession .review-main"));
       setupElanAudio(card);
       const reviewAudio = document.getElementById("reviewAudio");
       const reviewAudioBtn = document.getElementById("reviewAudioBtn");
@@ -1719,7 +1734,10 @@ setTimeout(() => {
       document.getElementById("hifdhQuestion").hidden = true;
       document.getElementById("hifdhSummary").hidden = true;
       renderHifdhSetup();
-      window.scrollTo(0, 0);
+      resetScrollPosition(
+        document.getElementById("hifdhScreen"),
+        document.getElementById("hifdhSetup")
+      );
     }
 
     function closeHifdhTest() {
@@ -1970,7 +1988,10 @@ setTimeout(() => {
       audio.onerror = () => { setAudioControlState(document.getElementById("hifdhAudioIcon"), "error"); };
       audio.currentTime = 0;
       audio.play().catch(() => {});
-      window.scrollTo(0, 0);
+      resetScrollPosition(
+        document.getElementById("hifdhScreen"),
+        document.querySelector(".hifdh-question-scroll")
+      );
     }
 
     function stopHifdhAudio() {

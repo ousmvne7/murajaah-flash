@@ -373,6 +373,19 @@ body {
   box-shadow: none;
 }
 
+.quran-picker-modal {
+  z-index: 140;
+}
+
+.quran-picker-sheet {
+  max-height: calc(100dvh - 32px);
+}
+
+.quran-picker-columns {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
 #addScreen .picker-target-icon {
   border-radius: var(--mf-radius);
   color: var(--mf-primary);
@@ -591,14 +604,14 @@ body {
 }
 
 #hifdhScreen .hifdh-progress-row i {
-  background: linear-gradient(90deg, #48c98b, #66d6a1) !important;
-  box-shadow: 0 0 16px rgba(72, 201, 139, .30) !important;
+  background: linear-gradient(90deg, var(--mf-hifdh), #7658d6) !important;
+  box-shadow: 0 0 16px rgba(84, 57, 175, .28) !important;
 }
 
 #hifdhScreen .hifdh-stage-tabs span.active {
-  color: #123a2b !important;
-  background: linear-gradient(135deg, #48c98b, #66d6a1) !important;
-  box-shadow: 0 10px 24px rgba(35, 155, 102, .24) !important;
+  color: #fff !important;
+  background: linear-gradient(135deg, #7658d6, var(--mf-hifdh)) !important;
+  box-shadow: 0 10px 24px rgba(84, 57, 175, .24) !important;
 }
 
 #hifdhScreen .hifdh-start-line {
@@ -1127,21 +1140,27 @@ textarea:focus-visible {
 
 @media (max-width: 360px), (max-height: 720px) {
   #reviewIntro .review-intro-header {
-    min-height: 202px;
+    min-height: 224px;
   }
 
   #reviewIntro .review-intro-header-mark {
-    top: calc(38px + env(safe-area-inset-top));
+    top: calc(30px + env(safe-area-inset-top));
   }
 
   #reviewIntro .review-intro-header h1 {
-    top: calc(80px + env(safe-area-inset-top));
-    font-size: 32px;
+    top: calc(76px + env(safe-area-inset-top));
+    left: 50px;
+    right: 50px;
+    font-size: 28px;
+    line-height: 1.06;
   }
 
   #reviewIntro .review-intro-title p {
-    top: calc(127px + env(safe-area-inset-top));
-    font-size: 13px;
+    top: calc(143px + env(safe-area-inset-top));
+    left: 42px;
+    right: 42px;
+    font-size: 12px;
+    line-height: 1.4;
   }
 }
 
@@ -1233,6 +1252,11 @@ textarea:focus-visible {
   background: #f4f1ff;
 }
 
+#hifdhScreen .question-reference-icon {
+  color: var(--mf-hifdh);
+  background: var(--mf-hifdh-soft);
+}
+
 #reviewSession .question-reference-translation {
   color: #0a5a43;
   border-color: rgba(10, 90, 67, .14);
@@ -1259,6 +1283,10 @@ textarea:focus-visible {
   stroke-linecap: round;
 }
 
+#hifdhScreen .audio-wave-icon {
+  stroke: var(--mf-hifdh);
+}
+
 :is(#hifdhScreen, #reviewSession) .audio-reciter > span {
   min-width: 0;
   margin: 0 !important;
@@ -1276,7 +1304,15 @@ textarea:focus-visible {
   box-shadow: none !important;
 }
 
+#hifdhScreen .elan-actions > span {
+  color: var(--mf-hifdh) !important;
+}
+
 @media (max-width: 360px) {
+  #libraryScreen .library-search input {
+    font-size: 10.5px;
+  }
+
   #hifdhScreen .hifdh-question-context,
   #reviewSession .review-question-context {
     padding-inline: 8px;

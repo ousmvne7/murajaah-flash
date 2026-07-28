@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "murajaah-flash";
-const CACHE_VERSION = "v73-audio-speed-clean";
+const CACHE_VERSION = "v76-responsive-audit";
 const APP_CACHE = `${CACHE_PREFIX}-app-${CACHE_VERSION}`;
 const MUSHAF_CACHE = `${CACHE_PREFIX}-mushaf-${CACHE_VERSION}`;
 
@@ -16,10 +16,10 @@ const APP_SHELL = [
   "./css/review-intro.css?v=5",
   "./css/typography.css?v=3",
   "./css/visual-audit.css?v=6",
-  "./css/design-system.css?v=29",
+  "./css/design-system.css?v=32",
   "./js/pwa.js",
   "./js/icon-system.js?v=24",
-  "./js/app.js?v=audio-wave1",
+  "./js/app.js?v=responsive1",
   "./assets/icons/lucide.svg?v=9",
   "./assets/icons/LUCIDE_LICENSE.txt",
   "./assets/icon.svg",
