@@ -817,8 +817,8 @@
   #homeScreen .home-mode-copy small { font-size: 12px; }
   #homeScreen .home-quick-grid span { font-size: 11.5px; }
 
-  #libraryScreen .library-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  #libraryScreen .library-stat { min-height: 116px; }
+  #libraryScreen .library-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #libraryScreen .library-stat { min-height: 112px; }
   #libraryScreen .memory-card {
     grid-template-columns: 42px minmax(0, 1fr) 44px;
     align-items: start;
@@ -883,7 +883,7 @@
     align-items: flex-start;
     flex-direction: column;
   }
-  #hifdhSetup .hifdh-counts { grid-template-columns: 1fr; }
+  #hifdhSetup .hifdh-counts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   #hifdhSetup .hifdh-how-card { grid-template-columns: 1fr; }
   #hifdhSetup .hifdh-how-art { display: none; }
   #hifdhScreen .hifdh-picker-item {

@@ -280,6 +280,30 @@ body {
   color: var(--mf-primary) !important;
 }
 
+#libraryScreen .library-stat-mastered :is(.library-stat-icon, small) {
+  color: #087153 !important;
+}
+
+#libraryScreen .library-stat-mastered .library-stat-icon {
+  background: #eaf8f1 !important;
+}
+
+#libraryScreen .library-stat-reinforce :is(.library-stat-icon, small) {
+  color: #ef8a22 !important;
+}
+
+#libraryScreen .library-stat-reinforce .library-stat-icon {
+  background: #fff3e6 !important;
+}
+
+#libraryScreen .library-stat-due :is(.library-stat-icon, small) {
+  color: #df3940 !important;
+}
+
+#libraryScreen .library-stat-due .library-stat-icon {
+  background: #fff0f1 !important;
+}
+
 #libraryScreen :is(.library-card-status.mastered,
                     .library-card-status.reinforce,
                     .library-card-status.due) {
@@ -595,6 +619,19 @@ body {
   border-color: rgba(84, 57, 175, .28) !important;
   background: var(--mf-hifdh-soft) !important;
   box-shadow: none !important;
+}
+
+@media (max-width: 380px) {
+  #hifdhSetup .hifdh-counts {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px;
+  }
+
+  #hifdhSetup .hifdh-counts button {
+    min-height: 74px;
+    padding-inline: 4px;
+    font-size: 11.5px;
+  }
 }
 
 #hifdhScreen .hifdh-picker-item.active .hifdh-picker-state {

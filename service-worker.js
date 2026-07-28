@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "murajaah-flash";
-const CACHE_VERSION = "v76-responsive-audit";
+const CACHE_VERSION = "v78-hifdh-counts-responsive";
 const APP_CACHE = `${CACHE_PREFIX}-app-${CACHE_VERSION}`;
 const MUSHAF_CACHE = `${CACHE_PREFIX}-mushaf-${CACHE_VERSION}`;
 
@@ -14,9 +14,9 @@ const APP_SHELL = [
   "./css/library.css?v=4",
   "./css/hifdh-setup.css?v=setup5",
   "./css/review-intro.css?v=5",
-  "./css/typography.css?v=3",
+  "./css/typography.css?v=5",
   "./css/visual-audit.css?v=6",
-  "./css/design-system.css?v=32",
+  "./css/design-system.css?v=34",
   "./js/pwa.js",
   "./js/icon-system.js?v=24",
   "./js/app.js?v=responsive1",
