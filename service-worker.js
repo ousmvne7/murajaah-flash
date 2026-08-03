@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "murajaah-flash";
-const CACHE_VERSION = "v124-adhkar-fixed-reader";
+const CACHE_VERSION = "v125-adhkar-fixed-action";
 const APP_CACHE = `${CACHE_PREFIX}-app-${CACHE_VERSION}`;
 const MUSHAF_CACHE = `${CACHE_PREFIX}-mushaf-${CACHE_VERSION}`;
 
@@ -16,7 +16,7 @@ const APP_SHELL = [
   "./css/review-intro.css?v=5",
   "./css/typography.css?v=5",
   "./css/visual-audit.css?v=6",
-  "./css/design-system.css?v=64",
+  "./css/design-system.css?v=65",
   "./js/pwa.js",
   "./js/icon-system.js?v=31",
   "./js/app.js?v=adhkar-shortcut2",
