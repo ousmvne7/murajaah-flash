@@ -492,6 +492,7 @@ setTimeout(() => {
         progressElement?.setAttribute("aria-valuenow", "100");
         document.getElementById("adhkarReaderActive").hidden = true;
         document.getElementById("adhkarReaderComplete").hidden = false;
+        document.getElementById("adhkarReaderAction").hidden = true;
         document.getElementById("adhkarReaderCompleteText").textContent = `${total} adhkār ${total === 1 ? "lu" : "lus"} · Toutes les répétitions ont été accomplies.`;
         return;
       }
@@ -500,6 +501,7 @@ setTimeout(() => {
       const target = Math.max(1, Number(item.repetitions) || 1);
       document.getElementById("adhkarReaderActive").hidden = false;
       document.getElementById("adhkarReaderComplete").hidden = true;
+      document.getElementById("adhkarReaderAction").hidden = false;
       document.getElementById("adhkarReaderPosition").textContent = `Adhkār ${session.index + 1} sur ${total}`;
       document.getElementById("adhkarReaderPeriod").textContent = item.period === "evening" ? "Adhkār du soir" : "Adhkār du matin";
       document.getElementById("adhkarReaderTitle").textContent = item.title;

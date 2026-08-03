@@ -2465,9 +2465,9 @@ textarea:focus-visible {
 #adhkarReaderScreen {
   height: 100dvh;
   min-height: 100dvh;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
   color: #17231f;
   background:
@@ -2537,7 +2537,7 @@ textarea:focus-visible {
 
 .adhkar-reader-content {
   min-height: 0;
-  padding: 22px 16px calc(96px + env(safe-area-inset-bottom));
+  padding: 22px 16px 18px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -2723,12 +2723,7 @@ textarea:focus-visible {
 .adhkar-reader-benefit[open] summary span { transform: rotate(180deg); }
 
 .adhkar-recite-btn {
-  position: fixed;
-  left: 50%;
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  z-index: 30;
-  width: min(calc(100% - 32px), 398px);
-  transform: translateX(-50%);
+  width: 100%;
   min-height: 58px;
   display: flex;
   align-items: center;
@@ -2742,6 +2737,14 @@ textarea:focus-visible {
   background: var(--mf-primary);
   box-shadow: 0 12px 26px rgba(10, 90, 67, .2);
 }
+
+.adhkar-reader-action {
+  padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(10, 90, 67, .1);
+  background: #f8fbf9;
+}
+
+.adhkar-reader-action[hidden] { display: none !important; }
 
 .adhkar-recite-btn svg { width: 23px; height: 23px; }
 
