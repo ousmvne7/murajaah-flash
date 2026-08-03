@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="css/review-intro.css?v=5">
   <link rel="stylesheet" href="css/typography.css?v=5">
   <link rel="stylesheet" href="css/visual-audit.css?v=6">
-  <link rel="stylesheet" href="css/design-system.css?v=67">
+  <link rel="stylesheet" href="css/design-system.css?v=85">
 </head>
 <body>
   <main class="app">
@@ -460,7 +460,9 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
         </button>
         <div class="adhkar-reader-progress-copy">
-          <span id="adhkarReaderPosition">Adhkār 1 sur 1</span>
+          <small id="adhkarReaderPeriod" lang="ar" dir="rtl">أذكار الصباح</small>
+          <h1 id="adhkarReaderTitle">Adhkār</h1>
+          <span id="adhkarReaderPosition">1 / 1</span>
           <div class="adhkar-reader-progress" role="progressbar" aria-label="Progression de la session" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <i id="adhkarReaderProgressBar"></i>
           </div>
@@ -469,30 +471,23 @@
 
       <div class="adhkar-reader-content">
         <div id="adhkarReaderActive">
-          <div class="adhkar-reader-title-row">
-            <div><span id="adhkarReaderPeriod">Matin</span><h1 id="adhkarReaderTitle">Adhkār</h1></div>
-            <strong id="adhkarReaderTarget">×1</strong>
-          </div>
-
           <article class="adhkar-reading-card">
-            <span class="adhkar-item-progress" aria-hidden="true"><i id="adhkarReciteProgress"></i></span>
+            <span class="adhkar-item-progress" id="adhkarItemProgress" aria-hidden="true"><i id="adhkarReciteProgress"></i></span>
+            <div class="adhkar-reader-title-actions">
+              <strong id="adhkarReaderTarget" hidden>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons/lucide.svg#lucide-repeat-2"></use></svg>
+                <span id="adhkarReaderTargetLabel">À répéter 3 fois</span>
+              </strong>
+            </div>
             <p class="adhkar-reading-arabic" id="adhkarReaderArabic" lang="ar" dir="rtl"></p>
             <span aria-hidden="true"></span>
-            <button class="adhkar-translation-toggle" id="adhkarTranslationToggle" type="button" aria-expanded="false" hidden onclick="toggleAdhkarTranslation()">Voir la traduction</button>
+            <button class="adhkar-translation-toggle translation-toggle" id="adhkarTranslationToggle" type="button" aria-expanded="false" onclick="toggleAdhkarTranslation()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+              <span id="adhkarTranslationLabel">Traduction</span>
+            </button>
             <p class="adhkar-reading-translation" id="adhkarReaderTranslation"></p>
           </article>
 
-          <details class="adhkar-reader-benefit" id="adhkarReaderBenefitWrap" hidden>
-            <summary><strong>Voir les bienfaits</strong><span aria-hidden="true">⌄</span></summary>
-            <p id="adhkarReaderBenefit"></p>
-          </details>
-
-          <div class="adhkar-reader-action" id="adhkarReaderAction">
-            <button class="adhkar-recite-btn" id="adhkarReciteBtn" type="button" onclick="validateAdhkarRepetition()">
-              <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
-              <span id="adhkarReciteLabel">J’ai récité</span>
-            </button>
-          </div>
         </div>
 
         <div class="adhkar-reader-complete" id="adhkarReaderComplete" hidden>
@@ -501,6 +496,17 @@
           <p id="adhkarReaderCompleteText">Tous tes adhkār ont été lus.</p>
           <button type="button" onclick="closeAdhkarReading()">Retour aux adhkār</button>
         </div>
+      </div>
+
+      <div class="adhkar-reader-action" id="adhkarReaderAction">
+        <details class="adhkar-reader-benefit" id="adhkarReaderBenefitWrap" hidden>
+          <summary aria-label="Voir les bienfaits"><span aria-hidden="true">?</span></summary>
+          <p id="adhkarReaderBenefit"></p>
+        </details>
+        <button class="adhkar-recite-btn" id="adhkarReciteBtn" type="button" onclick="validateAdhkarRepetition()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+          <span id="adhkarReciteLabel">J’ai récité</span>
+        </button>
       </div>
 
     </section>
@@ -1044,6 +1050,6 @@
 
   <script src="js/pwa.js"></script>
   <script src="js/icon-system.js?v=31"></script>
-  <script src="js/app.js?v=adhkar-action-row"></script>
+  <script src="js/app.js?v=adhkar-header-arabic"></script>
 </body>
 </html>

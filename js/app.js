@@ -502,10 +502,13 @@ setTimeout(() => {
       document.getElementById("adhkarReaderActive").hidden = false;
       document.getElementById("adhkarReaderComplete").hidden = true;
       document.getElementById("adhkarReaderAction").hidden = false;
-      document.getElementById("adhkarReaderPosition").textContent = `Adhkār ${session.index + 1} sur ${total}`;
-      document.getElementById("adhkarReaderPeriod").textContent = item.period === "evening" ? "Adhkār du soir" : "Adhkār du matin";
+      document.getElementById("adhkarReaderPosition").textContent = `${session.index + 1} / ${total}`;
+      document.getElementById("adhkarReaderPeriod").textContent = item.period === "evening" ? "أذكار المساء" : "أذكار الصباح";
       document.getElementById("adhkarReaderTitle").textContent = item.title;
-      document.getElementById("adhkarReaderTarget").textContent = `×${target}`;
+      const targetNode = document.getElementById("adhkarReaderTarget");
+      targetNode.hidden = target <= 1;
+      document.getElementById("adhkarItemProgress").hidden = target <= 1;
+      document.getElementById("adhkarReaderTargetLabel").textContent = `À répéter ${target} fois`;
       const arabicNode = document.getElementById("adhkarReaderArabic");
       arabicNode.textContent = item.arabic;
       arabicNode.classList.toggle("quranic", Boolean(item.quranRef));
@@ -515,8 +518,8 @@ setTimeout(() => {
       document.getElementById("adhkarReaderScreen").classList.toggle("is-long-adhkar", isLong);
       translationNode.textContent = item.translation;
       translationNode.hidden = isLong;
-      translationToggle.hidden = !isLong;
-      translationToggle.textContent = "Voir la traduction";
+      translationToggle.hidden = false;
+      document.getElementById("adhkarTranslationLabel").textContent = "Traduction";
       translationToggle.setAttribute("aria-expanded", "false");
       const optionalFields = [
         ["adhkarReaderBenefit", item.benefit, "adhkarReaderBenefitWrap"]
@@ -541,7 +544,7 @@ setTimeout(() => {
       const toggle = document.getElementById("adhkarTranslationToggle");
       const willOpen = translation.hidden;
       translation.hidden = !willOpen;
-      toggle.textContent = willOpen ? "Masquer la traduction" : "Voir la traduction";
+      document.getElementById("adhkarTranslationLabel").textContent = "Traduction";
       toggle.setAttribute("aria-expanded", String(willOpen));
     }
 
