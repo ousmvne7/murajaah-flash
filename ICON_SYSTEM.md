@@ -29,7 +29,7 @@ Implementation actuelle : sprite local verrouille dans `assets/icons/lucide.svg`
 | Navigation | Accueil | `House` | Onglet Accueil et retour explicite a l'accueil |
 | Navigation | Revision ciblee | `BookOpen` | Onglet Revision et acces au mode Revision |
 | Navigation et Accueil | Test Hifdh | `Brain` | Onglet et accès au Test Hifdh |
-| Navigation | Bilan / Journal | `ChartNoAxesColumnIncreasing` | Onglet Bilan et syntheses de progression |
+| Navigation | Ressources | `CirclePlus` | Onglet Ressources et acces aux outils complementaires |
 | Navigation | Profil | `UserRound` | Acces au Profil sur toutes les pages |
 | Navigation | Retour | `ArrowLeft` | Bouton retour en haut a gauche |
 | Navigation | Etape suivante | `CircleArrowRight` | CTA pour avancer vers le verset ou l'etape suivante |
@@ -57,6 +57,16 @@ Implementation actuelle : sprite local verrouille dans `assets/icons/lucide.svg`
 | Accueil, Révision, Mes passages | Ajouter un passage | `CirclePlus` | Action unique d’ajout d’un passage |
 | Accueil, Révision | Mes passages | `BookmarkCheck` | Passages personnels enregistrés |
 | Accueil | Bilan | `ChartNoAxesColumnIncreasing` | Accès rapide au Bilan |
+| Ressources | Journal de revision | `CalendarCheck` | Historique et progression des revisions |
+| Ressources | Vocabulaire | `Languages` | Apprentissage des mots importants du Coran |
+| Ressources | Adhkar | `MoonStar` | Invocations du matin et du soir |
+| Adhkar | Matin | `Sunrise` | Acces aux invocations du matin |
+| Adhkar | Soir | `MoonStar` | Acces aux invocations du soir |
+| Adhkar | Ajouter un adhkar personnel | `CirclePlus` | Creation d'un rappel personnel |
+| Adhkar | Mes adhkar | `BookmarkCheck` | Consultation des rappels enregistres |
+| Adhkar | Supprimer un adhkar personnel | `Trash2` | Suppression individuelle avec confirmation |
+| Adhkar | Commencer la lecture | `Play` | Lancement d'une session d'adhkar personnels |
+| Adhkar | Valider une repetition | `CircleCheckBig` | Incrementation du compteur de repetition |
 | Bibliotheque | Total des passages | `LibraryBig` | Statistique Total |
 | Bibliotheque | Maitrise | `CircleCheckBig` | Statut Maitrise / Acquis |
 | Bibliotheque | A renforcer | `CircleDashed` | Statut fragile ou presque acquis |

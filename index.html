@@ -15,14 +15,14 @@
   <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="css/styles.css?v=audio-status1">
-  <link rel="stylesheet" href="css/home.css?v=20">
+  <link rel="stylesheet" href="css/home.css?v=25">
   <link rel="stylesheet" href="css/journal.css?v=4">
   <link rel="stylesheet" href="css/library.css?v=4">
   <link rel="stylesheet" href="css/hifdh-setup.css?v=setup5">
   <link rel="stylesheet" href="css/review-intro.css?v=5">
   <link rel="stylesheet" href="css/typography.css?v=5">
   <link rel="stylesheet" href="css/visual-audit.css?v=6">
-  <link rel="stylesheet" href="css/design-system.css?v=34">
+  <link rel="stylesheet" href="css/design-system.css?v=63">
 </head>
 <body>
   <main class="app">
@@ -98,6 +98,17 @@
           </button>
         </div>
 
+        <div class="home-adhkar-shortcut" aria-label="Raccourcis vers les adhkār">
+          <span class="home-adhkar-shortcut-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.2A8 8 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"/><path d="M17.5 3.5v3M16 5h3"/></svg>
+          </span>
+          <span class="home-adhkar-shortcut-copy"><small>Raccourci</small><strong>Adhkār du jour</strong></span>
+          <span class="home-adhkar-shortcut-choices">
+            <button type="button" onclick="startCuratedAdhkarReading('morning')">Matin</button>
+            <button type="button" onclick="startCuratedAdhkarReading('evening')">Soir</button>
+          </span>
+        </div>
+
         <section class="home-quick-actions" aria-label="Actions rapides">
           <h2>Actions rapides</h2>
           <div class="home-quick-grid">
@@ -109,9 +120,9 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 5.25A2.25 2.25 0 0 1 5.75 3H10a2 2 0 0 1 2 2v15.5a2.75 2.75 0 0 0-2.75-2.75H3.5Z"/><path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"/></svg>
               <span>Mes passages</span>
             </button>
-            <button type="button" onclick="openJournal()">
+            <button type="button" onclick="openMainSection('resources')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19V10M12 19V5M19 19v-7"/><path d="M3.5 19.5h17"/></svg>
-              <span>Bilan</span>
+              <span>Ressources</span>
             </button>
           </div>
         </section>
@@ -358,10 +369,143 @@
       </div>
     </section>
 
+    <section class="screen resources-screen" id="resourcesScreen" aria-labelledby="resourcesTitle">
+      <header class="resources-header">
+        <button class="page-back-btn resources-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="navigateBack('home')">
+          <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+        </button>
+        <div>
+          <span class="resources-header-mark" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+          <h1 id="resourcesTitle">Ressources</h1>
+          <p>Des outils simples pour accompagner ton Hifdh au quotidien.</p>
+        </div>
+        <span class="resources-header-spacer" aria-hidden="true"></span>
+      </header>
+
+      <div class="resources-content">
+        <button class="resource-card" type="button" onclick="openJournal()">
+          <span class="resource-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+          <span class="resource-card-copy">
+            <strong>Journal de révision</strong>
+            <small>Consulte ton historique et suis ta progression.</small>
+          </span>
+          <span class="resource-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+        </button>
+
+        <button class="resource-card" type="button" onclick="openResourceSoon('Vocabulaire')">
+          <span class="resource-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+          <span class="resource-card-copy">
+            <strong>Vocabulaire</strong>
+            <small>Révise les mots importants du Coran.</small>
+          </span>
+          <span class="resource-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+        </button>
+
+        <button class="resource-card" type="button" onclick="openAdhkar()">
+          <span class="resource-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+          <span class="resource-card-copy">
+            <strong>Adhkār</strong>
+            <small>Les invocations du matin et du soir.</small>
+          </span>
+          <span class="resource-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+        </button>
+
+        <blockquote class="resources-hadith-card">
+          <span class="resources-hadith-mark" aria-hidden="true">“</span>
+          <p class="resources-hadith-lead">Le Prophète ﷺ a dit :</p>
+          <p class="resources-hadith-text">« L’exemple de celui qui invoque son Seigneur et de celui qui ne L’invoque pas est celui du vivant et du mort. »</p>
+          <span class="resources-hadith-divider" aria-hidden="true"></span>
+          <cite>— Rapporté par Sahih al-Bukhari</cite>
+        </blockquote>
+      </div>
+    </section>
+
+    <section class="screen adhkar-screen" id="adhkarScreen" aria-labelledby="adhkarTitle">
+      <header class="adhkar-header">
+        <button class="page-back-btn adhkar-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="navigateBack('resources')">
+          <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+        </button>
+        <div>
+          <span class="adhkar-header-mark" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+          <h1 id="adhkarTitle">Adhkār</h1>
+          <p>Les invocations du matin<br>et du soir.</p>
+        </div>
+      </header>
+
+      <div class="adhkar-content">
+        <button class="adhkar-card morning" type="button" onclick="startCuratedAdhkarReading('morning')">
+          <span class="adhkar-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+          <span class="adhkar-card-copy">
+            <strong>Adhkār du matin</strong>
+            <small>Commence ta journée par le rappel d’Allah.</small>
+          </span>
+          <span class="adhkar-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+        </button>
+
+        <button class="adhkar-card evening" type="button" onclick="openResourceSoon('Adhkār du soir')">
+          <span class="adhkar-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+          <span class="adhkar-card-copy">
+            <strong>Adhkār du soir</strong>
+            <small>Termine ta journée dans la sérénité.</small>
+          </span>
+          <span class="adhkar-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+        </button>
+
+      </div>
+    </section>
+
+    <section class="screen adhkar-reader-screen" id="adhkarReaderScreen" aria-labelledby="adhkarReaderTitle">
+      <header class="adhkar-reader-header">
+        <button class="page-back-btn adhkar-reader-back" type="button" aria-label="Quitter la lecture" onclick="closeAdhkarReading()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+        </button>
+        <div class="adhkar-reader-progress-copy">
+          <span id="adhkarReaderPosition">Adhkār 1 sur 1</span>
+          <div class="adhkar-reader-progress" role="progressbar" aria-label="Progression de la session" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <i id="adhkarReaderProgressBar"></i>
+          </div>
+        </div>
+      </header>
+
+      <div class="adhkar-reader-content">
+        <div id="adhkarReaderActive">
+          <div class="adhkar-reader-title-row">
+            <div><span id="adhkarReaderPeriod">Matin</span><h1 id="adhkarReaderTitle">Adhkār</h1></div>
+            <strong id="adhkarReaderTarget">×1</strong>
+          </div>
+
+          <article class="adhkar-reading-card">
+            <span class="adhkar-item-progress" aria-hidden="true"><i id="adhkarReciteProgress"></i></span>
+            <p class="adhkar-reading-arabic" id="adhkarReaderArabic" lang="ar" dir="rtl"></p>
+            <span aria-hidden="true"></span>
+            <button class="adhkar-translation-toggle" id="adhkarTranslationToggle" type="button" aria-expanded="false" hidden onclick="toggleAdhkarTranslation()">Voir la traduction</button>
+            <p class="adhkar-reading-translation" id="adhkarReaderTranslation"></p>
+          </article>
+
+          <details class="adhkar-reader-benefit" id="adhkarReaderBenefitWrap" hidden>
+            <summary><strong>Voir les bienfaits</strong><span aria-hidden="true">⌄</span></summary>
+            <p id="adhkarReaderBenefit"></p>
+          </details>
+
+          <button class="adhkar-recite-btn" id="adhkarReciteBtn" type="button" onclick="validateAdhkarRepetition()">
+            <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+            <span id="adhkarReciteLabel">J’ai récité</span>
+          </button>
+        </div>
+
+        <div class="adhkar-reader-complete" id="adhkarReaderComplete" hidden>
+          <span class="adhkar-reader-complete-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
+          <h1>Session terminée</h1>
+          <p id="adhkarReaderCompleteText">Tous tes adhkār ont été lus.</p>
+          <button type="button" onclick="closeAdhkarReading()">Retour aux adhkār</button>
+        </div>
+      </div>
+    </section>
+
     <section class="screen journal-screen" id="journalScreen" aria-labelledby="journalTitle">
       <header class="journal-header">
         <div class="journal-topline">
-          <button class="page-back-btn journal-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="navigateBack('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
+          <button class="page-back-btn journal-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="navigateBack('resources')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
           <div class="brand">MURAJAAH<small>FLASH</small></div>
           <button class="journal-profile-btn" type="button" aria-label="Ouvrir le profil" onclick="openProfile('progress')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -437,7 +581,7 @@
           <path d="M3.5 5.25A2.25 2.25 0 0 1 5.75 3H10a2 2 0 0 1 2 2v15.5a2.75 2.75 0 0 0-2.75-2.75H3.5Z"/>
           <path d="M20.5 5.25A2.25 2.25 0 0 0 18.25 3H14a2 2 0 0 0-2 2v15.5a2.75 2.75 0 0 1 2.75-2.75h5.75Z"/>
         </svg>
-        Murajaah
+        Révision
       </button>
       <button class="nav-btn" data-screen="hifdh" onclick="openMainSection('hifdh')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -446,12 +590,12 @@
         </svg>
         Test Hifdh
       </button>
-      <button class="nav-btn" data-screen="journal" onclick="openMainSection('journal')">
+      <button class="nav-btn" data-screen="resources" onclick="openMainSection('resources')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M5 19V11M12 19V5M19 19v-7"/>
           <path d="M3.5 19.5h17"/>
         </svg>
-        Bilan
+        Ressources
       </button>
     </nav>
 
@@ -465,7 +609,7 @@
             <svg viewBox="0 0 24 24"></svg>
           </span>
           <div class="review-intro-title">
-            <h1>Murajaah ciblée</h1>
+            <h1>Murajaah</h1>
             <p>Révise tes passages avec<br>la méthode de répétition espacée.</p>
           </div>
           <span class="review-intro-head-spacer" aria-hidden="true"></span>
@@ -492,12 +636,12 @@
           </div>
 
           <section class="review-quick-actions" aria-label="Accès rapides">
-            <button type="button" onclick="exitReview(); showScreen('library')">
+            <button type="button" onclick="exitReview('library')">
               <span class="review-quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.6v14"/><path d="M3 17.5V5.7A2.7 2.7 0 0 1 5.7 3H9a3 3 0 0 1 3 3v14.6a3.9 3.9 0 0 0-3.4-2H3Z"/><path d="M21 17.5V5.7A2.7 2.7 0 0 0 18.3 3H15a3 3 0 0 0-3 3v14.6a3.9 3.9 0 0 1 3.4-2H21Z"/></svg></span>
               <span><strong>Mes passages</strong><small>Consulte et révise tes passages<br>en toute simplicité.</small></span>
               <b class="review-quick-arrow"><svg viewBox="0 0 24 24"></svg></b>
             </button>
-            <button type="button" onclick="exitReview(); showScreen('add')">
+            <button type="button" onclick="exitReview('add')">
               <span class="review-quick-icon plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
               <span><strong>Ajouter un passage</strong><small>Ajoute un nouveau passage<br>en quelques secondes.</small></span>
               <b class="review-quick-arrow"><svg viewBox="0 0 24 24"></svg></b>
@@ -680,6 +824,7 @@
         </section>
 
         <section class="hifdh-setup-summary" aria-label="Résumé du test">
+          <h2>Récapitulatif</h2>
           <div>
             <span class="hifdh-summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
             <strong id="hifdhSummaryHizb">Hizb 1</strong>
@@ -858,6 +1003,31 @@
       </form>
     </div>
 
+    <div class="adhkar-sheet" id="adhkarSheet" hidden role="dialog" aria-modal="true" aria-labelledby="adhkarSheetTitle">
+      <button class="adhkar-sheet-backdrop" type="button" aria-label="Fermer" onclick="closeAdhkarPanel()"></button>
+      <section class="adhkar-sheet-card">
+        <div class="adhkar-sheet-head">
+          <div><span>Adhkār personnels</span><h2 id="adhkarSheetTitle">Ajouter un adhkār</h2></div>
+          <button type="button" aria-label="Fermer" onclick="closeAdhkarPanel()"><svg viewBox="0 0 24 24" aria-hidden="true"></svg></button>
+        </div>
+        <div class="adhkar-sheet-tabs" role="tablist" aria-label="Gestion des adhkār personnels">
+          <button class="active" type="button" role="tab" data-adhkar-tab="add" onclick="setAdhkarPanelMode('add')">Ajouter</button>
+          <button type="button" role="tab" data-adhkar-tab="list" onclick="setAdhkarPanelMode('list')">Mes adhkār <span id="adhkarTabCount">0</span></button>
+        </div>
+        <form class="adhkar-personal-form" id="adhkarPersonalForm" onsubmit="savePersonalAdhkar(event)">
+          <label><span>Titre</span><input id="adhkarPersonalTitle" maxlength="60" required placeholder="Ex. Avant de dormir"></label>
+          <div class="adhkar-form-row">
+            <label><span>Moment</span><select id="adhkarPersonalPeriod"><option value="morning">Matin</option><option value="evening">Soir</option></select></label>
+            <label><span>Répétitions</span><input id="adhkarPersonalRepetitions" type="number" min="1" max="100" inputmode="numeric" value="3" required></label>
+          </div>
+          <label><span>Adhkār en arabe</span><textarea class="adhkar-arabic-input" id="adhkarPersonalArabic" lang="ar" dir="rtl" maxlength="500" rows="4" required placeholder="اكتب الذكر هنا"></textarea></label>
+          <label><span>Traduction française</span><textarea id="adhkarPersonalTranslation" maxlength="500" rows="4" required placeholder="Écris ici sa traduction"></textarea></label>
+          <button class="adhkar-personal-save" type="submit">Enregistrer l’adhkār</button>
+        </form>
+        <div class="adhkar-personal-list" id="adhkarPersonalList" hidden></div>
+      </section>
+    </div>
+
     <div class="splash-screen" id="splashScreen" aria-label="Ouverture de Murajaah Flash">
       <img class="splash-bismillah" src="assets/bismillah.png" alt="بسم الله الرحمن الرحيم">
       <div class="splash-brand">
@@ -870,7 +1040,7 @@
   </main>
 
   <script src="js/pwa.js"></script>
-  <script src="js/icon-system.js?v=24"></script>
-  <script src="js/app.js?v=responsive1"></script>
+  <script src="js/icon-system.js?v=31"></script>
+  <script src="js/app.js?v=adhkar-shortcut2"></script>
 </body>
 </html>

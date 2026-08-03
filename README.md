@@ -31,6 +31,7 @@ L’application programme ensuite la prochaine révision avec une répétition e
 - Test Hifdh par hizb avec auto-évaluation
 - Traduction française Hamidullah affichable à la demande en Révision et Test Hifdh
 - Journal de révision libre et historique supprimable
+- Ressources Adhkār du matin et du soir, avec contenu bilingue intégré, répétitions et lecture guidée
 - Bilan de fréquence par hizb
 - Données locales
 - Sans compte

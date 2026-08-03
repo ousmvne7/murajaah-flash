@@ -18,6 +18,7 @@ setTimeout(() => {
     const ACTIVITY_KEY = "murajaah_flash_v2_activity";
     const HIFDH_HISTORY_KEY = "murajaah_flash_v2_hifdh_tests";
     const JOURNAL_KEY = "murajaah_flash_v1_free_reviews";
+    const ADHKAR_KEY = "murajaah_flash_v1_personal_adhkar";
     const ELAN_RECITER_BASE = "https://everyayah.com/data/Minshawy_Murattal_128kbps";
     const ELAN_PLAYBACK_RATE = 1.25;
     const FRENCH_TRANSLATION_PATH = "data/quran-fr-hamidullah.json";
@@ -29,6 +30,75 @@ setTimeout(() => {
       }
     };
     const DAY = 86400000;
+    const CURATED_ADHKAR = {
+      morning: [
+        {
+          id: "morning-ayat-al-kursi",
+          title: "Ayat al-Kursi",
+          period: "morning",
+          repetitions: 1,
+          quranRef: { surah: 2, ayah: 255 },
+          translation: "Allah ! Point de divinité à part Lui, le Vivant, Celui qui subsiste par Lui-même. Ni somnolence ni sommeil ne Le saisissent. À Lui appartient tout ce qui est dans les cieux et sur la terre. Qui peut intercéder auprès de Lui sans Sa permission ? Il connaît leur passé et leur futur. Et de Sa science, ils n’embrassent que ce qu’Il veut. Son Kursiy déborde les cieux et la terre, dont la garde ne Lui coûte aucune peine. Et Il est le Très Haut, le Très Grand.",
+          reference: "Sourate al-Baqara, verset 255",
+          benefit: "Le Prophète ﷺ a dit : « Celui qui récite Ayat al-Kursi le matin est protégé contre les djinns jusqu’au soir, et celui qui le récite le soir est protégé jusqu’au matin. » Rapporté par al-Hakim et authentifié par al-Albani."
+        },
+        {
+          id: "morning-al-ikhlas",
+          title: "Al-Ikhlas",
+          period: "morning",
+          repetitions: 3,
+          quranRef: { surah: 112, startAyah: 1, endAyah: 4 },
+          reference: "Sourate al-Ikhlas, versets 1 à 4",
+          benefit: "Ces trois sourates couvrent l’ensemble des formes de protection : al-Ikhlas affirme le tawhid, l’unicité divine ; al-Falaq protège contre les maux extérieurs, comme la sorcellerie, l’envie et l’obscurité ; et an-Nas protège contre les maux intérieurs, notamment les chuchotements de Shaytan. Récitées trois fois le matin, elles forment un bouclier complet pour la journée."
+        },
+        {
+          id: "morning-al-falaq",
+          title: "Al-Falaq",
+          period: "morning",
+          repetitions: 3,
+          quranRef: { surah: 113, startAyah: 1, endAyah: 5 },
+          reference: "Sourate al-Falaq, versets 1 à 5"
+        },
+        {
+          id: "morning-an-nas",
+          title: "An-Nas",
+          period: "morning",
+          repetitions: 3,
+          quranRef: { surah: 114, startAyah: 1, endAyah: 6 },
+          reference: "Sourate an-Nas, versets 1 à 6"
+        },
+        {
+          id: "morning-sayyid-al-istighfar",
+          title: "Sayyid al-Istighfar",
+          period: "morning",
+          repetitions: 1,
+          arabic: "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
+          translation: "Ô Allah, Tu es mon Seigneur, il n’y a de divinité digne d’adoration que Toi. Tu m’as créé et je suis Ton serviteur. Je suis fidèle à Ton pacte et à Ta promesse autant que je le puis. Je cherche refuge auprès de Toi contre le mal que j’ai commis. Je reconnais devant Toi Tes bienfaits à mon égard et je reconnais mon péché. Pardonne-moi, car nul ne pardonne les péchés si ce n’est Toi.",
+          reference: "Rapporté par al-Bukhari (6306)",
+          benefit: "Le Prophète ﷺ a dit : « Celui qui la récite le matin avec conviction et meurt dans la journée entrera au Paradis. Et celui qui la récite le soir avec conviction et meurt durant la nuit entrera au Paradis. » Rapporté par al-Bukhari. Cette invocation réunit la reconnaissance de la seigneurie d’Allah, Son unicité, la soumission du serviteur, la demande de protection et l’aveu des péchés."
+        },
+        {
+          id: "morning-al-afiya",
+          title: "Demande de bien-être (Al-‘Afiya)",
+          period: "morning",
+          repetitions: 1,
+          arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِي وَعَنْ يَمِينِي وَعَنْ شِمَالِي وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي",
+          translation: "Ô Allah, je Te demande le bien-être dans ce monde et dans l’au-delà. Ô Allah, je Te demande le pardon et le bien-être dans ma religion, ma vie, ma famille et mes biens. Ô Allah, couvre mes défauts et apaise mes craintes. Ô Allah, protège-moi par devant, par derrière, sur ma droite, sur ma gauche et au-dessus de moi. Et je cherche refuge auprès de Ta grandeur contre le fait d’être englouti par en dessous.",
+          reference: "Rapporté par Abu Dawud (5074) et Ibn Majah (3871), authentifié par al-Albani",
+          benefit: "Cette invocation couvre toutes les dimensions de la protection : spirituelle, physique, familiale et matérielle. Al-‘afiya désigne le bien-être et la préservation. Lorsque al-‘Abbas ibn ‘Abd al-Muttalib demanda au Prophète ﷺ de lui enseigner une invocation, il lui répondit : « Demandez à Allah al-‘afiya. » Rapporté par at-Tirmidhi."
+        },
+        {
+          id: "morning-asbahna-wa-asbahal-mulku",
+          title: "Asbahna wa asbahal-mulku lillah",
+          period: "morning",
+          repetitions: 1,
+          arabic: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَٰذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَٰذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ",
+          translation: "Nous voilà au matin et la royauté appartient à Allah. Louange à Allah. Il n’y a de divinité digne d’adoration qu’Allah, Seul, sans associé. À Lui la royauté, à Lui la louange et Il est Omnipotent. Seigneur, je Te demande le bien de cette journée et le bien de ce qui vient après. Et je cherche refuge auprès de Toi contre le mal de cette journée et le mal de ce qui vient après.",
+          reference: "Rapporté par Muslim (2723)"
+        }
+      ],
+      evening: []
+    };
     let cards = load(STORAGE_KEY, [])
       .filter(card => !card.type || card.type === "recitation")
       .map(card => ({
@@ -41,6 +111,14 @@ setTimeout(() => {
     let activity = load(ACTIVITY_KEY, {});
     let hifdhHistory = load(HIFDH_HISTORY_KEY, []);
     let journalEntries = load(JOURNAL_KEY, []);
+    let personalAdhkar = load(ADHKAR_KEY, [])
+      .filter(item => item && item.id && item.title && (item.arabic || item.translation || item.text))
+      .map(item => ({
+        ...item,
+        arabic: item.arabic || "",
+        translation: item.translation || item.text || "",
+        repetitions: Math.max(1, Math.min(100, Number(item.repetitions) || 1))
+      }));
     let journalShowAll = false;
     let activeFilter = "all";
     let librarySort = "recent";
@@ -76,6 +154,7 @@ setTimeout(() => {
     let hifdhPickerCloseTimer = null;
     let screenHistory = [];
     let overlayReturnScreen = "home";
+    let adhkarReadingSession = null;
 
     function load(key, fallback) {
       try {
@@ -90,6 +169,7 @@ setTimeout(() => {
         localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activity));
         localStorage.setItem(HIFDH_HISTORY_KEY, JSON.stringify(hifdhHistory));
         localStorage.setItem(JOURNAL_KEY, JSON.stringify(journalEntries));
+        localStorage.setItem(ADHKAR_KEY, JSON.stringify(personalAdhkar));
         return true;
       } catch (_) {
         toast("Stockage plein : supprime un ancien audio ou raccourcis l’enregistrement.");
@@ -188,8 +268,10 @@ setTimeout(() => {
           : name === "add"
             ? (current === "library" ? "review" : "home")
             : name === "progress"
-              ? (current === "journal" ? "journal" : "home")
-              : name;
+              ? (["journal", "resources"].includes(current) ? "resources" : "home")
+              : ["journal", "adhkar", "adhkarReader"].includes(name)
+                ? "resources"
+                : name;
         btn.classList.toggle("active", btn.dataset.screen === activeScreen);
       });
       if (name === "home") renderDashboard();
@@ -274,6 +356,227 @@ setTimeout(() => {
     function openJournal() {
       journalShowAll = false;
       showScreen("journal");
+    }
+
+    function openAdhkar() {
+      showScreen("adhkar");
+      renderPersonalAdhkar();
+    }
+
+    function openAdhkarPanel(mode = "add") {
+      document.getElementById("adhkarSheet").hidden = false;
+      document.body.style.overflow = "hidden";
+      setAdhkarPanelMode(mode);
+    }
+
+    function closeAdhkarPanel() {
+      document.getElementById("adhkarSheet").hidden = true;
+      document.body.style.overflow = "";
+    }
+
+    function setAdhkarPanelMode(mode = "add") {
+      const isList = mode === "list";
+      document.getElementById("adhkarSheetTitle").textContent = isList ? "Mes adhkār" : "Ajouter un adhkār";
+      document.getElementById("adhkarPersonalForm").hidden = isList;
+      document.getElementById("adhkarPersonalList").hidden = !isList;
+      document.querySelectorAll("[data-adhkar-tab]").forEach(button => {
+        const active = button.dataset.adhkarTab === mode;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-selected", active ? "true" : "false");
+      });
+      if (isList) renderPersonalAdhkar();
+    }
+
+    function savePersonalAdhkar(event) {
+      event.preventDefault();
+      const title = document.getElementById("adhkarPersonalTitle").value.trim();
+      const arabic = document.getElementById("adhkarPersonalArabic").value.trim();
+      const translation = document.getElementById("adhkarPersonalTranslation").value.trim();
+      const period = document.getElementById("adhkarPersonalPeriod").value;
+      const repetitions = Math.max(1, Math.min(100, Number(document.getElementById("adhkarPersonalRepetitions").value) || 1));
+      if (!title || !arabic || !translation) return toast("Ajoute le texte arabe et sa traduction.");
+      personalAdhkar.unshift({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        title,
+        arabic,
+        translation,
+        repetitions,
+        period: period === "evening" ? "evening" : "morning",
+        createdAt: Date.now()
+      });
+      personalAdhkar = personalAdhkar.slice(0, 100);
+      persist();
+      document.getElementById("adhkarPersonalForm").reset();
+      renderPersonalAdhkar();
+      setAdhkarPanelMode("list");
+      toast("Adhkār enregistré.");
+    }
+
+    function renderPersonalAdhkar() {
+      const count = personalAdhkar.length;
+      const countNode = document.getElementById("personalAdhkarCount");
+      if (countNode) {
+        countNode.textContent = count;
+        countNode.parentElement.lastChild.textContent = count === 1 ? " enregistré" : " enregistrés";
+      }
+      const tabCount = document.getElementById("adhkarTabCount");
+      if (tabCount) tabCount.textContent = count;
+      const list = document.getElementById("adhkarPersonalList");
+      if (!list) return;
+      if (!count) {
+        list.innerHTML = `<div class="adhkar-empty"><svg viewBox="0 0 24 24" aria-hidden="true"></svg><strong>Aucun adhkār ajouté</strong><span>Ajoute ton premier rappel personnel.</span><button type="button" onclick="setAdhkarPanelMode('add')">Ajouter maintenant</button></div>`;
+        return;
+      }
+      list.innerHTML = `
+        <button class="adhkar-start-session" type="button" onclick="startAdhkarReading()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+          <span><strong>Commencer la lecture</strong><small>${count} adhkār à lire</small></span>
+        </button>` + personalAdhkar.map(item => `
+        <article class="adhkar-personal-item">
+          <div><span>${item.period === "evening" ? "Soir" : "Matin"} · ×${item.repetitions || 1}</span><strong>${escapeHtml(item.title)}</strong>${item.arabic ? `<p class="adhkar-personal-arabic" lang="ar" dir="rtl">${escapeHtml(item.arabic)}</p>` : ""}<p>${escapeHtml(item.translation)}</p></div>
+          <button type="button" aria-label="Supprimer ${escapeHtml(item.title)}" onclick="deletePersonalAdhkar('${item.id}')"><svg viewBox="0 0 24 24" aria-hidden="true"></svg></button>
+        </article>`).join("");
+    }
+
+    async function startCuratedAdhkarReading(period = "morning") {
+      const items = CURATED_ADHKAR[period] || [];
+      if (!items.length) return toast(`Adhkār du ${period === "evening" ? "soir" : "matin"} sera disponible prochainement.`);
+      try {
+        const [data, translations] = await Promise.all([loadQuranData(), loadFrenchTranslations()]);
+        const resolvedItems = items.map(item => {
+          if (!item.quranRef) return { ...item };
+          const chapter = data.chapters[String(item.quranRef.surah)];
+          const startAyah = item.quranRef.startAyah || item.quranRef.ayah;
+          const endAyah = item.quranRef.endAyah || startAyah;
+          const ayahs = Array.from({ length: endAyah - startAyah + 1 }, (_, index) => startAyah + index);
+          const arabic = ayahs.map(ayah => chapter?.verses?.[String(ayah)] || "").filter(Boolean).join(" ");
+          if (!arabic) throw new Error("Quran verse unavailable");
+          const translation = item.translation || ayahs
+            .map(ayah => translations.get(`${item.quranRef.surah}:${ayah}`) || "")
+            .filter(Boolean)
+            .join(" ");
+          return { ...item, arabic, translation };
+        });
+        startAdhkarReading(resolvedItems);
+      } catch (_) {
+        toast("Le texte KFGQPC Hafs v18 n’est pas disponible.");
+      }
+    }
+
+    function startAdhkarReading(items = personalAdhkar) {
+      if (!items.length) return toast("Aucun adhkār disponible.");
+      adhkarReadingSession = {
+        items: items.map(item => ({ ...item })),
+        index: 0,
+        completed: 0,
+        repetition: 0
+      };
+      closeAdhkarPanel();
+      document.getElementById("bottomNav").style.display = "none";
+      showScreen("adhkarReader");
+      renderAdhkarReading();
+    }
+
+    function renderAdhkarReading() {
+      if (!adhkarReadingSession) return;
+      const session = adhkarReadingSession;
+      const total = session.items.length;
+      const progress = total ? Math.round((session.completed / total) * 100) : 0;
+      const progressElement = document.querySelector("#adhkarReaderScreen .adhkar-reader-progress");
+      document.getElementById("adhkarReaderProgressBar").style.width = `${progress}%`;
+      progressElement?.setAttribute("aria-valuenow", String(progress));
+
+      if (session.completed >= total) {
+        document.getElementById("adhkarReaderPosition").textContent = `${total} adhkār sur ${total}`;
+        document.getElementById("adhkarReaderProgressBar").style.width = "100%";
+        progressElement?.setAttribute("aria-valuenow", "100");
+        document.getElementById("adhkarReaderActive").hidden = true;
+        document.getElementById("adhkarReaderComplete").hidden = false;
+        document.getElementById("adhkarReaderCompleteText").textContent = `${total} adhkār ${total === 1 ? "lu" : "lus"} · Toutes les répétitions ont été accomplies.`;
+        return;
+      }
+
+      const item = session.items[session.index];
+      const target = Math.max(1, Number(item.repetitions) || 1);
+      document.getElementById("adhkarReaderActive").hidden = false;
+      document.getElementById("adhkarReaderComplete").hidden = true;
+      document.getElementById("adhkarReaderPosition").textContent = `Adhkār ${session.index + 1} sur ${total}`;
+      document.getElementById("adhkarReaderPeriod").textContent = item.period === "evening" ? "Adhkār du soir" : "Adhkār du matin";
+      document.getElementById("adhkarReaderTitle").textContent = item.title;
+      document.getElementById("adhkarReaderTarget").textContent = `×${target}`;
+      const arabicNode = document.getElementById("adhkarReaderArabic");
+      arabicNode.textContent = item.arabic;
+      arabicNode.classList.toggle("quranic", Boolean(item.quranRef));
+      const translationNode = document.getElementById("adhkarReaderTranslation");
+      const translationToggle = document.getElementById("adhkarTranslationToggle");
+      const isLong = item.arabic.length > 420 || item.translation.length > 360;
+      document.getElementById("adhkarReaderScreen").classList.toggle("is-long-adhkar", isLong);
+      translationNode.textContent = item.translation;
+      translationNode.hidden = isLong;
+      translationToggle.hidden = !isLong;
+      translationToggle.textContent = "Voir la traduction";
+      translationToggle.setAttribute("aria-expanded", "false");
+      const optionalFields = [
+        ["adhkarReaderBenefit", item.benefit, "adhkarReaderBenefitWrap"]
+      ];
+      optionalFields.forEach(([id, value, wrapperId]) => {
+        const node = document.getElementById(id);
+        const wrapper = document.getElementById(wrapperId || id);
+        if (node) node.textContent = value || "";
+        if (wrapper) {
+          wrapper.hidden = !value;
+          if ("open" in wrapper) wrapper.open = false;
+        }
+      });
+      document.getElementById("adhkarReciteLabel").textContent = target > 1
+        ? `J’ai récité · ${session.repetition}/${target}`
+        : "J’ai récité";
+      document.getElementById("adhkarReciteProgress").style.width = `${Math.round((session.repetition / target) * 100)}%`;
+    }
+
+    function toggleAdhkarTranslation() {
+      const translation = document.getElementById("adhkarReaderTranslation");
+      const toggle = document.getElementById("adhkarTranslationToggle");
+      const willOpen = translation.hidden;
+      translation.hidden = !willOpen;
+      toggle.textContent = willOpen ? "Masquer la traduction" : "Voir la traduction";
+      toggle.setAttribute("aria-expanded", String(willOpen));
+    }
+
+    function validateAdhkarRepetition() {
+      if (!adhkarReadingSession) return;
+      const session = adhkarReadingSession;
+      const item = session.items[session.index];
+      const target = Math.max(1, Number(item.repetitions) || 1);
+      session.repetition += 1;
+      if (session.repetition >= target) {
+        session.completed += 1;
+        session.index += 1;
+        session.repetition = 0;
+      }
+      renderAdhkarReading();
+    }
+
+    function closeAdhkarReading() {
+      adhkarReadingSession = null;
+      document.getElementById("bottomNav").style.display = "grid";
+      showScreen("adhkar", { remember: false });
+    }
+
+    function deletePersonalAdhkar(id) {
+      const item = personalAdhkar.find(entry => entry.id === id);
+      if (!item) return;
+      openModal(`Supprimer « ${item.title} » ?`, "Cet adhkār sera retiré de ta liste personnelle.", () => {
+        personalAdhkar = personalAdhkar.filter(entry => entry.id !== id);
+        persist();
+        closeModal();
+        renderPersonalAdhkar();
+        toast("Adhkār supprimé.");
+      });
+    }
+
+    function openResourceSoon(name) {
+      toast(`${name} sera disponible prochainement.`);
     }
 
     function setProfileTab(tab = "progress") {
@@ -2456,6 +2759,7 @@ setTimeout(() => {
         cards = [];
         activity = {};
         journalEntries = [];
+        personalAdhkar = [];
         persist();
         closeModal();
         renderProgress();
@@ -2775,6 +3079,7 @@ setTimeout(() => {
     renderDashboard();
     renderLibrary();
     renderJournal();
+    renderPersonalAdhkar();
     Promise.all([loadQuranData(), loadQuranPagesData()]).then(() => {
       renderDashboard();
       renderLibrary();

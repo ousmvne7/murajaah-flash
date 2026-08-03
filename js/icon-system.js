@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const SPRITE = "assets/icons/lucide.svg?v=9";
+  const SPRITE = "assets/icons/lucide.svg?v=10";
 
   const rules = [
     [".home-profile-btn > svg, .journal-profile-btn > svg", "user-round"],
@@ -12,7 +12,7 @@
     [".review-mode-card .home-mode-icon > svg", "book-open"],
     [".hifdh-mode-card .home-mode-icon > svg", "brain"],
     [".review-intro-header-mark > svg", "book-open"],
-    [".hifdh-header-mark > svg", "shield-check"],
+    [".hifdh-header-mark > svg", "brain"],
     [".home-mode-arrow > svg", "chevron-right"],
     [".home-quick-grid > button:nth-child(1) > svg", "circle-plus"],
     [".home-quick-grid > button:nth-child(2) > svg", "bookmark-check"],
@@ -50,7 +50,27 @@
     [".bottom-nav .nav-btn[data-screen='home'] > svg", "house"],
     [".bottom-nav .nav-btn[data-screen='review'] > svg", "book-open"],
     [".bottom-nav .nav-btn[data-screen='hifdh'] > svg", "brain"],
-    [".bottom-nav .nav-btn[data-screen='journal'] > svg", "chart-no-axes-column-increasing"],
+    [".bottom-nav .nav-btn[data-screen='resources'] > svg", "circle-plus"],
+    [".resources-back-btn > svg", "arrow-left"],
+    [".resources-header-mark > svg", "circle-plus"],
+    [".resource-card:nth-child(1) .resource-card-icon > svg", "calendar-check"],
+    [".resource-card:nth-child(2) .resource-card-icon > svg", "languages"],
+    [".resource-card:nth-child(3) .resource-card-icon > svg", "moon-star"],
+    [".resource-card-arrow > svg", "chevron-right"],
+    [".adhkar-back-btn > svg", "arrow-left"],
+    [".adhkar-header-mark > svg", "moon-star"],
+    [".adhkar-card.morning .adhkar-card-icon > svg", "sunrise"],
+    [".adhkar-card.evening .adhkar-card-icon > svg", "moon-star"],
+    [".adhkar-card-arrow > svg", "chevron-right"],
+    [".adhkar-add-btn > svg", "circle-plus"],
+    [".adhkar-list-btn > svg", "bookmark-check"],
+    [".adhkar-sheet-head > button > svg", "x"],
+    [".adhkar-personal-item > button > svg", "trash-2"],
+    [".adhkar-empty > svg", "bookmark"],
+    [".adhkar-start-session > svg", "play"],
+    [".adhkar-reader-back > svg", "arrow-left"],
+    [".adhkar-recite-btn > svg", "circle-check-big"],
+    [".adhkar-reader-complete-icon > svg", "circle-check-big"],
     [".review-quick-actions > button:nth-child(1) .review-quick-icon > svg", "bookmark-check"],
     [".review-quick-actions > button:nth-child(2) .review-quick-icon > svg", "circle-plus"],
     [".review-quick-arrow > svg", "chevron-right"],

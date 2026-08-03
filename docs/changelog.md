@@ -1,5 +1,27 @@
 # Journal des évolutions
 
+## 3 août 2026
+
+### Adhkār
+
+- retrait des commandes d’ajout et de gestion des adhkār personnels ;
+- ajout d’une collection interne d’adhkār validés, classés par matin et soir ;
+- ajout d’Ayat al-Kursi avec arabe, traduction, référence et bienfait ;
+- ouverture de la lecture guidée depuis la carte Adhkār du matin.
+- simplification du lecteur : retrait de la phonétique et du bloc de répétition, avec compteur compact dans le bouton.
+- chargement d’Ayat al-Kursi depuis la référence KFGQPC Hafs v18 `2:255`, sans copie arabe séparée.
+- ajout des trois Qul dans l’ordre Al-Ikhlas, Al-Falaq et An-Nas, avec texte KFGQPC Hafs v18, traduction Hamidullah et trois répétitions chacune.
+
+## 1 août 2026
+
+### Adhkār
+
+- ajout des accès Adhkār du matin et du soir dans Ressources ;
+- ajout d’un espace personnel pour enregistrer un adhkār en arabe avec sa traduction française ;
+- consultation, comptage et suppression des adhkār personnels stockés localement.
+- configuration du nombre de répétitions pour chaque adhkār ;
+- lecture guidée avec jauge globale, compteur individuel et écran de fin de session.
+
 ## 19 juillet 2026
 
 ### Interface

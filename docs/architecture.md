@@ -62,6 +62,7 @@ Les données utilisateur sont stockées dans le navigateur. Elles comprennent no
 - les audios personnels éventuels ;
 - l’activité et la progression ;
 - les entrées du Journal de révision libre.
+- les adhkār de référence sont intégrés dans `CURATED_ADHKAR`, avec arabe, traduction, source, bienfait, catégorie et répétitions.
 
 La suppression d’une entrée du Bilan demande confirmation et déclenche le recalcul des statistiques.
 

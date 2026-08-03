@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "murajaah-flash";
-const CACHE_VERSION = "v78-hifdh-counts-responsive";
+const CACHE_VERSION = "v123-adhkar-gold-border";
 const APP_CACHE = `${CACHE_PREFIX}-app-${CACHE_VERSION}`;
 const MUSHAF_CACHE = `${CACHE_PREFIX}-mushaf-${CACHE_VERSION}`;
 
@@ -8,7 +8,7 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
   "./css/styles.css?v=audio-status1",
-  "./css/home.css?v=20",
+  "./css/home.css?v=25",
   "./css/journal.css?v=4",
   "./assets/home-hero-bg.png",
   "./css/library.css?v=4",
@@ -16,11 +16,11 @@ const APP_SHELL = [
   "./css/review-intro.css?v=5",
   "./css/typography.css?v=5",
   "./css/visual-audit.css?v=6",
-  "./css/design-system.css?v=34",
+  "./css/design-system.css?v=63",
   "./js/pwa.js",
-  "./js/icon-system.js?v=24",
-  "./js/app.js?v=responsive1",
-  "./assets/icons/lucide.svg?v=9",
+  "./js/icon-system.js?v=31",
+  "./js/app.js?v=adhkar-shortcut2",
+  "./assets/icons/lucide.svg?v=10",
   "./assets/icons/LUCIDE_LICENSE.txt",
   "./assets/icon.svg",
   "./assets/favicon-32.png",
