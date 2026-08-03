@@ -2467,7 +2467,7 @@ textarea:focus-visible {
   min-height: 100dvh;
   padding-bottom: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
   color: #17231f;
   background:
@@ -2537,7 +2537,7 @@ textarea:focus-visible {
 
 .adhkar-reader-content {
   min-height: 0;
-  padding: 22px 16px 18px;
+  padding: 22px 16px calc(22px + env(safe-area-inset-bottom));
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -2739,9 +2739,7 @@ textarea:focus-visible {
 }
 
 .adhkar-reader-action {
-  padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
-  border-top: 1px solid rgba(10, 90, 67, .1);
-  background: #f8fbf9;
+  padding: 0;
 }
 
 .adhkar-reader-action[hidden] { display: none !important; }

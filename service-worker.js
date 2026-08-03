@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "murajaah-flash";
-const CACHE_VERSION = "v126-adhkar-action-row";
+const CACHE_VERSION = "v127-adhkar-action-flow";
 const APP_CACHE = `${CACHE_PREFIX}-app-${CACHE_VERSION}`;
 const MUSHAF_CACHE = `${CACHE_PREFIX}-mushaf-${CACHE_VERSION}`;
 
@@ -16,7 +16,7 @@ const APP_SHELL = [
   "./css/review-intro.css?v=5",
   "./css/typography.css?v=5",
   "./css/visual-audit.css?v=6",
-  "./css/design-system.css?v=66",
+  "./css/design-system.css?v=67",
   "./js/pwa.js",
   "./js/icon-system.js?v=31",
   "./js/app.js?v=adhkar-action-row",

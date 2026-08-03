@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="css/review-intro.css?v=5">
   <link rel="stylesheet" href="css/typography.css?v=5">
   <link rel="stylesheet" href="css/visual-audit.css?v=6">
-  <link rel="stylesheet" href="css/design-system.css?v=66">
+  <link rel="stylesheet" href="css/design-system.css?v=67">
 </head>
 <body>
   <main class="app">
@@ -487,6 +487,12 @@
             <p id="adhkarReaderBenefit"></p>
           </details>
 
+          <div class="adhkar-reader-action" id="adhkarReaderAction">
+            <button class="adhkar-recite-btn" id="adhkarReciteBtn" type="button" onclick="validateAdhkarRepetition()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+              <span id="adhkarReciteLabel">J’ai récité</span>
+            </button>
+          </div>
         </div>
 
         <div class="adhkar-reader-complete" id="adhkarReaderComplete" hidden>
@@ -497,12 +503,6 @@
         </div>
       </div>
 
-      <div class="adhkar-reader-action" id="adhkarReaderAction">
-        <button class="adhkar-recite-btn" id="adhkarReciteBtn" type="button" onclick="validateAdhkarRepetition()">
-          <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
-          <span id="adhkarReciteLabel">J’ai récité</span>
-        </button>
-      </div>
     </section>
 
     <section class="screen journal-screen" id="journalScreen" aria-labelledby="journalTitle">
