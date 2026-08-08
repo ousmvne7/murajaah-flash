@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "murajaah-flash";
-const CACHE_VERSION = "v147-adhkar-review-card";
+const CACHE_VERSION = "v160-adhkar-punctuation-title";
 const APP_CACHE = `${CACHE_PREFIX}-app-${CACHE_VERSION}`;
 const MUSHAF_CACHE = `${CACHE_PREFIX}-mushaf-${CACHE_VERSION}`;
 
@@ -19,7 +19,7 @@ const APP_SHELL = [
   "./css/design-system.css?v=85",
   "./js/pwa.js",
   "./js/icon-system.js?v=31",
-  "./js/app.js?v=adhkar-header-arabic",
+  "./js/app.js?v=vocabulary-clean-2",
   "./assets/icons/lucide.svg?v=10",
   "./assets/icons/LUCIDE_LICENSE.txt",
   "./assets/icon.svg",

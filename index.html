@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="css/review-intro.css?v=5">
   <link rel="stylesheet" href="css/typography.css?v=5">
   <link rel="stylesheet" href="css/visual-audit.css?v=6">
-  <link rel="stylesheet" href="css/design-system.css?v=85">
+  <link rel="stylesheet" href="css/design-system.css?v=92">
 </head>
 <body>
   <main class="app">
@@ -392,7 +392,7 @@
           <span class="resource-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
         </button>
 
-        <button class="resource-card" type="button" onclick="openResourceSoon('Vocabulaire')">
+        <button class="resource-card" type="button" onclick="openVocabulary()">
           <span class="resource-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
           <span class="resource-card-copy">
             <strong>Vocabulaire</strong>
@@ -420,6 +420,78 @@
       </div>
     </section>
 
+    <section class="screen vocabulary-screen" id="vocabularyScreen" aria-labelledby="vocabularyTitle">
+      <header class="vocabulary-header">
+        <button class="page-back-btn vocabulary-back-btn" type="button" aria-label="Revenir aux ressources" onclick="navigateBack('resources')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </button>
+        <div>
+          <span>مُفْرَدَات</span>
+          <h1 id="vocabularyTitle">Vocabulaire</h1>
+          <p>Apprends les mots essentiels<br>des récits et du Coran.</p>
+        </div>
+      </header>
+
+      <div class="vocabulary-content">
+        <div class="vocabulary-intro">
+          <div><span>Mes mots</span><strong id="vocabularySavedSummary">Aucun mot ajouté</strong></div>
+          <b id="vocabularyProgressValue">0%</b>
+        </div>
+
+        <section class="vocabulary-themes" aria-labelledby="vocabularyThemesTitle">
+          <div class="vocabulary-section-head">
+            <h2 id="vocabularyThemesTitle">Banque de vocabulaire</h2>
+            <span>1 leçon</span>
+          </div>
+          <details class="vocabulary-lesson-folder">
+            <summary>
+              <span class="vocabulary-folder-number">1</span>
+              <span><strong>Les histoires des prophètes</strong><small>24 mots à découvrir</small></span>
+              <i>⌄</i>
+            </summary>
+            <div class="vocabulary-bank" id="vocabularyBank"></div>
+          </details>
+        </section>
+
+        <section class="vocabulary-my-words" aria-labelledby="vocabularyMyWordsTitle">
+          <div class="vocabulary-section-head"><h2 id="vocabularyMyWordsTitle">Mes mots</h2><span id="vocabularySavedCount">0 ajouté</span></div>
+          <div id="vocabularySavedList"></div>
+          <button class="vocabulary-start-btn" id="vocabularyStartBtn" type="button" onclick="startVocabularyReview()" disabled>Commencer la révision</button>
+        </section>
+      </div>
+    </section>
+
+    <section class="screen vocabulary-study-screen" id="vocabularyStudyScreen" aria-labelledby="vocabularyStudyTitle">
+      <header class="vocabulary-study-header">
+        <button class="page-back-btn" type="button" aria-label="Revenir aux thèmes" onclick="navigateBack('vocabulary')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </button>
+        <div><span>RÉVISION DES MOTS</span><h1 id="vocabularyStudyTitle">Les histoires des prophètes</h1></div>
+        <b id="vocabularyStudyCounter">1 / 1</b>
+      </header>
+      <div class="vocabulary-study-progress"><span id="vocabularyStudyProgress"></span></div>
+      <div class="vocabulary-study-content">
+        <article class="vocabulary-word-card">
+          <span class="vocabulary-word-language">Arabe</span>
+          <strong id="vocabularyStudyArabic" lang="ar" dir="rtl"></strong>
+        </article>
+        <div class="vocabulary-answer" id="vocabularyAnswer" hidden>
+          <span>Français</span><strong id="vocabularyStudyFrench"></strong>
+        </div>
+      </div>
+      <div class="vocabulary-study-help" id="vocabularyStudyHelp">
+        <button class="vocabulary-help-btn" type="button" aria-label="Afficher la consigne" aria-expanded="false" onclick="toggleVocabularyHelp(this)">?</button>
+        <p id="vocabularyHelpText" hidden>Réfléchis à la bonne réponse puis appuie sur le bouton suivant.</p>
+      </div>
+      <div class="vocabulary-study-action">
+        <button class="vocabulary-reveal-btn" id="vocabularyRevealBtn" type="button" onclick="revealVocabularyAnswer()">Devine la traduction</button>
+      </div>
+      <div class="vocabulary-rating" id="vocabularyRating" hidden>
+        <span>Évalue ta mémorisation</span>
+        <div><button class="known" type="button" onclick="rateVocabularyWord('acquired')">Acquis</button><button class="almost" type="button" onclick="rateVocabularyWord('almost')">Presque</button><button class="review" type="button" onclick="rateVocabularyWord('review')">À revoir</button></div>
+      </div>
+    </section>
+
     <section class="screen adhkar-screen" id="adhkarScreen" aria-labelledby="adhkarTitle">
       <header class="adhkar-header">
         <button class="page-back-btn adhkar-back-btn" type="button" aria-label="Revenir à la page précédente" onclick="navigateBack('resources')">
@@ -442,7 +514,7 @@
           <span class="adhkar-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
         </button>
 
-        <button class="adhkar-card evening" type="button" onclick="openResourceSoon('Adhkār du soir')">
+        <button class="adhkar-card evening" type="button" onclick="startCuratedAdhkarReading('evening')">
           <span class="adhkar-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
           <span class="adhkar-card-copy">
             <strong>Adhkār du soir</strong>
@@ -455,37 +527,33 @@
     </section>
 
     <section class="screen adhkar-reader-screen" id="adhkarReaderScreen" aria-labelledby="adhkarReaderTitle">
-      <header class="adhkar-reader-header">
-        <button class="page-back-btn adhkar-reader-back" type="button" aria-label="Quitter la lecture" onclick="closeAdhkarReading()">
-          <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
-        </button>
-        <div class="adhkar-reader-progress-copy">
-          <small id="adhkarReaderPeriod" lang="ar" dir="rtl">أذكار الصباح</small>
-          <h1 id="adhkarReaderTitle">Adhkār</h1>
-          <span id="adhkarReaderPosition">1 / 1</span>
-          <div class="adhkar-reader-progress" role="progressbar" aria-label="Progression de la session" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-            <i id="adhkarReaderProgressBar"></i>
-          </div>
-        </div>
-      </header>
+      <button class="page-back-btn adhkar-reader-back" type="button" aria-label="Quitter la lecture" onclick="closeAdhkarReading()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+      </button>
+      <div class="adhkar-reader-status" aria-label="Progression de la session">
+        <span id="adhkarReaderPosition">01 · 18</span>
+        <div class="adhkar-vertical-progress" id="adhkarVerticalProgress" aria-hidden="true"></div>
+      </div>
 
-      <div class="adhkar-reader-content">
+      <div class="adhkar-reader-content" id="adhkarReaderSwipeSurface">
         <div id="adhkarReaderActive">
           <article class="adhkar-reading-card">
-            <span class="adhkar-item-progress" id="adhkarItemProgress" aria-hidden="true"><i id="adhkarReciteProgress"></i></span>
+            <h1 class="adhkar-reading-title" id="adhkarReaderTitle">Adhkār</h1>
             <div class="adhkar-reader-title-actions">
-              <strong id="adhkarReaderTarget" hidden>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons/lucide.svg#lucide-repeat-2"></use></svg>
-                <span id="adhkarReaderTargetLabel">À répéter 3 fois</span>
+              <strong id="adhkarReaderTarget">
+                <i aria-hidden="true"></i><span id="adhkarReaderTargetLabel">À réciter 1 fois</span><i aria-hidden="true"></i>
               </strong>
             </div>
             <p class="adhkar-reading-arabic" id="adhkarReaderArabic" lang="ar" dir="rtl"></p>
-            <span aria-hidden="true"></span>
-            <button class="adhkar-translation-toggle translation-toggle" id="adhkarTranslationToggle" type="button" aria-expanded="false" onclick="toggleAdhkarTranslation()">
-              <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
-              <span id="adhkarTranslationLabel">Traduction</span>
-            </button>
-            <p class="adhkar-reading-translation" id="adhkarReaderTranslation"></p>
+            <div class="adhkar-ornament-divider" aria-hidden="true"><span>✦</span></div>
+            <details class="adhkar-inline-panel" id="adhkarTranslationPanel">
+              <summary><span><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons/lucide.svg#lucide-book-open"></use></svg>Traduction</span><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons/lucide.svg#lucide-chevron-down"></use></svg></summary>
+              <p class="adhkar-reading-translation" id="adhkarReaderTranslation"></p>
+            </details>
+            <details class="adhkar-inline-panel adhkar-reader-benefit" id="adhkarReaderBenefitWrap" hidden>
+              <summary><span><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons/lucide.svg#lucide-wand-sparkles"></use></svg>Bienfaits</span><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons/lucide.svg#lucide-chevron-down"></use></svg></summary>
+              <p id="adhkarReaderBenefit"></p>
+            </details>
           </article>
 
         </div>
@@ -498,15 +566,10 @@
         </div>
       </div>
 
-      <div class="adhkar-reader-action" id="adhkarReaderAction">
-        <details class="adhkar-reader-benefit" id="adhkarReaderBenefitWrap" hidden>
-          <summary aria-label="Voir les bienfaits"><span aria-hidden="true">?</span></summary>
-          <p id="adhkarReaderBenefit"></p>
-        </details>
-        <button class="adhkar-recite-btn" id="adhkarReciteBtn" type="button" onclick="validateAdhkarRepetition()">
-          <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
-          <span id="adhkarReciteLabel">J’ai récité</span>
-        </button>
+      <div class="adhkar-swipe-footer" id="adhkarReaderAction">
+        <div class="adhkar-repetition-dots" id="adhkarRepetitionDots" aria-label="Répétitions"></div>
+        <div class="adhkar-carousel-dots" id="adhkarCarouselDots" aria-hidden="true"></div>
+        <small>Swiper pour continuer</small>
       </div>
 
     </section>
@@ -1050,6 +1113,6 @@
 
   <script src="js/pwa.js"></script>
   <script src="js/icon-system.js?v=31"></script>
-  <script src="js/app.js?v=adhkar-header-arabic"></script>
+  <script src="js/app.js?v=vocabulary-clean-2"></script>
 </body>
 </html>

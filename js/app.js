@@ -19,6 +19,7 @@ setTimeout(() => {
     const HIFDH_HISTORY_KEY = "murajaah_flash_v2_hifdh_tests";
     const JOURNAL_KEY = "murajaah_flash_v1_free_reviews";
     const ADHKAR_KEY = "murajaah_flash_v1_personal_adhkar";
+    const VOCABULARY_KEY = "murajaah_flash_v1_vocabulary_words";
     const ELAN_RECITER_BASE = "https://everyayah.com/data/Minshawy_Murattal_128kbps";
     const ELAN_PLAYBACK_RATE = 1.25;
     const FRENCH_TRANSLATION_PATH = "data/quran-fr-hamidullah.json";
@@ -30,6 +31,58 @@ setTimeout(() => {
       }
     };
     const DAY = 86400000;
+    const VOCABULARY_BANK = [
+      { id: "lesson1-aazar", arabic: "آزَرُ", french: "Āzar" },
+      { id: "lesson1-bai", arabic: "بَائِعٌ", french: "vendeur" },
+      { id: "lesson1-bayt", arabic: "بَيْتٌ / بُيُوتٌ", french: "maison(s), demeure(s)" },
+      { id: "lesson1-rajul", arabic: "رَجُلٌ / رِجَالٌ", french: "homme(s)" },
+      { id: "lesson1-sanam", arabic: "صَنَمٌ / أَصْنَامٌ", french: "idole(s)" },
+      { id: "lesson1-fi", arabic: "فِي", french: "dans" },
+      { id: "lesson1-qarya", arabic: "قَرْيَةٌ / قُرًى", french: "village(s)" },
+      { id: "lesson1-kabir", arabic: "كَبِيرٌ", french: "grand" },
+      { id: "lesson1-kasara", arabic: "كَسَرَ / يَكْسِرُ", french: "casser" },
+      { id: "lesson1-mashhur", arabic: "مَشْهُورٌ", french: "connu, célèbre" },
+      { id: "lesson1-nas", arabic: "نَاسٌ", french: "gens" },
+      { id: "lesson1-wa", arabic: "وَ", french: "et, alors que" },
+      { id: "lesson1-ism", arabic: "اِسْمٌ / أَسْمَاءٌ", french: "nom(s)" },
+      { id: "lesson1-baa", arabic: "بَاعَ / يَبِيعُ", french: "vendre" },
+      { id: "lesson1-jiddan", arabic: "جِدًّا", french: "très, beaucoup" },
+      { id: "lesson1-sajada", arabic: "سَجَدَ / يَسْجُدُ", french: "se prosterner" },
+      { id: "lesson1-abada", arabic: "عَبَدَ / يَعْبُدُ", french: "adorer" },
+      { id: "lesson1-qabla", arabic: "قَبْلَ", french: "avant" },
+      { id: "lesson1-kana", arabic: "كَانَ / يَكُونُ", french: "être" },
+      { id: "lesson1-kathir", arabic: "كَثِيرٌ", french: "nombreux" },
+      { id: "lesson1-li", arabic: "لِـ", french: "pour" },
+      { id: "lesson1-man", arabic: "مَنْ", french: "qui" },
+      { id: "lesson1-hadha", arabic: "هَذَا / هَذِهِ", french: "ce, cet, cette" },
+      { id: "lesson1-yawm", arabic: "يَوْمٌ / أَيَّامٌ", french: "jour(s)" }
+    ];
+    const VIDEO_ADHKAR_COMMON = [
+      { key: "ya-hayyu-ya-qayyum", title: "Yā Hayyu, Yā Qayyūm", repetitions: 1, arabic: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَىٰ نَفْسِي طَرْفَةَ عَيْنٍ", translation: "Ô Vivant, Ô Toi qui subsistes par Toi-même, j’implore secours par Ta miséricorde. Améliore toute ma situation et ne me laisse pas livré à moi-même, ne serait-ce que le temps d’un clin d’œil." },
+      { key: "fatir-as-samawat", title: "Créateur des cieux et de la terre", repetitions: 1, arabic: "اللَّهُمَّ فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ", translation: "Ô Allah, Créateur des cieux et de la terre, Connaisseur de l’invisible et du visible, Seigneur et Souverain de toute chose, j’atteste qu’il n’existe aucune divinité digne d’adoration en dehors de Toi. Je cherche refuge auprès de Toi contre le mal de mon âme et contre le mal de Satan et son incitation à l’association." },
+      { key: "bismillah-alladhi", title: "Bismillāh alladhī lā yadurru", repetitions: 3, arabic: "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ، وَهُوَ السَّمِيعُ الْعَلِيمُ", translation: "Au nom d’Allah, dont le Nom protège de tout mal sur la terre comme dans le ciel. Il est Celui qui entend tout et sait tout." },
+      { key: "la-ilaha-illa-allah", title: "Lā ilāha illa Allah", repetitions: 10, arabic: "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ", translation: "Il n’existe aucune divinité digne d’adoration en dehors d’Allah, Seul et sans associé. À Lui appartiennent la royauté et la louange, et Il est capable de toute chose." },
+      { key: "subhanallah-wa-bihamdihi", title: "Subhān Allāhi wa bihamdih", repetitions: 100, arabic: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", translation: "Gloire et louange à Allah." },
+      { key: "kalimat-allah", title: "Les paroles parfaites d’Allah", repetitions: 1, arabic: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ", translation: "Je cherche refuge auprès des paroles parfaites d’Allah contre le mal de ce qu’Il a créé." }
+    ];
+    const makeVideoAdhkar = (period, items) => items.map(item => ({ ...item, id: `${period}-${item.key}`, period }));
+    const VIDEO_ADHKAR_MORNING = [
+      ...makeVideoAdhkar("morning", VIDEO_ADHKAR_COMMON),
+      { id: "morning-raditu-billahi-rabban", title: "Radītu billāhi Rabban", period: "morning", repetitions: 3, arabic: "رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ نَبِيًّا", translation: "J’agrée Allah comme Seigneur, l’islam comme religion et Muhammad comme Prophète." },
+      { id: "morning-allahumma-bika-asbahna", title: "Allāhumma bika asbahnâ", period: "morning", repetitions: 1, arabic: "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ", translation: "Ô Allah, c’est par Toi que nous entrons dans le matin et dans le soir. Par Toi nous vivons, par Toi nous mourons et vers Toi se fera la résurrection." },
+      { id: "morning-nimah", title: "Les bienfaits viennent d’Allah", period: "morning", repetitions: 1, arabic: "اللَّهُمَّ مَا أَصْبَحَ بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ، فَمِنْكَ وَحْدَكَ لَا شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ", translation: "Ô Allah, tout bienfait dont je jouis ce matin, ou dont jouit l’une de Tes créatures, vient de Toi seul, sans associé. À Toi la louange et la reconnaissance." },
+      { id: "morning-fitrah", title: "Sur la nature primordiale de l’islam", period: "morning", repetitions: 1, arabic: "أَصْبَحْنَا عَلَى فِطْرَةِ الْإِسْلَامِ، وَكَلِمَةِ الْإِخْلَاصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ ﷺ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا مُسْلِمًا، وَمَا كَانَ مِنَ الْمُشْرِكِينَ", translation: "Nous voici au matin sur la nature primordiale de l’islam, la parole de sincérité, la religion de notre Prophète Muhammad ﷺ et la voie de notre père Ibrahim, exclusivement soumis à Allah." },
+      { id: "morning-nushhiduka", title: "Ô Allah, nous Te prenons à témoin", period: "morning", repetitions: 1, arabic: "اللَّهُمَّ إِنَّا أَصْبَحْنَا نُشْهِدُكَ، وَنُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلَائِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ، لَا إِلَٰهَ إِلَّا أَنْتَ، وَحْدَكَ لَا شَرِيكَ لَكَ، وَأَنَّ مُحَمَّدًا عَبْدُكَ وَرَسُولُكَ", translation: "Ô Allah, ce matin nous Te prenons à témoin, ainsi que les porteurs de Ton Trône, Tes anges et toute Ta création, que Tu es Allah, Seul et sans associé, et que Muhammad est Ton serviteur et Ton Messager." }
+    ];
+    const VIDEO_ADHKAR_EVENING = makeVideoAdhkar("evening", VIDEO_ADHKAR_COMMON).concat([
+      { id: "evening-al-afiya", title: "Demande de bien-être (Al-‘Afiya)", period: "evening", repetitions: 1, arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي، وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ، وَمِنْ خَلْفِي، وَعَنْ يَمِينِي، وَعَنْ شِمَالِي، وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي", translation: "Ô Allah, je Te demande le bien-être dans ce monde et dans l’au-delà. Je Te demande le pardon et le bien-être dans ma religion, ma vie, ma famille et mes biens. Couvre mes défauts, apaise mes craintes et protège-moi de toutes parts." },
+      { id: "evening-allahumma-bika-amsayna", title: "Allāhumma bika amsaynâ", period: "evening", repetitions: 1, arabic: "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ", translation: "Ô Allah, c’est par Toi que nous entrons dans le soir et dans le matin. Par Toi nous vivons, par Toi nous mourons et vers Toi est le retour." },
+      { id: "evening-amsayna-wa-amsal-mulku", title: "Amsaynā wa amsal-mulku lillāh", period: "evening", repetitions: 1, arabic: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَٰذِهِ اللَّيْلَةِ وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ هَٰذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ", translation: "Nous voici au soir et la royauté appartient à Allah. Louange à Allah. Seigneur, je Te demande le bien de cette nuit et de ce qui vient après, et je cherche refuge auprès de Toi contre son mal, contre la paresse, la mauvaise vieillesse, le châtiment du Feu et le châtiment de la tombe." },
+      { id: "evening-nimah", title: "Les bienfaits viennent d’Allah", period: "evening", repetitions: 1, arabic: "اللَّهُمَّ مَا أَمْسَى بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ، فَمِنْكَ وَحْدَكَ لَا شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ", translation: "Ô Allah, tout bienfait dont je jouis ce soir, ou dont jouit l’une de Tes créatures, vient de Toi seul, sans associé. À Toi la louange et la reconnaissance." },
+      { id: "evening-fitrah", title: "Sur la nature primordiale de l’islam", period: "evening", repetitions: 1, arabic: "أَمْسَيْنَا عَلَى فِطْرَةِ الْإِسْلَامِ، وَكَلِمَةِ الْإِخْلَاصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ ﷺ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا مُسْلِمًا، وَمَا كَانَ مِنَ الْمُشْرِكِينَ", translation: "Nous voici au soir sur la nature primordiale de l’islam, la parole de sincérité, la religion de notre Prophète Muhammad ﷺ et la voie de notre père Ibrahim, exclusivement soumis à Allah." },
+      { id: "evening-nushhiduka", title: "Ô Allah, nous Te prenons à témoin", period: "evening", repetitions: 1, arabic: "اللَّهُمَّ إِنَّا أَمْسَيْنَا نُشْهِدُكَ، وَنُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلَائِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ، لَا إِلَٰهَ إِلَّا أَنْتَ، وَحْدَكَ لَا شَرِيكَ لَكَ، وَأَنَّ مُحَمَّدًا عَبْدُكَ وَرَسُولُكَ", translation: "Ô Allah, ce soir nous Te prenons à témoin, ainsi que les porteurs de Ton Trône, Tes anges et toute Ta création, que Tu es Allah, Seul et sans associé, et que Muhammad est Ton serviteur et Ton Messager." }
+    ]);
+
     const CURATED_ADHKAR = {
       morning: [
         {
@@ -95,9 +148,62 @@ setTimeout(() => {
           arabic: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَٰذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَٰذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ",
           translation: "Nous voilà au matin et la royauté appartient à Allah. Louange à Allah. Il n’y a de divinité digne d’adoration qu’Allah, Seul, sans associé. À Lui la royauté, à Lui la louange et Il est Omnipotent. Seigneur, je Te demande le bien de cette journée et le bien de ce qui vient après. Et je cherche refuge auprès de Toi contre le mal de cette journée et le mal de ce qui vient après.",
           reference: "Rapporté par Muslim (2723)"
-        }
+        },
+        ...VIDEO_ADHKAR_MORNING
       ],
-      evening: []
+      evening: [
+        {
+          id: "evening-ayat-al-kursi",
+          title: "Ayat al-Kursi",
+          period: "evening",
+          repetitions: 1,
+          quranRef: { surah: 2, ayah: 255 },
+          translation: "Allah ! Point de divinité à part Lui, le Vivant, Celui qui subsiste par Lui-même. Ni somnolence ni sommeil ne Le saisissent. À Lui appartient tout ce qui est dans les cieux et sur la terre. Qui peut intercéder auprès de Lui sans Sa permission ? Il connaît leur passé et leur futur. Et de Sa science, ils n’embrassent que ce qu’Il veut. Son Kursiy déborde les cieux et la terre, dont la garde ne Lui coûte aucune peine. Et Il est le Très Haut, le Très Grand.",
+          benefit: "Le Prophète ﷺ a dit : « Celui qui récite Ayat al-Kursi le matin est protégé contre les djinns jusqu’au soir, et celui qui le récite le soir est protégé jusqu’au matin. » Rapporté par al-Hakim et authentifié par al-Albani."
+        },
+        {
+          id: "evening-al-ikhlas",
+          title: "Al-Ikhlas",
+          period: "evening",
+          repetitions: 3,
+          quranRef: { surah: 112, startAyah: 1, endAyah: 4 },
+          benefit: "Récitées trois fois le soir, Al-Ikhlas, Al-Falaq et An-Nas forment une protection complète pour la nuit."
+        },
+        {
+          id: "evening-al-falaq",
+          title: "Al-Falaq",
+          period: "evening",
+          repetitions: 3,
+          quranRef: { surah: 113, startAyah: 1, endAyah: 5 }
+        },
+        {
+          id: "evening-an-nas",
+          title: "An-Nas",
+          period: "evening",
+          repetitions: 3,
+          quranRef: { surah: 114, startAyah: 1, endAyah: 6 }
+        },
+        {
+          id: "evening-sayyid-al-istighfar",
+          title: "Sayyid al-Istighfar",
+          period: "evening",
+          repetitions: 1,
+          arabic: "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
+          translation: "Ô Allah, Tu es mon Seigneur, il n’y a de divinité digne d’adoration que Toi. Tu m’as créé et je suis Ton serviteur. Je suis fidèle à Ton pacte et à Ta promesse autant que je le puis. Je cherche refuge auprès de Toi contre le mal que j’ai commis. Je reconnais devant Toi Tes bienfaits à mon égard et je reconnais mon péché. Pardonne-moi, car nul ne pardonne les péchés si ce n’est Toi.",
+          reference: "Rapporté par al-Bukhari (6306)",
+          benefit: "Le Prophète ﷺ a dit : « Celui qui la récite le soir avec conviction et meurt durant la nuit entrera au Paradis. » Rapporté par al-Bukhari."
+        },
+        {
+          id: "evening-raditu-billahi-rabban",
+          title: "Radītu billāhi Rabban",
+          period: "evening",
+          repetitions: 3,
+          arabic: "رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا",
+          translation: "Je suis satisfait d’Allah comme Seigneur, de l’islam comme religion et de Muhammad ﷺ comme Prophète.",
+          reference: "Sunan Ibn Mājah (3870)"
+        },
+        ...VIDEO_ADHKAR_EVENING
+      ]
     };
     let cards = load(STORAGE_KEY, [])
       .filter(card => !card.type || card.type === "recitation")
@@ -119,6 +225,11 @@ setTimeout(() => {
         translation: item.translation || item.text || "",
         repetitions: Math.max(1, Math.min(100, Number(item.repetitions) || 1))
       }));
+    let vocabularyWords = load(VOCABULARY_KEY, [])
+      .filter(item => VOCABULARY_BANK.some(word => word.id === item.id))
+      .map(item => ({ id: item.id, level: item.level || "new", reviews: Number(item.reviews) || 0 }));
+    let vocabularyReviewQueue = [];
+    let vocabularyReviewIndex = 0;
     let journalShowAll = false;
     let activeFilter = "all";
     let librarySort = "recent";
@@ -170,6 +281,7 @@ setTimeout(() => {
         localStorage.setItem(HIFDH_HISTORY_KEY, JSON.stringify(hifdhHistory));
         localStorage.setItem(JOURNAL_KEY, JSON.stringify(journalEntries));
         localStorage.setItem(ADHKAR_KEY, JSON.stringify(personalAdhkar));
+        localStorage.setItem(VOCABULARY_KEY, JSON.stringify(vocabularyWords));
         return true;
       } catch (_) {
         toast("Stockage plein : supprime un ancien audio ou raccourcis l’enregistrement.");
@@ -269,7 +381,7 @@ setTimeout(() => {
             ? (current === "library" ? "review" : "home")
             : name === "progress"
               ? (["journal", "resources"].includes(current) ? "resources" : "home")
-              : ["journal", "adhkar", "adhkarReader"].includes(name)
+              : ["journal", "adhkar", "adhkarReader", "vocabulary", "vocabularyStudy"].includes(name)
                 ? "resources"
                 : name;
         btn.classList.toggle("active", btn.dataset.screen === activeScreen);
@@ -281,6 +393,7 @@ setTimeout(() => {
         renderSettings();
       }
       if (name === "journal") renderJournal();
+      if (name === "vocabulary") renderVocabulary();
       window.scrollTo(0, 0);
       requestAnimationFrame(() => {
         target.scrollTop = 0;
@@ -474,6 +587,36 @@ setTimeout(() => {
       closeAdhkarPanel();
       document.getElementById("bottomNav").style.display = "none";
       showScreen("adhkarReader");
+      bindAdhkarSwipe();
+      renderAdhkarReading();
+    }
+
+    let adhkarSwipeBound = false;
+    let adhkarSwipeStartX = 0;
+    let adhkarSwipeStartY = 0;
+
+    function bindAdhkarSwipe() {
+      if (adhkarSwipeBound) return;
+      const surface = document.getElementById("adhkarReaderSwipeSurface");
+      surface.addEventListener("pointerdown", (event) => {
+        adhkarSwipeStartX = event.clientX;
+        adhkarSwipeStartY = event.clientY;
+      });
+      surface.addEventListener("pointerup", (event) => {
+        const deltaX = event.clientX - adhkarSwipeStartX;
+        const deltaY = event.clientY - adhkarSwipeStartY;
+        if (Math.abs(deltaX) < 55 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
+        if (deltaX < 0) validateAdhkarRepetition();
+        else showPreviousAdhkar();
+      });
+      adhkarSwipeBound = true;
+    }
+
+    function showPreviousAdhkar() {
+      if (!adhkarReadingSession || adhkarReadingSession.index <= 0) return;
+      adhkarReadingSession.index -= 1;
+      adhkarReadingSession.completed = Math.min(adhkarReadingSession.completed, adhkarReadingSession.index);
+      adhkarReadingSession.repetition = 0;
       renderAdhkarReading();
     }
 
@@ -481,15 +624,8 @@ setTimeout(() => {
       if (!adhkarReadingSession) return;
       const session = adhkarReadingSession;
       const total = session.items.length;
-      const progress = total ? Math.round((session.completed / total) * 100) : 0;
-      const progressElement = document.querySelector("#adhkarReaderScreen .adhkar-reader-progress");
-      document.getElementById("adhkarReaderProgressBar").style.width = `${progress}%`;
-      progressElement?.setAttribute("aria-valuenow", String(progress));
-
       if (session.completed >= total) {
-        document.getElementById("adhkarReaderPosition").textContent = `${total} adhkār sur ${total}`;
-        document.getElementById("adhkarReaderProgressBar").style.width = "100%";
-        progressElement?.setAttribute("aria-valuenow", "100");
+        document.getElementById("adhkarReaderPosition").textContent = `${String(total).padStart(2, "0")} · ${String(total).padStart(2, "0")}`;
         document.getElementById("adhkarReaderActive").hidden = true;
         document.getElementById("adhkarReaderComplete").hidden = false;
         document.getElementById("adhkarReaderAction").hidden = true;
@@ -502,25 +638,30 @@ setTimeout(() => {
       document.getElementById("adhkarReaderActive").hidden = false;
       document.getElementById("adhkarReaderComplete").hidden = true;
       document.getElementById("adhkarReaderAction").hidden = false;
-      document.getElementById("adhkarReaderPosition").textContent = `${session.index + 1} / ${total}`;
-      document.getElementById("adhkarReaderPeriod").textContent = item.period === "evening" ? "أذكار المساء" : "أذكار الصباح";
+      document.getElementById("adhkarReaderPosition").textContent = `${String(session.index + 1).padStart(2, "0")} · ${String(total).padStart(2, "0")}`;
+      document.getElementById("adhkarReaderScreen").classList.toggle("is-evening", item.period === "evening");
       document.getElementById("adhkarReaderTitle").textContent = item.title;
       const targetNode = document.getElementById("adhkarReaderTarget");
-      targetNode.hidden = target <= 1;
-      document.getElementById("adhkarItemProgress").hidden = target <= 1;
-      document.getElementById("adhkarReaderTargetLabel").textContent = `À répéter ${target} fois`;
+      targetNode.hidden = false;
+      document.getElementById("adhkarReaderTargetLabel").textContent = `À réciter ${target} fois`;
       const arabicNode = document.getElementById("adhkarReaderArabic");
-      arabicNode.textContent = item.arabic;
+      arabicNode.replaceChildren();
+      item.arabic.split(/([،,])/).forEach((part) => {
+        if (/[،,]/.test(part) && !item.quranRef) {
+          const punctuation = document.createElement("span");
+          punctuation.className = "adhkar-arabic-punctuation";
+          punctuation.textContent = part;
+          arabicNode.append(punctuation);
+        } else {
+          arabicNode.append(document.createTextNode(part));
+        }
+      });
       arabicNode.classList.toggle("quranic", Boolean(item.quranRef));
       const translationNode = document.getElementById("adhkarReaderTranslation");
-      const translationToggle = document.getElementById("adhkarTranslationToggle");
       const isLong = item.arabic.length > 420 || item.translation.length > 360;
       document.getElementById("adhkarReaderScreen").classList.toggle("is-long-adhkar", isLong);
       translationNode.textContent = item.translation;
-      translationNode.hidden = isLong;
-      translationToggle.hidden = false;
-      document.getElementById("adhkarTranslationLabel").textContent = "Traduction";
-      translationToggle.setAttribute("aria-expanded", "false");
+      document.getElementById("adhkarTranslationPanel").open = false;
       const optionalFields = [
         ["adhkarReaderBenefit", item.benefit, "adhkarReaderBenefitWrap"]
       ];
@@ -533,19 +674,21 @@ setTimeout(() => {
           if ("open" in wrapper) wrapper.open = false;
         }
       });
-      document.getElementById("adhkarReciteLabel").textContent = target > 1
-        ? `J’ai récité · ${session.repetition}/${target}`
-        : "J’ai récité";
-      document.getElementById("adhkarReciteProgress").style.width = `${Math.round((session.repetition / target) * 100)}%`;
+      renderAdhkarReaderDots(total, session.index, target, session.repetition);
     }
 
-    function toggleAdhkarTranslation() {
-      const translation = document.getElementById("adhkarReaderTranslation");
-      const toggle = document.getElementById("adhkarTranslationToggle");
-      const willOpen = translation.hidden;
-      translation.hidden = !willOpen;
-      document.getElementById("adhkarTranslationLabel").textContent = "Traduction";
-      toggle.setAttribute("aria-expanded", String(willOpen));
+    function renderAdhkarReaderDots(total, index, target, repetition) {
+      const visibleCount = Math.min(total, 7);
+      const start = Math.max(0, Math.min(index - 3, total - visibleCount));
+      const entries = Array.from({ length: visibleCount }, (_, offset) => start + offset);
+      const dots = entries.map(value => `<i class="${value === index ? "active" : ""}"></i>`).join("");
+      document.getElementById("adhkarVerticalProgress").innerHTML = dots;
+      document.getElementById("adhkarCarouselDots").innerHTML = dots;
+      const repeat = document.getElementById("adhkarRepetitionDots");
+      repeat.hidden = target <= 1;
+      repeat.innerHTML = target > 1
+        ? Array.from({ length: target }, (_, value) => `<i class="${value < repetition ? "active" : ""}"></i>`).join("")
+        : "";
     }
 
     function validateAdhkarRepetition() {
@@ -582,6 +725,103 @@ setTimeout(() => {
 
     function openResourceSoon(name) {
       toast(`${name} sera disponible prochainement.`);
+    }
+
+    function openVocabulary() {
+      showScreen("vocabulary");
+    }
+
+    function vocabularyRecord(id) {
+      return vocabularyWords.find(item => item.id === id);
+    }
+
+    function renderVocabulary() {
+      const bank = document.getElementById("vocabularyBank");
+      const saved = document.getElementById("vocabularySavedList");
+      if (!bank || !saved) return;
+      bank.innerHTML = VOCABULARY_BANK.map(word => {
+        const added = Boolean(vocabularyRecord(word.id));
+        return `<article class="vocabulary-bank-word">
+          <div><strong lang="ar" dir="rtl">${word.arabic}</strong><small>${word.french}</small></div>
+          <button type="button" class="${added ? "added" : ""}" onclick="toggleVocabularyWord('${word.id}')">${added ? "Ajouté" : "Ajouter"}</button>
+        </article>`;
+      }).join("");
+      const selected = VOCABULARY_BANK.filter(word => vocabularyRecord(word.id));
+      saved.innerHTML = selected.length
+        ? selected.map(word => `<article class="vocabulary-saved-word"><strong lang="ar" dir="rtl">${word.arabic}</strong><span>${word.french}</span><button type="button" aria-label="Retirer ce mot" onclick="toggleVocabularyWord('${word.id}')">×</button></article>`).join("")
+        : `<p class="vocabulary-empty">Ajoute des mots depuis la banque pour commencer leur mémorisation.</p>`;
+      const count = selected.length;
+      const reviewed = vocabularyWords.filter(item => item.reviews > 0).length;
+      const progress = count ? Math.round(reviewed / count * 100) : 0;
+      document.getElementById("vocabularySavedSummary").textContent = count ? `${count} mot${count > 1 ? "s" : ""} à mémoriser` : "Aucun mot ajouté";
+      document.getElementById("vocabularySavedCount").textContent = `${count} ajouté${count > 1 ? "s" : ""}`;
+      document.getElementById("vocabularyProgressValue").textContent = `${progress}%`;
+      const start = document.getElementById("vocabularyStartBtn");
+      if (start) start.disabled = count === 0;
+    }
+
+    function toggleVocabularyWord(id) {
+      const existing = vocabularyRecord(id);
+      vocabularyWords = existing
+        ? vocabularyWords.filter(item => item.id !== id)
+        : [...vocabularyWords, { id, level: "new", reviews: 0 }];
+      persist();
+      renderVocabulary();
+    }
+
+    function startVocabularyReview() {
+      vocabularyReviewQueue = vocabularyWords
+        .map(item => VOCABULARY_BANK.find(word => word.id === item.id))
+        .filter(Boolean);
+      if (!vocabularyReviewQueue.length) return toast("Ajoute d’abord un mot à la révision.");
+      vocabularyReviewIndex = 0;
+      showScreen("vocabularyStudy");
+      renderVocabularyReviewWord();
+    }
+
+    function renderVocabularyReviewWord() {
+      const word = vocabularyReviewQueue[vocabularyReviewIndex];
+      if (!word) return;
+      document.getElementById("vocabularyStudyArabic").textContent = word.arabic;
+      document.getElementById("vocabularyStudyFrench").textContent = word.french;
+      document.getElementById("vocabularyStudyCounter").textContent = `${vocabularyReviewIndex + 1} / ${vocabularyReviewQueue.length}`;
+      document.getElementById("vocabularyStudyProgress").style.width = `${(vocabularyReviewIndex + 1) / vocabularyReviewQueue.length * 100}%`;
+      document.getElementById("vocabularyAnswer")?.setAttribute("hidden", "");
+      document.getElementById("vocabularyRating")?.setAttribute("hidden", "");
+      document.getElementById("vocabularyRevealBtn")?.removeAttribute("hidden");
+      document.getElementById("vocabularyStudyHelp")?.removeAttribute("hidden");
+      document.getElementById("vocabularyHelpText")?.setAttribute("hidden", "");
+    }
+
+    function revealVocabularyAnswer() {
+      document.getElementById("vocabularyAnswer")?.removeAttribute("hidden");
+      document.getElementById("vocabularyRating")?.removeAttribute("hidden");
+      document.getElementById("vocabularyRevealBtn")?.setAttribute("hidden", "");
+      document.getElementById("vocabularyStudyHelp")?.setAttribute("hidden", "");
+    }
+
+    function toggleVocabularyHelp(button) {
+      const help = document.getElementById("vocabularyHelpText");
+      if (!help) return;
+      const opening = help.hasAttribute("hidden");
+      help.toggleAttribute("hidden", !opening);
+      button?.setAttribute("aria-expanded", opening ? "true" : "false");
+    }
+
+    function rateVocabularyWord(level) {
+      const word = vocabularyReviewQueue[vocabularyReviewIndex];
+      if (!word) return;
+      vocabularyWords = vocabularyWords.map(item => item.id === word.id
+        ? { ...item, level, reviews: item.reviews + 1, lastReviewedAt: Date.now() }
+        : item);
+      persist();
+      vocabularyReviewIndex += 1;
+      if (vocabularyReviewIndex >= vocabularyReviewQueue.length) {
+        toast("Révision terminée.");
+        showScreen("vocabulary");
+        return;
+      }
+      renderVocabularyReviewWord();
     }
 
     function setProfileTab(tab = "progress") {
