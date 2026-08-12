@@ -588,12 +588,15 @@ setTimeout(() => {
       document.getElementById("bottomNav").style.display = "none";
       showScreen("adhkarReader");
       bindAdhkarSwipe();
+      bindAdhkarCounter();
       renderAdhkarReading();
     }
 
     let adhkarSwipeBound = false;
     let adhkarSwipeStartX = 0;
     let adhkarSwipeStartY = 0;
+    let adhkarTextSwipeStartX = 0;
+    let adhkarTextSwipeStartY = 0;
 
     function bindAdhkarSwipe() {
       if (adhkarSwipeBound) return;
@@ -606,18 +609,128 @@ setTimeout(() => {
         const deltaX = event.clientX - adhkarSwipeStartX;
         const deltaY = event.clientY - adhkarSwipeStartY;
         if (Math.abs(deltaX) < 55 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
-        if (deltaX < 0) validateAdhkarRepetition();
+        if (deltaX < 0) showNextAdhkar();
         else showPreviousAdhkar();
+      });
+      const textZone = document.getElementById("adhkarReaderArabic");
+      textZone.addEventListener("pointerdown", (event) => {
+        event.stopPropagation();
+        adhkarTextSwipeStartX = event.clientX;
+        adhkarTextSwipeStartY = event.clientY;
+      });
+      textZone.addEventListener("pointerup", (event) => {
+        event.stopPropagation();
+        const deltaX = event.clientX - adhkarTextSwipeStartX;
+        const deltaY = event.clientY - adhkarTextSwipeStartY;
+        if (Math.abs(deltaX) < 45 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
+        showAdhkarLanguage(deltaX > 0);
       });
       adhkarSwipeBound = true;
     }
 
+    function showAdhkarLanguage(showTranslation) {
+      if (!adhkarReadingSession) return;
+      const item = adhkarReadingSession.items[adhkarReadingSession.index];
+      const textZone = document.getElementById("adhkarReaderArabic");
+      textZone.classList.toggle("is-translation", showTranslation);
+      textZone.classList.toggle("quranic", !showTranslation && Boolean(item.quranRef));
+      textZone.lang = showTranslation ? "fr" : "ar";
+      textZone.dir = showTranslation ? "ltr" : "rtl";
+      textZone.replaceChildren();
+      if (showTranslation) {
+        textZone.append(document.createTextNode(item.translation));
+      } else {
+        appendAdhkarArabic(textZone, item);
+      }
+      const handle = document.createElement("span");
+      handle.className = "adhkar-language-handle";
+      handle.setAttribute("aria-hidden", "true");
+      handle.innerHTML = '<svg viewBox="0 0 24 24"><use href="assets/icons/lucide.svg?v=10#lucide-languages"></use></svg>';
+      textZone.append(handle);
+    }
+
+    function appendAdhkarArabic(node, item) {
+      item.arabic.split(/([،,])/).forEach((part) => {
+        if (/[،,]/.test(part) && !item.quranRef) {
+          const punctuation = document.createElement("span");
+          punctuation.className = "adhkar-arabic-punctuation";
+          punctuation.textContent = part;
+          node.append(punctuation);
+        } else {
+          node.append(document.createTextNode(part));
+        }
+      });
+    }
+
     function showPreviousAdhkar() {
       if (!adhkarReadingSession || adhkarReadingSession.index <= 0) return;
-      adhkarReadingSession.index -= 1;
-      adhkarReadingSession.completed = Math.min(adhkarReadingSession.completed, adhkarReadingSession.index);
-      adhkarReadingSession.repetition = 0;
-      renderAdhkarReading();
+      animateAdhkarSwipe("previous", () => {
+        adhkarReadingSession.index -= 1;
+        adhkarReadingSession.completed = Math.min(adhkarReadingSession.completed, adhkarReadingSession.index);
+        adhkarReadingSession.repetition = 0;
+        renderAdhkarReading();
+      });
+    }
+
+    function showNextAdhkar() {
+      if (!adhkarReadingSession) return;
+      animateAdhkarSwipe("next", () => {
+        adhkarReadingSession.index += 1;
+        adhkarReadingSession.completed = adhkarReadingSession.index;
+        adhkarReadingSession.repetition = 0;
+        renderAdhkarReading();
+      });
+    }
+
+    function bindAdhkarCounter() {
+      if (document.getElementById("adhkarTapCounter")) return;
+      const button = document.createElement("button");
+      button.id = "adhkarTapCounter";
+      button.className = "adhkar-tap-counter";
+      button.type = "button";
+      button.addEventListener("click", () => {
+        if (!adhkarReadingSession) return;
+        const item = adhkarReadingSession.items[adhkarReadingSession.index];
+        const target = Math.max(1, Number(item.repetitions) || 1);
+        const reachedTarget = adhkarReadingSession.repetition >= target;
+        adhkarReadingSession.repetition = Math.min(target, adhkarReadingSession.repetition + 1);
+        renderAdhkarCounter(target);
+        button.classList.remove("is-tapped");
+        void button.offsetWidth;
+        button.classList.add("is-tapped");
+        if (!reachedTarget && adhkarReadingSession.repetition >= target) {
+          const completedIndex = adhkarReadingSession.index;
+          setTimeout(() => {
+            if (adhkarReadingSession && adhkarReadingSession.index === completedIndex) showNextAdhkar();
+          }, 260);
+        }
+      });
+      document.getElementById("adhkarReaderScreen").append(button);
+    }
+
+    function renderAdhkarCounter(target) {
+      const button = document.getElementById("adhkarTapCounter");
+      if (!button || !adhkarReadingSession) return;
+      const count = Math.min(target, adhkarReadingSession.repetition || 0);
+      button.hidden = false;
+      button.classList.toggle("is-complete", count >= target);
+      button.setAttribute("aria-label", `Répétition ${count} sur ${target}`);
+      button.innerHTML = `<strong>${count}</strong><span>/${target}</span>`;
+    }
+
+    function animateAdhkarSwipe(direction, update) {
+      const surface = document.getElementById("adhkarReaderSwipeSurface");
+      const active = document.getElementById("adhkarReaderActive");
+      const outgoing = active.cloneNode(true);
+      outgoing.removeAttribute("id");
+      outgoing.querySelectorAll("[id]").forEach(node => node.removeAttribute("id"));
+      outgoing.className = `adhkar-reader-slide-out is-${direction}`;
+      surface.append(outgoing);
+      update();
+      active.classList.remove("is-entering-next", "is-entering-previous");
+      active.classList.add(direction === "next" ? "is-entering-next" : "is-entering-previous");
+      active.addEventListener("animationend", () => active.classList.remove("is-entering-next", "is-entering-previous"), { once: true });
+      outgoing.addEventListener("animationend", () => outgoing.remove(), { once: true });
     }
 
     function renderAdhkarReading() {
@@ -629,12 +742,15 @@ setTimeout(() => {
         document.getElementById("adhkarReaderActive").hidden = true;
         document.getElementById("adhkarReaderComplete").hidden = false;
         document.getElementById("adhkarReaderAction").hidden = true;
+        const counter = document.getElementById("adhkarTapCounter");
+        if (counter) counter.hidden = true;
         document.getElementById("adhkarReaderCompleteText").textContent = `${total} adhkār ${total === 1 ? "lu" : "lus"} · Toutes les répétitions ont été accomplies.`;
         return;
       }
 
       const item = session.items[session.index];
       const target = Math.max(1, Number(item.repetitions) || 1);
+      renderAdhkarCounter(target);
       document.getElementById("adhkarReaderActive").hidden = false;
       document.getElementById("adhkarReaderComplete").hidden = true;
       document.getElementById("adhkarReaderAction").hidden = false;
@@ -642,21 +758,13 @@ setTimeout(() => {
       document.getElementById("adhkarReaderScreen").classList.toggle("is-evening", item.period === "evening");
       document.getElementById("adhkarReaderTitle").textContent = item.title;
       const targetNode = document.getElementById("adhkarReaderTarget");
-      targetNode.hidden = false;
-      document.getElementById("adhkarReaderTargetLabel").textContent = `À réciter ${target} fois`;
+      targetNode.hidden = target <= 1;
+      document.getElementById("adhkarReaderTargetLabel").textContent = `À répéter ${target} fois`;
       const arabicNode = document.getElementById("adhkarReaderArabic");
-      arabicNode.replaceChildren();
-      item.arabic.split(/([،,])/).forEach((part) => {
-        if (/[،,]/.test(part) && !item.quranRef) {
-          const punctuation = document.createElement("span");
-          punctuation.className = "adhkar-arabic-punctuation";
-          punctuation.textContent = part;
-          arabicNode.append(punctuation);
-        } else {
-          arabicNode.append(document.createTextNode(part));
-        }
-      });
-      arabicNode.classList.toggle("quranic", Boolean(item.quranRef));
+      arabicNode.classList.remove("is-translation");
+      arabicNode.lang = "ar";
+      arabicNode.dir = "rtl";
+      showAdhkarLanguage(false);
       const translationNode = document.getElementById("adhkarReaderTranslation");
       const isLong = item.arabic.length > 420 || item.translation.length > 360;
       document.getElementById("adhkarReaderScreen").classList.toggle("is-long-adhkar", isLong);
@@ -674,35 +782,15 @@ setTimeout(() => {
           if ("open" in wrapper) wrapper.open = false;
         }
       });
-      renderAdhkarReaderDots(total, session.index, target, session.repetition);
+      renderAdhkarReaderDots(total, session.index);
     }
 
-    function renderAdhkarReaderDots(total, index, target, repetition) {
+    function renderAdhkarReaderDots(total, index) {
       const visibleCount = Math.min(total, 7);
       const start = Math.max(0, Math.min(index - 3, total - visibleCount));
       const entries = Array.from({ length: visibleCount }, (_, offset) => start + offset);
       const dots = entries.map(value => `<i class="${value === index ? "active" : ""}"></i>`).join("");
       document.getElementById("adhkarVerticalProgress").innerHTML = dots;
-      document.getElementById("adhkarCarouselDots").innerHTML = dots;
-      const repeat = document.getElementById("adhkarRepetitionDots");
-      repeat.hidden = target <= 1;
-      repeat.innerHTML = target > 1
-        ? Array.from({ length: target }, (_, value) => `<i class="${value < repetition ? "active" : ""}"></i>`).join("")
-        : "";
-    }
-
-    function validateAdhkarRepetition() {
-      if (!adhkarReadingSession) return;
-      const session = adhkarReadingSession;
-      const item = session.items[session.index];
-      const target = Math.max(1, Number(item.repetitions) || 1);
-      session.repetition += 1;
-      if (session.repetition >= target) {
-        session.completed += 1;
-        session.index += 1;
-        session.repetition = 0;
-      }
-      renderAdhkarReading();
     }
 
     function closeAdhkarReading() {

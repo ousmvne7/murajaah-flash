@@ -4241,10 +4241,35 @@ textarea:focus-visible {
 }
 
 #adhkarReaderScreen .adhkar-reader-content {
+  position: relative !important;
   flex: 0 0 auto !important;
-  overflow: visible !important;
+  overflow: hidden !important;
   background: inherit !important;
 }
+
+#adhkarReaderScreen .adhkar-carousel-dots,
+#adhkarReaderScreen .adhkar-repetition-dots,
+#adhkarReaderScreen .adhkar-swipe-footer small {
+  display: none !important;
+}
+
+#adhkarReaderScreen .adhkar-reader-slide-out {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 2 !important;
+  background: inherit !important;
+  pointer-events: none !important;
+}
+
+#adhkarReaderScreen .adhkar-reader-slide-out.is-next { animation: adhkar-slide-out-left .32s ease both; }
+#adhkarReaderScreen .adhkar-reader-slide-out.is-previous { animation: adhkar-slide-out-right .32s ease both; }
+#adhkarReaderScreen #adhkarReaderActive.is-entering-next { animation: adhkar-slide-in-right .32s ease both; }
+#adhkarReaderScreen #adhkarReaderActive.is-entering-previous { animation: adhkar-slide-in-left .32s ease both; }
+
+@keyframes adhkar-slide-out-left { to { transform: translateX(-100%); } }
+@keyframes adhkar-slide-out-right { to { transform: translateX(100%); } }
+@keyframes adhkar-slide-in-right { from { transform: translateX(100%); } }
+@keyframes adhkar-slide-in-left { from { transform: translateX(-100%); } }
 
 #adhkarReaderScreen #adhkarReaderAction.adhkar-swipe-footer {
   box-sizing: border-box !important;
@@ -4304,4 +4329,259 @@ textarea:focus-visible {
 #adhkarReaderScreen .adhkar-reader-title-actions {
   min-height: 18px !important;
   margin: 1px 0 2px !important;
+}
+
+/* Adhkar reader: balance short content and preserve long content. */
+#adhkarReaderScreen {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  overflow: hidden !important;
+}
+
+#adhkarReaderScreen .adhkar-reader-content {
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain !important;
+}
+
+#adhkarReaderScreen #adhkarReaderActive {
+  width: 100% !important;
+  min-height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#adhkarReaderScreen .adhkar-reading-card {
+  width: 100% !important;
+  flex: none !important;
+  margin-block: auto !important;
+}
+
+#adhkarReaderScreen.is-long-adhkar #adhkarReaderActive {
+  min-height: 100% !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#adhkarReaderScreen.is-long-adhkar .adhkar-reading-card {
+  gap: 2px !important;
+}
+
+#adhkarReaderScreen.is-long-adhkar .adhkar-reading-title {
+  font-size: clamp(18px, 4.8vw, 22px) !important;
+  line-height: 1.08 !important;
+}
+
+#adhkarReaderScreen.is-long-adhkar .adhkar-reader-title-actions {
+  margin: 0 !important;
+}
+
+#adhkarReaderScreen.is-long-adhkar .adhkar-reading-arabic,
+#adhkarReaderScreen.is-long-adhkar .adhkar-reading-arabic.quranic {
+  font-size: clamp(25px, 7vw, 31px) !important;
+  line-height: 1.62 !important;
+}
+
+#adhkarReaderScreen.is-long-adhkar .adhkar-ornament-divider {
+  margin-block: 5px 6px !important;
+}
+
+/* Adhkar reader: language swipe on the text only. */
+#adhkarReaderScreen #adhkarTranslationPanel {
+  display: none !important;
+}
+
+#adhkarReaderScreen .adhkar-reading-arabic {
+  position: relative !important;
+  width: 100% !important;
+  padding-inline: 28px !important;
+  touch-action: pan-y !important;
+  transition: opacity .18s ease, transform .18s ease !important;
+}
+
+#adhkarReaderScreen .adhkar-reading-arabic.is-translation {
+  color: #52655e !important;
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: clamp(17px, 4.8vw, 21px) !important;
+  line-height: 1.72 !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+}
+
+#adhkarReaderScreen .adhkar-language-handle {
+  position: absolute !important;
+  top: 50% !important;
+  right: 0 !important;
+  width: 14px !important;
+  height: 34px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  transform: translateY(-50%) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+#adhkarReaderScreen .adhkar-language-handle svg {
+  display: none !important;
+}
+
+#adhkarReaderScreen .adhkar-language-handle::before,
+#adhkarReaderScreen .adhkar-language-handle::after {
+  content: "" !important;
+  width: 6px !important;
+  height: 6px !important;
+  flex: none !important;
+  border-radius: 50% !important;
+  background: #d2dad6 !important;
+  transition: transform .18s ease, background .18s ease !important;
+}
+
+#adhkarReaderScreen .adhkar-language-handle::before,
+#adhkarReaderScreen .adhkar-reading-arabic.is-translation .adhkar-language-handle::after {
+  transform: scale(1.25) !important;
+  background: #176149 !important;
+}
+
+#adhkarReaderScreen .adhkar-reading-arabic.is-translation .adhkar-language-handle::before {
+  transform: scale(1) !important;
+  background: #d2dad6 !important;
+}
+
+#adhkarReaderScreen .adhkar-reading-card {
+  gap: 10px !important;
+}
+
+#adhkarReaderScreen .adhkar-reading-title {
+  line-height: 1.15 !important;
+}
+
+#adhkarReaderScreen .adhkar-reader-title-actions {
+  margin: 4px 0 8px !important;
+}
+
+#adhkarReaderScreen .adhkar-reading-arabic,
+#adhkarReaderScreen .adhkar-reading-arabic.quranic {
+  line-height: 1.78 !important;
+}
+
+#adhkarReaderScreen.is-long-adhkar .adhkar-reading-card {
+  gap: 6px !important;
+}
+
+#adhkarReaderScreen.is-long-adhkar .adhkar-reader-title-actions {
+  margin: 2px 0 5px !important;
+}
+
+/* Adhkar reader: compact repetition counter. */
+#adhkarReaderScreen .adhkar-reader-content {
+  padding-bottom: max(94px, calc(env(safe-area-inset-bottom) + 82px)) !important;
+}
+
+#adhkarReaderScreen .adhkar-tap-counter {
+  position: fixed !important;
+  z-index: 24 !important;
+  left: 50% !important;
+  bottom: max(18px, env(safe-area-inset-bottom)) !important;
+  width: 52px !important;
+  height: 52px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 1px !important;
+  border: 1px solid rgba(10, 90, 67, .16) !important;
+  border-radius: 50% !important;
+  transform: translateX(-50%) !important;
+  color: #0a5a43 !important;
+  background: #f5faf7 !important;
+  box-shadow: 0 6px 18px rgba(24, 68, 53, .1), inset 0 0 0 3px rgba(255, 255, 255, .72) !important;
+  font: inherit !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+#adhkarReaderScreen .adhkar-tap-counter[hidden] {
+  display: none !important;
+}
+
+#adhkarReaderScreen .adhkar-tap-counter strong {
+  display: block !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+}
+
+#adhkarReaderScreen .adhkar-tap-counter span {
+  display: block !important;
+  margin: 0 !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+  opacity: 1 !important;
+}
+
+#adhkarReaderScreen .adhkar-tap-counter.is-tapped {
+  animation: adhkar-counter-tap .22s ease !important;
+}
+
+#adhkarReaderScreen .adhkar-tap-counter.is-complete {
+  color: #fff !important;
+  background: #0a5a43 !important;
+  box-shadow: 0 6px 18px rgba(10, 90, 67, .18), inset 0 0 0 3px rgba(255, 255, 255, .1) !important;
+}
+
+@keyframes adhkar-counter-tap {
+  50% { transform: translateX(-50%) scale(.9); }
+}
+
+/* PWA update notice. */
+.pwa-update-notice {
+  position: fixed;
+  z-index: 1000;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  width: min(calc(100% - 32px), 390px);
+  min-height: 54px;
+  padding: 8px 9px 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(10, 90, 67, .14);
+  border-radius: 16px;
+  color: #17362c;
+  background: rgba(250, 253, 251, .97);
+  box-shadow: 0 12px 32px rgba(20, 59, 45, .16);
+  backdrop-filter: blur(14px);
+}
+
+.pwa-update-notice span {
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 750;
+}
+
+.pwa-update-notice button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 11px;
+  color: #fff;
+  background: #0a5a43;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pwa-update-notice.is-updating {
+  opacity: .72;
 }

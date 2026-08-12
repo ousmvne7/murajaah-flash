@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "murajaah-flash";
-const CACHE_VERSION = "v160-adhkar-punctuation-title";
+const CACHE_VERSION = "v161-pwa-update";
 const APP_CACHE = `${CACHE_PREFIX}-app-${CACHE_VERSION}`;
 const MUSHAF_CACHE = `${CACHE_PREFIX}-mushaf-${CACHE_VERSION}`;
 
@@ -16,8 +16,8 @@ const APP_SHELL = [
   "./css/review-intro.css?v=5",
   "./css/typography.css?v=5",
   "./css/visual-audit.css?v=6",
-  "./css/design-system.css?v=85",
-  "./js/pwa.js",
+  "./css/design-system.css?v=93",
+  "./js/pwa.js?v=2",
   "./js/icon-system.js?v=31",
   "./js/app.js?v=vocabulary-clean-2",
   "./assets/icons/lucide.svg?v=10",
@@ -40,8 +40,11 @@ self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(APP_CACHE)
       .then(cache => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
   );
+});
+
+self.addEventListener("message", event => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
