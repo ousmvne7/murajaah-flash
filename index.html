@@ -848,10 +848,14 @@
       </header>
 
       <div class="hifdh-body" id="hifdhSetup">
+        <section class="hifdh-setup-intro">
+          <span>Session personnalisée</span>
+          <h2>Teste ta mémorisation</h2>
+          <p>Choisis une plage et avance à ton rythme.</p>
+        </section>
+
         <section class="hifdh-panel hifdh-setup-primary hifdh-step-card">
-          <div class="hifdh-setup-heading">
-            <h2>Choisis ton hizb</h2>
-          </div>
+          <div class="hifdh-setup-heading"><h2>Plage du test</h2></div>
           <button type="button" class="hifdh-select-card" onclick="toggleHifdhHizbPicker()">
             <span class="hifdh-select-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2h5a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H3Z"/><path d="M21 18a1 1 0 0 0 1-1V5a2 2 0 0 0-2-2h-5a3 3 0 0 0-3 3v15a3 3 0 0 1 3-3h6Z"/></svg>
@@ -886,7 +890,8 @@
 
         <section class="hifdh-panel hifdh-step-card hifdh-question-step">
           <div class="hifdh-settings-title">
-            <h2>Nombre de questions</h2>
+            <h2>Durée de la session</h2>
+            <small>Choisis le nombre de questions</small>
           </div>
           <div class="hifdh-counts" role="radiogroup" aria-label="Nombre de questions">
             <button type="button" data-hifdh-count="5" onclick="selectHifdhQuestionCount(5)">5 questions</button>
@@ -896,19 +901,15 @@
         </section>
 
         <section class="hifdh-setup-summary" aria-label="Résumé du test">
-          <h2>Récapitulatif</h2>
           <div>
-            <span class="hifdh-summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
             <strong id="hifdhSummaryHizb">Hizb 1</strong>
             <small id="hifdhSummaryRange">Pages 1 - 10</small>
           </div>
           <div>
-            <span class="hifdh-summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
             <strong id="hifdhSummaryCount">10 questions</strong>
             <small>Sélectionné</small>
           </div>
           <div>
-            <span class="hifdh-summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"></svg></span>
             <strong id="hifdhEstimate">~10 min</strong>
             <small>Durée estimée</small>
           </div>
@@ -923,24 +924,20 @@
 
       <div class="hifdh-body hifdh-test-body" id="hifdhQuestion" hidden>
         <div class="hifdh-question-scroll">
-          <section class="hifdh-question-context" aria-label="Référence du verset">
-            <div class="question-reference-main">
-              <span class="question-reference-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><use href="assets/icons/lucide.svg#lucide-book-open"></use></svg>
-              </span>
-              <span class="question-reference-copy">
-                <small id="hifdhQuestionSurah">AL-BAQARA</small>
-                <strong id="hifdhQuestionReference">Page 1 – V1</strong>
-              </span>
-            </div>
-            <button type="button" class="translation-toggle question-reference-translation" id="hifdhTranslationToggle" aria-pressed="false" onclick="toggleHifdhTranslation()">
-              <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
-              <span>Traduction</span>
-            </button>
-          </section>
-
           <article class="hifdh-verse-card">
             <div class="verse-surface hifdh-verse-surface single">
+              <section class="hifdh-question-context" aria-label="Référence du verset">
+                <div class="question-reference-main">
+                  <span class="question-reference-copy">
+                    <small id="hifdhQuestionSurah">AL-BAQARA</small>
+                    <strong id="hifdhQuestionReference">Page 1 – V1</strong>
+                  </span>
+                </div>
+                <button type="button" class="translation-toggle question-reference-translation" id="hifdhTranslationToggle" aria-pressed="false" onclick="toggleHifdhTranslation()">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"></svg>
+                  <span>Traduction</span>
+                </button>
+              </section>
               <div class="review-verse-item mushaf-line active hifdh-start-line">
                 <div class="arabic" id="hifdhStartVerse" dir="rtl"></div>
               </div>

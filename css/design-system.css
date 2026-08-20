@@ -630,7 +630,7 @@ body,
 #adhkarReaderScreen #adhkarReaderTarget i:last-child { transform: scaleX(-1) !important; }
 #adhkarReaderScreen .adhkar-reading-arabic {
   margin: 0 auto !important; padding: 0 !important; color: #10241d !important;
-  font-size: clamp(29px, 8vw, 38px) !important; line-height: 1.72 !important;
+  font-size: clamp(31.9px, 8.8vw, 41.8px) !important; line-height: 1.72 !important;
   text-align: center !important; background: transparent !important; border: 0 !important;
 }
 #adhkarReaderScreen .adhkar-ornament-divider {
@@ -681,7 +681,7 @@ body,
 }
 @media (max-width: 390px) {
   #adhkarReaderScreen .adhkar-reader-content { padding-inline: 6% !important; }
-  #adhkarReaderScreen .adhkar-reading-arabic { font-size: clamp(27px, 8vw, 34px) !important; line-height: 1.7 !important; }
+  #adhkarReaderScreen .adhkar-reading-arabic { font-size: clamp(29.7px, 8.8vw, 37.4px) !important; line-height: 1.7 !important; }
 }
 
 #hifdhScreen .hifdh-header-mark {
@@ -4355,6 +4355,10 @@ textarea:focus-visible {
   justify-content: center !important;
 }
 
+#adhkarReaderScreen #adhkarReaderActive[hidden] {
+  display: none !important;
+}
+
 #adhkarReaderScreen .adhkar-reading-card {
   width: 100% !important;
   flex: none !important;
@@ -4382,7 +4386,7 @@ textarea:focus-visible {
 
 #adhkarReaderScreen.is-long-adhkar .adhkar-reading-arabic,
 #adhkarReaderScreen.is-long-adhkar .adhkar-reading-arabic.quranic {
-  font-size: clamp(25px, 7vw, 31px) !important;
+  font-size: clamp(27.5px, 7.7vw, 34.1px) !important;
   line-height: 1.62 !important;
 }
 
@@ -4398,7 +4402,7 @@ textarea:focus-visible {
 #adhkarReaderScreen .adhkar-reading-arabic {
   position: relative !important;
   width: 100% !important;
-  padding-inline: 28px !important;
+  padding-inline: 6px !important;
   touch-action: pan-y !important;
   transition: opacity .18s ease, transform .18s ease !important;
 }
